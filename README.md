@@ -169,3 +169,11 @@ Falls Port 8000 auf dem Rechner belegt ist: `docker run -p 8001:8000 fittrack` u
 - Leere Datenliste: 0.0, 0.0, `null`, 0.
 
 Rechnet die Erwartungswerte für das Fixture selbst aus, bevor ihr die KI nach Code fragt. Sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt.
+
+## Für Dozierende
+
+- `docs/dozent/prompt-skript.md`: alle Prompts in Schrittreihenfolge mit Prüfpunkten und Befehlen
+- `docs/dozent/erwartungswerte.md`: Handrechnung für das Fixture
+- `docs/dozent/render-deploy.md` und `docs/dozent/lmstudio-demo.md`
+- `docs/kurs/`: das Kurskonzept
+- Branch `starter` ist der Ausgangsstand für Studierende. Jeder Schritt ist ein Tag: `sprint-0`, `us-3`, `us-1`, `us-2`, `us-4`, `us-5`, `us-6`, `docker`, `render`, `ci`. Anzeigen mit `git checkout <tag>`, zurück mit `git checkout main`.
