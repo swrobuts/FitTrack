@@ -703,14 +703,14 @@ nicht neu erzeugt wird.
 
 | Befund im Erstentwurf | Warum das täuscht | Zweitentwurf |
 |---|---|---|
-| Ring geschlossen, „161 % vom Ziel“ | Ein Kreis zeigt einen Anteil an einem Ganzen. Eine Woche ist kein Ganzes, sie hat ein Ziel, das man verfehlt oder übertrifft. Ab 100 % ist der Ring voll und stumm, die Zahl hat keine Einheit. | Bullet-Graph: Balken für 64,4 km, Marke bei 40 km, Skala bis 80 km. Die Übererfüllung liegt sichtbar rechts der Marke. Daneben „24,4 km über dem Ziel“, Badge „Ziel erreicht“, „3 Wochen in Folge“ |
+| Ring geschlossen, „161 % vom Ziel“ | Ein Kreis zeigt einen Anteil an einem Ganzen. Eine Woche ist kein Ganzes, sie hat ein Ziel, das man verfehlt oder übertrifft. Ab 100 % ist der Ring voll und sagt nichts mehr, die Zahl hat keine Einheit. | Bullet-Graph: Balken für 64,4 km, Marke bei 40 km, Skala bis 80 km. Die Übererfüllung liegt sichtbar rechts der Marke. Daneben „24,4 km über dem Ziel“, Badge „Ziel erreicht“, „3 Wochen in Folge“ |
 | „Kalenderwoche 36“ als Fortschritt, obwohl die Woche vorbei ist | Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis. | Titel „Letzte Trainingswoche“ mit Datumsspanne; nur bei Daten in der laufenden Woche „Diese Woche, Stand Do“ mit Badge „Auf Kurs“ oder „Im Rückstand“ gegen das anteilige Ziel |
 | Wochenziel 40 km ohne Bezug | 2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, muss aber dastehen. | „Ziel 40 km über alle Sportarten“, der Balken im Bullet-Graph ist nach Sportart gefärbt, darunter die Kilometer je Sportart |
 | Balken ohne x-Achse, Tooltip nur mit Maus | Welcher Balken ist welche Woche? Raten. Auf dem Handy gibt es keinen Hover. | Achse „Kalenderwoche“, Ziellinie, Farbe sagt „Ziel erreicht“ oder „unter dem Ziel“, Tippen irgendwo in der Spalte zeigt die Woche mit einem Balken je Sportart unter dem Diagramm |
 | Gestapelte Säulen, „Alles“ mit 105 Balken | Stapel sind auf 375 px nicht ablesbar: Teilbalken haben keine gemeinsame Nulllinie. 105 Balken sind unlesbar. | Ein Balken je Woche, die Sportarten im Detail darunter; ab einem Jahr Monatssummen |
 | Kürzel „8 W / 6 M / 1 J“, „Sc / Wa / Ra“ | Versteht niemand ohne Einweisung. | Ausgeschrieben, Symbole je Sportart |
 | „Einheiten“ zweimal, einmal je Woche, einmal gesamt | Gleiches Wort, andere Bedeutung. | „Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Beste Woche, KW 37/2025“ |
-| Schrift 12 px, keine `aria-pressed`, nur dunkel | Auf dem Handy in der Sonne unlesbar, für Screenreader stumm. | Mindestens 13 px, `aria-pressed`, sprechende `aria-label`, Tabelle für Screenreader, helles Thema |
+| Schrift 12 px, keine `aria-pressed`, nur dunkel | Auf dem Handy in der Sonne unlesbar, für Screenreader nicht lesbar. | Mindestens 13 px, `aria-pressed`, sprechende `aria-label`, Tabelle für Screenreader, helles Thema |
 
 **Was der Zweitentwurf zusätzlich bringt,** weil das Review danach gefragt hat, nicht die KI:
 
