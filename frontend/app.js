@@ -4,7 +4,8 @@
 // Jede Funktion macht genau eine Sache und heißt nach dem, was sie anzeigt.
 
 const SPORTARTEN = ["Laufen", "Radfahren", "Schwimmen", "Wandern"];
-const LISTEN_START = 10;     // so viele Aktivitäten stehen beim Laden in der Liste
+const LISTEN_START = 10;     // so viele Aktivitäten stehen beim Laden in der Liste (Handy)
+const LISTEN_START_BREIT = 6; // auf dem Desktop weniger, damit die Liste neben den Sportarten endet
 const LISTEN_SCHRITT = 20;   // so viele kommen pro Klick dazu
 const WOCHENZIEL_KM = 40;    // Wochenziel über alle Sportarten; die einzige Zahl, die nicht aus der API kommt
 const KALENDER_WOCHEN = 8;   // so viele Wochen zeigt der Trainingskalender
@@ -623,6 +624,7 @@ function zeigeSportarten(workouts) {
     if (eigene.length === 0) return;
     const km = eigene.reduce((summe, w) => summe + w.distanz_km, 0);
     const anteil = (km / gesamt) * 100;
+    const letzte = eigene[0];   // Liste ist absteigend sortiert: erste eigene = jüngste
     const kachel = document.createElement("button");
     kachel.type = "button";
     kachel.className = "tippbar";
@@ -631,7 +633,8 @@ function zeigeSportarten(workouts) {
       <span class="sport-kopf">${sportSymbol(sportart)}${sportart}</span>
       <span class="sport-km">${formatZahl(km, 0)}<small>km</small></span>
       <span class="anteil" aria-hidden="true"><span style="width:${anteil}%"></span></span>
-      <span class="sport-meta">${formatZahl(anteil, 0)} % · ${eigene.length} Einheiten</span>`;
+      <span class="sport-meta">${formatZahl(anteil, 0)} % · ${eigene.length} Einheiten</span>
+      <span class="sport-meta">Ø ${formatZahl(km / eigene.length)} km je Einheit · zuletzt ${formatDatum(letzte.datum)}</span>`;
     kachel.addEventListener("click", () => sheetSportart(sportart));
     bereich.appendChild(kachel);
   });
@@ -693,7 +696,7 @@ function zeigeAktivitaeten(workouts) {
     knopfMehr.hidden = knopfAlle.hidden = true;
     return;
   }
-  zeigeWeitere(LISTEN_START);
+  zeigeWeitere(matchMedia("(min-width: 768px)").matches ? LISTEN_START_BREIT : LISTEN_START);
   // Alte Klick-Handler ersetzen, damit ein Filterwechsel keine doppelten Einträge erzeugt
   knopfMehr.onclick = () => zeigeWeitere(LISTEN_SCHRITT);
   knopfAlle.onclick = () => zeigeWeitere(workouts.length);
