@@ -152,6 +152,10 @@ Prüfen: <http://localhost:8000/health> antwortet mit `{"status": "ok"}`. Auf de
 
 Falls Port 8000 auf dem Rechner belegt ist: `docker run -p 8001:8000 fittrack` und dann Port 8001 im Browser nutzen.
 
+## Deploy auf Render.com
+
+`render.yaml` beschreibt den Web Service. Render baut das Dockerfile aus dem GitHub-Repo und stellt die App unter einer öffentlichen HTTPS-Adresse bereit. Einrichtung: bei Render anmelden, `New → Blueprint`, Repo verbinden, `Apply`. Jeder Push auf `main` löst einen neuen Deploy aus.
+
 ## Wie die Kennzahlen definiert sind
 
 - `gesamt_km`: Summe aller `distanz_km`, gerundet auf 1 Nachkommastelle.

@@ -1,0 +1,9 @@
+# Render.com Blueprint: beschreibt den Web Service, den Render aus diesem Repo baut.
+# Anleitung: docs/dozent/render-deploy.md
+services:
+  - type: web
+    name: fittrack
+    runtime: docker          # Render baut das Dockerfile im Repo
+    plan: free               # schläft nach 15 Minuten ohne Zugriff ein, erster Aufruf dauert dann ca. 1 Minute
+    healthCheckPath: /health # Render fragt diesen Pfad, um zu prüfen, ob die App läuft
+    autoDeploy: true         # jeder Push auf main löst einen neuen Deploy aus
