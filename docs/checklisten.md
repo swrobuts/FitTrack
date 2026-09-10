@@ -25,7 +25,7 @@ Ein Vorschlag, der gut aussieht, ist noch nicht richtig. Der Erstentwurf des Fit
 - [ ] **Nachrechnen:** Kann ich die Zahl aus den Rohdaten (Datenbank, API-Antwort) selbst herleiten? Stichprobe machen.
 - [ ] **Zustände:** Was bedeutet das Element bei 0 %, bei 100 %, bei mehr als 100 %? Was zeigt es, wenn es „voll“ ist? Ist die Aussage dann noch wahr?
 - [ ] **Form passt zur Aussage:** Ein Kreis zeigt Anteile an einem Ganzen. Ein Ziel braucht eine Marke am Balken (Bullet-Graph), damit Verfehlen und Übertreffen sichtbar bleiben. Verläufe als ein Balken je Zeitabschnitt; keine Stapel auf 375 px.
-- [ ] **Zeitbezug:** Ist der Zeitraum abgeschlossen oder laufend? Ein Fortschrittsbalken für eine vergangene Woche ist ein Ergebnis, kein Fortschritt.
+- [ ] **Zeitbezug:** Ist der Zeitraum abgeschlossen oder laufend? Ein Fortschrittsbalken für eine vergangene Woche ist ein Ergebnis, kein Fortschritt. Steht an jeder Karte, worauf sich ihre Zahlen beziehen (seit wann, welche Wochen, mit Jahr)? Eine Kalenderwoche ohne Jahr ist kein Zeitbezug.
 - [ ] **Achsen und Legende:** Hat jede Achse Titel und Einheit? Ist jede Farbe erklärt? Weiß ich, welcher Balken welche Woche ist?
 - [ ] **Gleiche Wörter, gleiche Bedeutung:** Kommt ein Begriff zweimal vor („Einheiten“), meint er beide Male dasselbe? Sonst Bezug ergänzen.
 - [ ] **Abkürzungen:** Versteht jemand ohne Einweisung „8 W“, „Sc“, „Ø“? Ausschreiben oder erklären.

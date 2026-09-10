@@ -113,6 +113,13 @@ function wochenSpanne(eintrag) {
   return `KW ${kalenderwoche(eintrag)}, ${formatKurz(eintrag.wochenstart)} bis ${formatDatum(tageSpaeter(eintrag.wochenstart, 6))}`;
 }
 
+function seitText(wochen) {
+  // Beginn des Datensatzes als "seit Sep 2024", aus der ersten Kalenderwoche
+  if (!wochen.length) return "";
+  const d = alsDatum(wochen[0].wochenstart);
+  return `seit ${MONATE[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 function nachKilometern(jeSportart) {
   // {Laufen: 5, Radfahren: 30} -> [["Radfahren", 30], ["Laufen", 5]]
   return Object.entries(jeSportart).sort((a, b) => b[1] - a[1]);
@@ -220,7 +227,7 @@ function sheetSportart(sportart) {
   const laengste = eigene.reduce((a, b) => (b.distanz_km > a.distanz_km ? b : a), eigene[0]);
   const gesamt = alleWorkouts.reduce((summe, w) => summe + w.distanz_km, 0) || 1;
   const gefiltert = aktiverFilter === sportart;
-  oeffneSheet(sportart, `${formatZahl((km / gesamt) * 100, 0)} % aller Kilometer`,
+  oeffneSheet(sportart, `${formatZahl((km / gesamt) * 100, 0)} % aller Kilometer ${seitText(alleWochen)}`,
     htmlZahlen([["Kilometer", formatZahl(km, 0)], ["Einheiten", String(eigene.length)], ["Ø je Einheit", `${formatZahl(km / eigene.length)}<small>km</small>`]]) +
     `<p class="sheet-text">Längste Einheit <strong>${formatZahl(laengste.distanz_km)} km</strong> am ${formatDatum(laengste.datum)} · ${formatZahl(min / 60, 0)} Stunden insgesamt</p>` +
     `<button type="button" class="knopf knopf-voll" id="sheet-filter">${gefiltert ? "Filter aufheben" : `Nur ${sportart} in der Liste zeigen`}</button>`);
@@ -243,7 +250,8 @@ function sheetKennzahl(name) {
       `<p class="sheet-text">Summe aller Kilometer aus <strong>${stats.anzahl} Einheiten</strong>, gerundet auf eine Nachkommastelle: ${formatZahl(stats.gesamt_km)} km.</p>` +
       "<h3>Je Sportart</h3>" + htmlSportBalken(jeSportart));
   } else if (name === "woche") {
-    oeffneSheet(`Ø ${formatZahl(stats.durchschnitt_km_pro_woche)} km pro Woche`, `${alleWochen.length} Kalenderwochen`,
+    oeffneSheet(`Ø ${formatZahl(stats.durchschnitt_km_pro_woche)} km pro Woche`,
+      `${alleWochen.length} Kalenderwochen, ${formatDatum(alleWochen[0].wochenstart)} bis ${formatDatum(tageSpaeter(alleWochen[alleWochen.length - 1].wochenstart, 6))}`,
       `<p class="sheet-text"><strong>${formatZahl(stats.gesamt_km)} km</strong> geteilt durch <strong>${alleWochen.length} Kalenderwochen</strong> von der Woche des ersten bis zur Woche des letzten Trainings, Wochen ohne Training zählen mit. Das Wochenziel liegt bei ${WOCHENZIEL_KM} km.</p>` +
       htmlZahlen([["Ziel erreicht", `${alleWochen.filter((w) => w.distanz_km >= WOCHENZIEL_KM).length}<small>Wochen</small>`], ["Unter dem Ziel", `${alleWochen.filter((w) => w.distanz_km < WOCHENZIEL_KM && w.anzahl > 0).length}<small>Wochen</small>`], ["Ohne Training", `${alleWochen.filter((w) => w.anzahl === 0).length}<small>Wochen</small>`]]));
   } else if (name === "beste") {
@@ -288,7 +296,7 @@ function zeigeKennzahlen(stats, wochen) {
   document.getElementById("stat-gesamt-sub").textContent = `in ${stats.anzahl} Einheiten`;
   document.getElementById("stat-woche").textContent = formatZahl(stats.durchschnitt_km_pro_woche);
   const erreicht = wochen.filter((w) => w.distanz_km >= WOCHENZIEL_KM).length;
-  document.getElementById("stat-woche-sub").textContent = `Ziel in ${erreicht} von ${wochen.length} Wochen`;
+  document.getElementById("stat-woche-sub").textContent = `${wochen.length} Wochen ${seitText(wochen)}, Ziel in ${erreicht}`;
   document.getElementById("stat-anzahl").textContent = formatZahl(stats.anzahl, 0);
   document.getElementById("stat-anzahl-sub").textContent = wochen.length
     ? `Ø ${formatZahl(stats.anzahl / wochen.length)} je Woche` : "";
@@ -453,6 +461,24 @@ function nachMonaten(wochen) {
   return [...monate.values()];
 }
 
+function zeitraumText(auswahl) {
+  // "KW 29 bis 36, 13.07. bis 06.09.2026" oder "Sep 2024 bis Aug 2026"; das Jahr steht immer dabei
+  if (!auswahl.length) return "";
+  const erster = auswahl[0];
+  const letzter = auswahl[auswahl.length - 1];
+  if (aktuellerModus === "monate") {
+    const a = alsDatum(erster.wochenstart);
+    const b = alsDatum(letzter.wochenstart);
+    return `${MONATE[a.getMonth()]} ${a.getFullYear()} bis ${MONATE[b.getMonth()]} ${b.getFullYear()}`;
+  }
+  const jahrA = erster.kw.slice(0, 4);
+  const jahrB = letzter.kw.slice(0, 4);
+  const kwText = jahrA === jahrB
+    ? `KW ${kalenderwoche(erster)} bis ${kalenderwoche(letzter)}`
+    : `KW ${kalenderwoche(erster)}/${jahrA} bis KW ${kalenderwoche(letzter)}/${jahrB}`;
+  return `${kwText}, ${formatKurz(erster.wochenstart)} bis ${formatDatum(tageSpaeter(letzter.wochenstart, 6))}`;
+}
+
 function beschriftung(eintrag) {
   // Achsenbeschriftung: Nummer der Kalenderwoche oder Monat mit Jahr
   if (aktuellerModus === "monate") {
@@ -507,6 +533,7 @@ function zeigeDiagramm(wochen, anzahlWochen) {
 
   document.getElementById("verlauf-titel").textContent =
     aktuellerModus === "monate" ? "Kilometer pro Monat" : "Kilometer pro Woche";
+  document.getElementById("verlauf-untertitel").textContent = zeitraumText(auswahl);
   document.getElementById("legende-ziel").hidden = aktuellerModus === "monate";
 
   if (wochenChart) {
@@ -625,6 +652,8 @@ function zeigeSportarten(workouts) {
   // Eine Kachel je Sportart: Kilometer, Anteil, Einheiten; Tippen öffnet die Sportart
   const bereich = document.getElementById("sport-kacheln");
   bereich.innerHTML = "";
+  document.getElementById("sportarten-untertitel").textContent =
+    `Alle ${workouts.length} Einheiten ${seitText(alleWochen)}`;
   const gesamt = workouts.reduce((summe, w) => summe + w.distanz_km, 0) || 1;
   SPORTARTEN.forEach((sportart) => {
     const eigene = workouts.filter((w) => w.sportart === sportart);
