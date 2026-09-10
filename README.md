@@ -214,6 +214,7 @@ Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: elf Labs ent
 ## Für Dozierende
 
 - `docs/dozent/prompt-skript.md`: alle Prompts in Schrittreihenfolge mit Prüfpunkten und Befehlen
+- `docs/dozent/anleitung.html`: dieselben Inhalte als klickbare Anleitung zum lokalen Öffnen, mit Abhaken je Schritt und Kopierknopf an jedem Prompt und Befehl; erzeugt aus den Markdown-Dateien mit `scripts/baue_anleitung.py`
 - `docs/dozent/erwartungswerte.md`: Handrechnung für das Fixture
 - `docs/dozent/tests.md`: alle 15 Tests, ihr Aufbau, Ausführung und typische Fehlerbilder
 - `docs/dozent/render-deploy.md` und `docs/dozent/lmstudio-demo.md`

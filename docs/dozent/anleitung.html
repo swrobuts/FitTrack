@@ -1,0 +1,1475 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FitTrack · Dozentenanleitung</title>
+<style>
+  :root { --bordeaux: #7A1E32; --gold: #E0B15A; --tinte: #1F171A; --grau: #5c5458; --linie: #e3dcdc; --hell: #faf6f6; --sand: #f6efe2; --gruen: #2e7d4f; --blau: #1f4e79; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.5 "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--tinte); background: #fff; }
+  .rahmen { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100vh; }
+  nav { position: sticky; top: 0; height: 100vh; overflow: auto; background: var(--hell); border-right: 1px solid var(--linie); padding: 20px 16px; }
+  nav .marke { font-weight: 800; color: var(--bordeaux); font-size: 18px; margin-bottom: 4px; }
+  nav .fortschritt { font-size: 13px; color: var(--grau); margin-bottom: 12px; }
+  nav .balken { height: 6px; background: var(--linie); border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+  nav .balken span { display: block; height: 100%; background: var(--bordeaux); width: 0; transition: width .3s; }
+  nav ul { list-style: none; margin: 0; padding: 0; }
+  nav .nav-kapitel { margin-bottom: 12px; }
+  nav .nav-kapitel > a { font-weight: 700; color: var(--bordeaux); text-decoration: none; display: block; padding: 4px 0; }
+  nav .nav-kapitel ul { margin-left: 4px; border-left: 2px solid var(--linie); }
+  nav .nav-kapitel ul a { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; color: var(--tinte); text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+  nav .nav-kapitel ul a:hover { background: #fff; }
+  nav .nav-kapitel ul a.aktiv { background: #fff; box-shadow: inset 0 0 0 1px var(--linie); }
+  .haken { flex: 0 0 14px; width: 14px; height: 14px; border: 1.5px solid var(--grau); border-radius: 4px; margin-top: 4px; }
+  a.fertig .haken { background: var(--gruen); border-color: var(--gruen); }
+  a.fertig { color: var(--grau); text-decoration: line-through; }
+  nav .werkzeuge { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+  nav .werkzeuge button { font: inherit; font-size: 12.5px; border: 1px solid var(--linie); background: #fff; border-radius: 6px; padding: 5px 8px; cursor: pointer; }
+  main { padding: 28px 48px 80px; max-width: 980px; }
+  .kapitel { margin-bottom: 56px; }
+  .kapitel > h1 { color: var(--bordeaux); font-size: 30px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .kapitel-kurz { color: var(--grau); margin: 0 0 24px; font-size: 15px; }
+  .schritt { border: 1px solid var(--linie); border-radius: 12px; margin: 18px 0; overflow: hidden; }
+  .schritt-kopf { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--hell); border-bottom: 1px solid var(--linie); }
+  .schritt-kopf h2 { margin: 0; font-size: 19px; }
+  .schritt.fertig .schritt-kopf { background: #eef6f0; }
+  .schritt.fertig .schritt-kopf h2 { color: var(--grau); }
+  .erledigt { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--grau); white-space: nowrap; cursor: pointer; }
+  .erledigt input { width: 18px; height: 18px; accent-color: var(--gruen); }
+  .schritt-inhalt { padding: 6px 20px 20px; }
+  .schritt-inhalt h3 { font-size: 16px; margin: 20px 0 6px; }
+  p.label { margin: 14px 0 6px; }
+  p.label-handlung strong { display: inline-block; background: var(--bordeaux); color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 13px; margin-right: 6px; }
+  p.label-info strong { display: inline-block; background: var(--sand); color: var(--tinte); padding: 2px 8px; border-radius: 5px; font-size: 13px; margin-right: 6px; }
+  .block { border: 1px solid var(--linie); border-radius: 10px; margin: 10px 0 16px; overflow: hidden; }
+  .block-kopf { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; font-size: 12.5px; font-weight: 700; letter-spacing: .02em; }
+  .block-prompt .block-kopf { background: var(--bordeaux); color: #fff; }
+  .block-terminal .block-kopf { background: var(--tinte); color: #fff; }
+  .block-datei .block-kopf { background: var(--blau); color: #fff; }
+  .block-text .block-kopf { background: var(--sand); color: var(--tinte); }
+  .block pre { margin: 0; padding: 12px 14px; overflow: auto; font: 13px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: #fff; white-space: pre; }
+  .block-prompt pre { background: #fdf7f8; white-space: pre-wrap; }
+  .kopieren { font: inherit; font-size: 12px; border: 1px solid rgba(255,255,255,.5); background: transparent; color: inherit; border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+  .block-text .kopieren { border-color: var(--grau); }
+  .kopieren.ok { background: var(--gruen); border-color: var(--gruen); color: #fff; }
+  code { font: 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--sand); padding: 1px 5px; border-radius: 4px; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 10px 0 16px; }
+  th, td { border: 1px solid var(--linie); padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--hell); }
+  blockquote { margin: 12px 0; padding: 8px 14px; border-left: 4px solid var(--gold); background: var(--sand); }
+  ul.checkliste, .schritt-inhalt ul { padding-left: 22px; }
+  .schritt-inhalt li { margin: 4px 0; }
+  .hinweis-oben { background: var(--sand); border-radius: 10px; padding: 14px 18px; margin: 0 0 28px; font-size: 15px; }
+  .hinweis-oben b { color: var(--bordeaux); }
+  @media (max-width: 900px) { .rahmen { grid-template-columns: 1fr; } nav { position: static; height: auto; } main { padding: 20px; } }
+  @media print { nav { display: none; } .rahmen { display: block; } .kopieren, .erledigt { display: none; } .schritt { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="rahmen">
+<nav>
+  <div class="marke">FitTrack · Dozentenanleitung</div>
+  <div class="fortschritt"><span id="zaehler">0 von 0</span> Schritten erledigt</div>
+  <div class="balken"><span id="balken"></span></div>
+  <ul><li class="nav-kapitel"><a href="#vorbereitung">Vorbereitung</a><ul><li><a href="#vorbereitung-1-installation-pr-fen-vor-dem-ersten-termin" data-schritt="vorbereitung-1-installation-pr-fen-vor-dem-ersten-termin"><span class="haken"></span>1. Installation prüfen (vor dem ersten Termin)</a></li><li><a href="#vorbereitung-2-python-plugin-in-webstorm" data-schritt="vorbereitung-2-python-plugin-in-webstorm"><span class="haken"></span>2. Python-Plugin in WebStorm</a></li><li><a href="#vorbereitung-3-projekt-ffnen-und-interpreter-setzen" data-schritt="vorbereitung-3-projekt-ffnen-und-interpreter-setzen"><span class="haken"></span>3. Projekt öffnen und Interpreter setzen</a></li><li><a href="#vorbereitung-4-tests-laufen-lassen" data-schritt="vorbereitung-4-tests-laufen-lassen"><span class="haken"></span>4. Tests laufen lassen</a></li><li><a href="#vorbereitung-5-app-starten" data-schritt="vorbereitung-5-app-starten"><span class="haken"></span>5. App starten</a></li><li><a href="#vorbereitung-6-code-aus-dem-chat-bernehmen" data-schritt="vorbereitung-6-code-aus-dem-chat-bernehmen"><span class="haken"></span>6. Code aus dem Chat übernehmen</a></li><li><a href="#vorbereitung-7-committen-in-webstorm" data-schritt="vorbereitung-7-committen-in-webstorm"><span class="haken"></span>7. Committen in WebStorm</a></li><li><a href="#vorbereitung-8-handy-test-im-wlan" data-schritt="vorbereitung-8-handy-test-im-wlan"><span class="haken"></span>8. Handy-Test im WLAN</a></li><li><a href="#vorbereitung-9-docker-aus-webstorm-heraus-statt-terminal" data-schritt="vorbereitung-9-docker-aus-webstorm-heraus-statt-terminal"><span class="haken"></span>9. Docker aus WebStorm heraus (statt Terminal)</a></li></ul></li><li class="nav-kapitel"><a href="#ablauf">Der Bauweg</a><ul><li><a href="#ablauf-so-l-uft-jeder-schritt-ab" data-schritt="ablauf-so-l-uft-jeder-schritt-ab"><span class="haken"></span>So läuft jeder Schritt ab</a></li><li><a href="#ablauf-so-testen-sie-konkret" data-schritt="ablauf-so-testen-sie-konkret"><span class="haken"></span>So testen Sie konkret</a></li><li><a href="#ablauf-schritt-0-starter-termin-1-ab-0-10" data-schritt="ablauf-schritt-0-starter-termin-1-ab-0-10"><span class="haken"></span>Schritt 0: Starter (Termin 1, ab 0:10)</a></li><li><a href="#ablauf-schritt-1-us-3-health-endpunkt-termin-1-ab-0-55" data-schritt="ablauf-schritt-1-us-3-health-endpunkt-termin-1-ab-0-55"><span class="haken"></span>Schritt 1: US-3 Health-Endpunkt (Termin 1, ab 0:55)</a></li><li><a href="#ablauf-schritt-2-us-1-liste-der-trainingseinheiten-termin" data-schritt="ablauf-schritt-2-us-1-liste-der-trainingseinheiten-termin"><span class="haken"></span>Schritt 2: US-1 Liste der Trainingseinheiten (Termin 1, ab 1:05)</a></li><li><a href="#ablauf-schritt-3-us-2-kennzahlen-termin-1-ab-1-20" data-schritt="ablauf-schritt-3-us-2-kennzahlen-termin-1-ab-1-20"><span class="haken"></span>Schritt 3: US-2 Kennzahlen (Termin 1, ab 1:20)</a></li><li><a href="#ablauf-schritt-4-us-4-mobile-first-ger-st-termin-2-ab-0-0" data-schritt="ablauf-schritt-4-us-4-mobile-first-ger-st-termin-2-ab-0-0"><span class="haken"></span>Schritt 4: US-4 Mobile-first Gerüst (Termin 2, ab 0:05)</a></li><li><a href="#ablauf-schritt-5-us-5-kennzahlen-und-liste-per-fetch-term" data-schritt="ablauf-schritt-5-us-5-kennzahlen-und-liste-per-fetch-term"><span class="haken"></span>Schritt 5: US-5 Kennzahlen und Liste per fetch (Termin 2, ab 0:25)</a></li><li><a href="#ablauf-schritt-6-us-6-wochenverlauf-termin-2-ab-0-40" data-schritt="ablauf-schritt-6-us-6-wochenverlauf-termin-2-ab-0-40"><span class="haken"></span>Schritt 6: US-6 Wochenverlauf (Termin 2, ab 0:40)</a></li><li><a href="#ablauf-schritt-6b-us-7-sch-n-aber-falsch-termin-2-ab-1-00" data-schritt="ablauf-schritt-6b-us-7-sch-n-aber-falsch-termin-2-ab-1-00"><span class="haken"></span>Schritt 6b: US-7 Schön, aber falsch (Termin 2, ab 1:00)</a></li><li><a href="#ablauf-schritt-7-docker-termin-2-ab-1-10" data-schritt="ablauf-schritt-7-docker-termin-2-ab-1-10"><span class="haken"></span>Schritt 7: Docker (Termin 2, ab 1:10)</a></li><li><a href="#ablauf-schritt-8-render-com-termin-2-ab-1-25" data-schritt="ablauf-schritt-8-render-com-termin-2-ab-1-25"><span class="haken"></span>Schritt 8: Render.com (Termin 2, ab 1:25)</a></li><li><a href="#ablauf-schritt-9-github-actions-optional" data-schritt="ablauf-schritt-9-github-actions-optional"><span class="haken"></span>Schritt 9: GitHub Actions (optional)</a></li><li><a href="#ablauf-exkurs-lm-studio-termin-2-ab-1-35" data-schritt="ablauf-exkurs-lm-studio-termin-2-ab-1-35"><span class="haken"></span>Exkurs LM Studio (Termin 2, ab 1:35)</a></li><li><a href="#ablauf-anhang-wenn-etwas-schiefgeht" data-schritt="ablauf-anhang-wenn-etwas-schiefgeht"><span class="haken"></span>Anhang: Wenn etwas schiefgeht</a></li></ul></li><li class="nav-kapitel"><a href="#tests">Die Tests</a><ul><li><a href="#tests-ausf-hren" data-schritt="tests-ausf-hren"><span class="haken"></span>Ausführen</a></li><li><a href="#tests-aufbau" data-schritt="tests-aufbau"><span class="haken"></span>Aufbau</a></li><li><a href="#tests-das-fixture" data-schritt="tests-das-fixture"><span class="haken"></span>Das Fixture</a></li><li><a href="#tests-die-15-tests" data-schritt="tests-die-15-tests"><span class="haken"></span>Die 15 Tests</a></li><li><a href="#tests-was-die-tests-nicht-pr-fen" data-schritt="tests-was-die-tests-nicht-pr-fen"><span class="haken"></span>Was die Tests nicht prüfen</a></li><li><a href="#tests-tests-ndern" data-schritt="tests-tests-ndern"><span class="haken"></span>Tests ändern</a></li><li><a href="#tests-h-ufige-fehlerbilder" data-schritt="tests-h-ufige-fehlerbilder"><span class="haken"></span>Häufige Fehlerbilder</a></li></ul></li><li class="nav-kapitel"><a href="#checklisten">Checklisten</a><ul><li><a href="#checklisten-definition-of-done-pro-user-story" data-schritt="checklisten-definition-of-done-pro-user-story"><span class="haken"></span>Definition of Done (pro User Story)</a></li><li><a href="#checklisten-review-checkliste-f-r-bernommenen-ki-code-qa-rolle" data-schritt="checklisten-review-checkliste-f-r-bernommenen-ki-code-qa-rolle"><span class="haken"></span>Review-Checkliste für übernommenen KI-Code (QA-Rolle)</a></li><li><a href="#checklisten-semantik-review-sch-n-aber-falsch-vor-jeder-abnahm" data-schritt="checklisten-semantik-review-sch-n-aber-falsch-vor-jeder-abnahm"><span class="haken"></span>Semantik-Review: Schön, aber falsch (vor jeder Abnahme einer Oberfläche)</a></li><li><a href="#checklisten-prompt-regeln" data-schritt="checklisten-prompt-regeln"><span class="haken"></span>Prompt-Regeln</a></li><li><a href="#checklisten-end-abnahme-termin-2-wird-abgezeichnet" data-schritt="checklisten-end-abnahme-termin-2-wird-abgezeichnet"><span class="haken"></span>End-Abnahme (Termin 2, wird abgezeichnet)</a></li></ul></li><li class="nav-kapitel"><a href="#render">Deploy auf Render</a><ul><li><a href="#render-stand" data-schritt="render-stand"><span class="haken"></span>Stand</a></li><li><a href="#render-einmalige-einrichtung-ca-10-minuten" data-schritt="render-einmalige-einrichtung-ca-10-minuten"><span class="haken"></span>Einmalige Einrichtung (ca. 10 Minuten)</a></li><li><a href="#render-was-dabei-passiert" data-schritt="render-was-dabei-passiert"><span class="haken"></span>Was dabei passiert</a></li><li><a href="#render-hinweise-f-r-die-veranstaltung" data-schritt="render-hinweise-f-r-die-veranstaltung"><span class="haken"></span>Hinweise für die Veranstaltung</a></li><li><a href="#render-deploy-in-termin-2-zeigen-schritt-8-im-prompt-skri" data-schritt="render-deploy-in-termin-2-zeigen-schritt-8-im-prompt-skri"><span class="haken"></span>Deploy in Termin 2 zeigen (Schritt 8 im Prompt-Skript)</a></li></ul></li><li class="nav-kapitel"><a href="#lmstudio">Exkurs LM Studio</a><ul><li><a href="#lmstudio-vorbereitung-vor-der-veranstaltung" data-schritt="lmstudio-vorbereitung-vor-der-veranstaltung"><span class="haken"></span>Vorbereitung (vor der Veranstaltung)</a></li><li><a href="#lmstudio-ablauf" data-schritt="lmstudio-ablauf"><span class="haken"></span>Ablauf</a></li><li><a href="#lmstudio-typische-beobachtungen" data-schritt="lmstudio-typische-beobachtungen"><span class="haken"></span>Typische Beobachtungen</a></li><li><a href="#lmstudio-anbindung-an-webstorm-ausblick-2-minuten" data-schritt="lmstudio-anbindung-an-webstorm-ausblick-2-minuten"><span class="haken"></span>Anbindung an WebStorm (Ausblick, 2 Minuten)</a></li></ul></li></ul>
+  <div class="werkzeuge">
+    <button type="button" id="alle-zu">Erledigte einklappen</button>
+    <button type="button" id="alle-auf">Alle ausklappen</button>
+    <button type="button" id="zuruecksetzen">Haken zurücksetzen</button>
+  </div>
+</nav>
+<main>
+  <div class="hinweis-oben">
+    <b>So arbeiten Sie mit dieser Anleitung.</b> Jeder Schritt hat dieselbe Form: kurze Beschreibung, dann die Handlung
+    (rote Marke), dann Test, Prompt oder Befehl zum Kopieren. Prompts gehen in das Chat-Fenster, Befehle in das Terminal von
+    WebStorm, Dateien werden in WebStorm angelegt. Der Chat sieht Ihr Repository nicht, deshalb steht alles Nötige im Prompt.
+    Abgehakte Schritte merkt sich der Browser auf diesem Rechner.
+  </div>
+  <article class="kapitel" id="vorbereitung"><h1>Vorbereitung</h1><p class="kapitel-kurz">Vor dem ersten Termin: Werkzeuge installieren, Projekt in WebStorm öffnen, Tests und App einmal starten.</p><p>WebStorm ist eigentlich eine JavaScript-IDE. Mit dem Python-Plugin von JetBrains bearbeitet sie auch den FastAPI-Teil. Wer PyCharm hat, kann alle Schritte dort identisch ausführen.</p>
+<section class="schritt" id="vorbereitung-1-installation-pr-fen-vor-dem-ersten-termin"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-1-installation-pr-fen-vor-dem-ersten-termin"> <span>erledigt</span></label><h2>1. Installation prüfen (vor dem ersten Termin)</h2></header><div class="schritt-inhalt">
+<table>
+<thead>
+<tr>
+<th>Werkzeug</th>
+<th>Test im Terminal</th>
+<th>Erwartung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python 3.12</td>
+<td><code>python3 --version</code></td>
+<td><code>Python 3.12.x</code></td>
+</tr>
+<tr>
+<td>Git</td>
+<td><code>git --version</code></td>
+<td>eine Versionsnummer</td>
+</tr>
+<tr>
+<td>Docker Desktop</td>
+<td><code>docker run hello-world</code></td>
+<td>Text „Hello from Docker!“</td>
+</tr>
+<tr>
+<td>WebStorm</td>
+<td>App öffnen</td>
+<td>Startbildschirm</td>
+</tr>
+</tbody>
+</table>
+<p>Git einmalig konfigurieren:</p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>git config --global user.name &quot;Vorname Nachname&quot;
+git config --global user.email &quot;mail@example.com&quot;
+</code></pre></div>
+</div></section><section class="schritt" id="vorbereitung-2-python-plugin-in-webstorm"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-2-python-plugin-in-webstorm"> <span>erledigt</span></label><h2>2. Python-Plugin in WebStorm</h2></header><div class="schritt-inhalt">
+<ol>
+<li>WebStorm öffnen, <code>Settings</code> (macOS: <code>⌘,</code>, Windows: <code>Ctrl+Alt+S</code>).</li>
+<li><code>Plugins</code> → <code>Marketplace</code> → nach „Python“ suchen → das Plugin von JetBrains installieren.</li>
+<li>WebStorm neu starten.</li>
+</ol>
+</div></section><section class="schritt" id="vorbereitung-3-projekt-ffnen-und-interpreter-setzen"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-3-projekt-ffnen-und-interpreter-setzen"> <span>erledigt</span></label><h2>3. Projekt öffnen und Interpreter setzen</h2></header><div class="schritt-inhalt">
+<ol>
+<li><code>File → Open…</code> → den Ordner <code>FitTrack</code> wählen.</li>
+<li>Terminal in WebStorm öffnen (<code>View → Tool Windows → Terminal</code>) und ausführen:</li>
+</ol>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+</code></pre></div>
+<ol start="3">
+<li><code>Settings → Languages &amp; Frameworks → Python → Python Interpreter</code> → <code>Add Interpreter → Existing</code> → <code>.venv/bin/python</code> im Projektordner wählen.</li>
+</ol>
+<p>Danach zeigt WebStorm rote Unterstreichungen bei Importfehlern und bietet Autovervollständigung für FastAPI.</p>
+</div></section><section class="schritt" id="vorbereitung-4-tests-laufen-lassen"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-4-tests-laufen-lassen"> <span>erledigt</span></label><h2>4. Tests laufen lassen</h2></header><div class="schritt-inhalt">
+<p>Im Terminal:</p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>pytest
+</code></pre></div>
+<p>Oder in WebStorm: Rechtsklick auf <code>backend/tests/test_api.py</code> → <code>Run 'pytest in test_api.py'</code>. Danach erscheint oben rechts eine Run-Konfiguration, die sich mit dem grünen Pfeil wiederholen lässt.</p>
+</div></section><section class="schritt" id="vorbereitung-5-app-starten"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-5-app-starten"> <span>erledigt</span></label><h2>5. App starten</h2></header><div class="schritt-inhalt">
+<p>Im Terminal:</p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+</code></pre></div>
+<p><code>--reload</code> startet den Server automatisch neu, sobald eine Datei gespeichert wird. Im Browser: <a href="http://localhost:8000">http://localhost:8000</a>. API-Dokumentation: <a href="http://localhost:8000/docs">http://localhost:8000/docs</a>.</p>
+</div></section><section class="schritt" id="vorbereitung-6-code-aus-dem-chat-bernehmen"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-6-code-aus-dem-chat-bernehmen"> <span>erledigt</span></label><h2>6. Code aus dem Chat übernehmen</h2></header><div class="schritt-inhalt">
+<ol>
+<li>Im Chat auf „Kopieren“ am Codeblock klicken.</li>
+<li>In WebStorm die Zieldatei öffnen oder anlegen (Rechtsklick auf Ordner → <code>New → File</code>).</li>
+<li>Einfügen, dann <code>⌘⌥L</code> (Windows: <code>Ctrl+Alt+L</code>) für automatische Formatierung.</li>
+<li>Speichern. Tests laufen lassen. Erst dann committen.</li>
+</ol>
+</div></section><section class="schritt" id="vorbereitung-7-committen-in-webstorm"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-7-committen-in-webstorm"> <span>erledigt</span></label><h2>7. Committen in WebStorm</h2></header><div class="schritt-inhalt">
+<p><code>Git → Commit…</code> (oder <code>⌘K</code> / <code>Ctrl+K</code>). Geänderte Dateien anhaken, Commit-Message mit Story-Bezug schreiben, z. B. <code>feat(US-1): Workouts-Endpunkt</code>. Dann <code>Commit and Push</code>.</p>
+</div></section><section class="schritt" id="vorbereitung-8-handy-test-im-wlan"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-8-handy-test-im-wlan"> <span>erledigt</span></label><h2>8. Handy-Test im WLAN</h2></header><div class="schritt-inhalt">
+<ol>
+<li>IP-Adresse des Rechners herausfinden: macOS <code>ipconfig getifaddr en0</code>, Windows <code>ipconfig</code>.</li>
+<li>Server mit <code>--host 0.0.0.0</code> starten (siehe oben).</li>
+<li>Auf dem Smartphone im selben WLAN <code>http://&lt;IP&gt;:8000</code> öffnen.</li>
+</ol>
+<p>Wenn das Handy nicht zugreifen kann: Firewall des Rechners prüfen, oder Hotspot vom Handy nutzen und den Rechner damit verbinden.</p>
+</div></section><section class="schritt" id="vorbereitung-9-docker-aus-webstorm-heraus-statt-terminal"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="vorbereitung-9-docker-aus-webstorm-heraus-statt-terminal"> <span>erledigt</span></label><h2>9. Docker aus WebStorm heraus (statt Terminal)</h2></header><div class="schritt-inhalt">
+<p>Das Docker-Plugin ist in WebStorm enthalten. Damit lassen sich Image bauen und Container starten per Klick. Docker Desktop muss dafür laufen.</p>
+<h3>Einmalig: Docker-Verbindung anlegen</h3>
+<p>Ohne diesen Schritt erscheint beim Klick auf den grünen Pfeil die Meldung <code>Error running 'docker-compose.yml': Server is not specified</code>.</p>
+<ol>
+<li><code>Settings → Build, Execution, Deployment → Docker</code>.</li>
+<li>Auf <code>+</code> klicken, <code>Docker for Mac</code> (Windows: <code>Docker for Windows</code>) wählen.</li>
+<li>Unten muss <code>Connection successful</code> erscheinen. <code>OK</code>.</li>
+</ol>
+<p>Falls die Verbindung fehlschlägt: In Docker Desktop unter <code>Settings → Advanced</code> den Punkt <code>Allow the default Docker socket to be used</code> aktivieren und Docker Desktop neu starten.</p>
+<h3>Container starten</h3>
+<ul>
+<li>In <code>docker-compose.yml</code> steht links neben <code>services:</code> ein grüner Doppelpfeil. Ein Klick baut das Image und startet den Container. Beim ersten Mal fragt WebStorm nach dem Docker-Server: die eben angelegte Verbindung wählen.</li>
+<li>Alternativ in der <code>Dockerfile</code> neben <code>FROM</code> auf den Pfeil klicken → <code>Run on Docker</code>. Das baut das Image und startet einen Container ohne Port-Zuordnung. Diese ergänzt man in der Run-Konfiguration unter <code>Bind ports</code>: <code>8000</code> auf dem Rechner → <code>8000</code> im Container.</li>
+</ul>
+<p>Unten öffnet sich das Fenster <code>Services</code>. Dort stehen Logs, ein Stop-Knopf und unter <code>Ports</code> ein Link, der die App im Browser öffnet.</p>
+<h3>Port 8000 belegt</h3>
+<p>Meldung: <code>Bind for 0.0.0.0:8000 failed: port is already allocated</code>. Dann belegt ein anderes Programm oder ein anderer Container den Port. Zwei Wege:</p>
+<ul>
+<li>Eine Datei <code>.env</code> im Projektordner anlegen mit dem Inhalt <code>FITTRACK_PORT=8001</code>. Docker Compose liest sie automatisch, auch beim Klick in WebStorm. Die Datei ist per <code>.gitignore</code> ausgeschlossen und bleibt auf dem eigenen Rechner.</li>
+<li>Oder in der Run-Konfiguration der <code>docker-compose.yml</code> (Dropdown oben rechts → <code>Edit Configurations…</code>) unter <code>Environment variables</code> den Eintrag <code>FITTRACK_PORT=8001</code> setzen.</li>
+</ul>
+<p>Danach ist die App unter <a href="http://localhost:8001">http://localhost:8001</a> erreichbar.</p>
+<h3>Was Docker Desktop selbst kann</h3>
+<p>Docker Desktop zeigt unter <code>Containers</code> und <code>Images</code> alles an, was WebStorm oder das Terminal gebaut haben: starten, stoppen, Logs lesen, Port-Link öffnen. Ein Image aus einem Dockerfile bauen kann Docker Desktop nicht. Dafür braucht es WebStorm oder das Terminal.</p>
+<p>Für den Kurs gilt: Die drei Befehle <code>docker build</code>, <code>docker run</code> und <code>docker ps</code> im Terminal sind Lernziel. WebStorm und Docker Desktop sind die Bequemlichkeit obendrauf.</p></div></section></article><article class="kapitel" id="ablauf"><h1>Der Bauweg</h1><p class="kapitel-kurz">Termin 1 und 2 in Schritten. Jeder Schritt: kurz beschrieben, dann die Handlung, dann Test, Prompt und Befehle zum Kopieren.</p><p>Dieses Skript führt in 10 Schritten durch die Entwicklung der App. Jeder Schritt entspricht einem Git-Tag der Referenzlösung, sodass sich jeder Stand vorzeigen lässt:</p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>git checkout us-2        # Stand nach Schritt 3 anzeigen
+git checkout main        # zurück zum fertigen Stand
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Schritt</th>
+<th>Tag</th>
+<th>Termin</th>
+<th>Zeit</th>
+<th>Inhalt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>sprint-0</code></td>
+<td>1</td>
+<td>0:10</td>
+<td>Starter klonen, Setup, roter Test</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>us-3</code></td>
+<td>1</td>
+<td>0:55</td>
+<td><code>/health</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>us-1</code></td>
+<td>1</td>
+<td>1:05</td>
+<td><code>/api/workouts</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>us-2</code></td>
+<td>1</td>
+<td>1:20</td>
+<td><code>/api/stats</code> mit Handrechnung</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>us-4</code></td>
+<td>2</td>
+<td>0:05</td>
+<td>Frontend-Gerüst, mobile-first</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>us-5</code></td>
+<td>2</td>
+<td>0:25</td>
+<td>Kennzahlen und Liste per fetch</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>us-6</code></td>
+<td>2</td>
+<td>0:40</td>
+<td>Wochenverlauf, Ring, Diagramm</td>
+</tr>
+<tr>
+<td>6b</td>
+<td><code>us-7</code></td>
+<td>2</td>
+<td>1:00</td>
+<td>Semantik-Review: Bullet-Graph, Kalender, Kacheln</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>docker</code></td>
+<td>2</td>
+<td>1:10</td>
+<td>Dockerfile, Build, Handy-Test</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>render</code></td>
+<td>2</td>
+<td>1:25</td>
+<td>Deploy auf Render.com</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>ci</code></td>
+<td>optional</td>
+<td></td>
+<td>GitHub Actions</td>
+</tr>
+</tbody>
+</table>
+<section class="schritt" id="ablauf-so-l-uft-jeder-schritt-ab"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-so-l-uft-jeder-schritt-ab"> <span>erledigt</span></label><h2>So läuft jeder Schritt ab</h2></header><div class="schritt-inhalt">
+<div class="block block-text"><div class="block-kopf"><span>Ablauf</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>1. Story und Akzeptanzkriterium lesen          (PO)
+2. Test schreiben, pytest laufen lassen: ROT    (QA)
+3. Prompt in den Chat kopieren                  (Dev)
+4. Antwort LESEN, Prüfpunkte abhaken            (alle)
+5. Code in WebStorm übernehmen                  (Dev)
+6. pytest laufen lassen: GRÜN                   (QA)
+   rot? -&gt; Fehlermeldung wörtlich in den Chat zurück
+7. Commit mit Story-Bezug, Push                 (Dev)
+</code></pre></div>
+<p>Die Prompts sind in sich geschlossen. Der Chat sieht das Repo nicht, deshalb steht der nötige Kontext jedes Mal im Prompt. Die Antworten von Claude oder einem lokalen Modell weichen von der Referenzlösung ab. Das ist in Ordnung: Maßstab sind die Tests und das Akzeptanzkriterium, nicht die Übereinstimmung mit der Referenz.</p>
+<p>Konventionen, die in jedem Prompt stehen: deutsche Feldnamen, deutsche Bezeichner und Kommentare, nur die Pakete aus <code>requirements.txt</code>, Erklärung in drei Sätzen.</p>
+</div></section><section class="schritt" id="ablauf-so-testen-sie-konkret"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-so-testen-sie-konkret"> <span>erledigt</span></label><h2>So testen Sie konkret</h2></header><div class="schritt-inhalt">
+<p>Ein Test ist eine kleine Python-Funktion, die die App aufruft und das Ergebnis mit einem Wert vergleicht, den die Gruppe vorher selbst kennt. Ausgeführt wird sie mit einem Befehl im Terminal, nie im Chat. Der Chat bekommt den Test nur als Text mitgeliefert. Am Beispiel der Kennzahl „Gesamtkilometer“ (US-2):</p>
+<p><strong>1. Erwartungswert von Hand rechnen.</strong> Die Testdaten sind acht Einheiten in <code>backend/tests/fixtures/workouts_klein.sql</code>. Kilometer addieren: 5,0 + 20,0 + 8,0 + 1,5 + 30,0 + 9,0 + 10,0 + 4,0 = 87,5. Das ist die Zahl, die die App liefern muss. Lösung für den Dozenten in <code>erwartungswerte.md</code>.</p>
+<p><strong>2. Den Test in die Datei schreiben.</strong> In WebStorm <code>backend/tests/test_api.py</code> öffnen und ergänzen:</p>
+<div class="block block-datei"><div class="block-kopf"><span>Python-Datei</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>def test_stats_gesamt_km():
+    stats = client.get(&quot;/api/stats&quot;).json()
+    assert stats[&quot;gesamt_km&quot;] == 87.5
+</code></pre></div>
+<p>Zeile 1 benennt den Test (Name beginnt mit <code>test_</code>, sonst findet pytest ihn nicht). Zeile 2 ruft die App auf wie ein Browser. Zeile 3 behauptet: Das Feld <code>gesamt_km</code> ist 87,5. Stimmt das nicht, schlägt der Test fehl.</p>
+<p><strong>3. Tests laufen lassen.</strong> Im Terminal von WebStorm, im Projektordner:</p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>pytest
+</code></pre></div>
+<p>pytest sucht alle Funktionen, die mit <code>test_</code> beginnen, führt sie aus und meldet je Test PASSED oder FAILED. Solange der Endpunkt fehlt, sieht das so aus:</p>
+<div class="block block-text"><div class="block-kopf"><span>Ausgabe im Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>FAILED backend/tests/test_api.py::test_stats_gesamt_km - ... 404
+1 failed in 0.16s
+</code></pre></div>
+<p>Rot ist hier richtig. Es beweist, dass der Test etwas prüft, was noch fehlt. Ein Test, der von Anfang an grün ist, hat nichts belegt.</p>
+<p><strong>4. Prompt in den Chat.</strong> Der Chat führt nichts aus und sieht das Repository nicht. Deshalb steht der Test wörtlich im Prompt, als Auftrag: „Der Code muss diesen Test bestehen: …“. Die Antwort lesen, Prüfpunkte abhaken, Code in <code>statistik.py</code> und <code>main.py</code> übernehmen.</p>
+<p><strong>5. Wieder <code>pytest</code>.</strong> Entweder grün:</p>
+<div class="block block-text"><div class="block-kopf"><span>Ausgabe im Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>15 passed in 0.16s
+</code></pre></div>
+<p>oder rot mit genauer Angabe. Ein Lauf mit falschem Ergebnis sieht so aus:</p>
+<div class="block block-text"><div class="block-kopf"><span>Ausgabe im Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>&gt;       assert stats[&quot;gesamt_km&quot;] == 87.5
+E       assert 90.0 == 87.5
+backend/tests/test_api.py:52: AssertionError
+</code></pre></div>
+<p>Die Zeile mit <code>E</code> sagt: Die App liefert 90,0, der Test erwartete 87,5. Genau diesen Block wörtlich in den Chat zurück („Der Test schlägt so fehl: …“), korrigierten Code übernehmen, wieder <code>pytest</code>. Bis grün.</p>
+<p><strong>6. Committen.</strong> Erst wenn <code>pytest</code> grün ist: <code>Git → Commit</code> in WebStorm, Nachricht <code>feat(US-2): Kennzahlen-Endpunkt</code>, Push. Ab Schritt 9 wiederholt GitHub Actions denselben Lauf bei jedem Push auf einem frischen Rechner.</p>
+<p class="label label-info"><strong>Alternative zum Terminal:</strong> Rechtsklick auf <code>test_api.py</code> in WebStorm, „Run pytest in test_api.py“. Unten erscheint eine Liste mit grünen Haken und roten Kreuzen je Test, oben rechts ein grüner Pfeil zum Wiederholen. Ein einzelner Test: <code>pytest -k test_stats_gesamt_km</code>. Mehr Ausgabe: <code>pytest -v</code>.</p>
+<p class="label label-info"><strong>Was dahinter passiert:</strong> <code>conftest.py</code> baut vor jedem Lauf aus <code>schema.sql</code> und dem Fixture eine temporäre Testdatenbank und setzt <code>FITTRACK_DATA</code> darauf. Die Tests laufen also nie gegen die 311 Echtdaten. <code>TestClient</code> ruft die App im selben Prozess auf, ein Server wird nicht gestartet; deshalb dauern alle 15 Tests unter einer Sekunde. Für den Randfall „keine Daten“ tauscht <code>monkeypatch</code> die Ladefunktion vorübergehend gegen eine leere Liste aus.</p>
+<p class="label label-info"><strong>Zwei Regeln:</strong> Der Erwartungswert kommt nie vom Modell, sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt. Und der Test wird nie geändert, damit er zum Code passt; der Code muss sich dem Test anpassen. Ausnahme: Eine Story erweitert bewusst die Spezifikation, wie US-7 mit <code>je_sportart</code>. Dann ändert sich der Test vor dem Code, mit Begründung im Commit.</p>
+<p>Beschreibung aller 15 Tests: <code>docs/dozent/tests.md</code>.</p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-0-starter-termin-1-ab-0-10"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-0-starter-termin-1-ab-0-10"> <span>erledigt</span></label><h2>Schritt 0: Starter (Termin 1, ab 0:10)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Ziel:</strong> Alle haben das Repo, die Umgebung läuft, der erste Test ist rot.</p>
+<p class="label label-handlung"><strong>Studierende führen aus:</strong></p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>git clone -b starter &lt;URL&gt; FitTrack
+cd FitTrack
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+pytest
+</code></pre></div>
+<p class="label label-info"><strong>Erwartung:</strong> <code>ModuleNotFoundError: No module named 'app.main'</code>. Das ist richtig so. Der Test in <code>backend/tests/test_api.py</code> beschreibt, was die App können soll, bevor es Code gibt.</p>
+<p class="label label-handlung"><strong>Zeigen:</strong></p>
+<ul>
+<li><code>README.md</code> mit Backlog und Datenmodell</li>
+<li><code>backend/app/data/fittrack.db</code>: SQLite-Datenbank mit 311 echten Einheiten, Schema in <code>schema.sql</code> (zwei Tabellen, eine Sicht)</li>
+<li><code>backend/tests/fixtures/workouts_klein.sql</code>: 8 Einheiten für die Tests, als lesbare SQL-Datei</li>
+<li><code>backend/tests/conftest.py</code>: warum die Tests eine eigene, frisch gebaute Testdatenbank nutzen (Testdaten sind nicht Produktionsdaten)</li>
+</ul>
+<p class="label label-handlung"><strong>Datenhaltung zeigen (5 Minuten):</strong> <code>schema.sql</code> in WebStorm öffnen und die drei Objekte erklären: Tabelle <code>sportart</code> (Name genau einmal gespeichert), Tabelle <code>workout</code> mit Fremdschlüssel und CHECK-Regeln, Sicht <code>v_workout</code>, die beide verbindet. Dann in WebStorm über das Database-Werkzeugfenster oder in DataGrip <code>fittrack.db</code> öffnen und <code>SELECT * FROM v_workout ORDER BY datum DESC LIMIT 5;</code> ausführen. Das ER-Diagramm steht im README. Botschaft: Die App liest nur die Sicht, das Schema schützt die Daten.</p>
+<p class="label label-handlung"><strong>Agiles Setup (0:20 bis 0:40):</strong> Vision vorlesen, Rollen vergeben, Sprint-1-Ziel festlegen: „Am Ende liefern <code>/api/workouts</code> und <code>/api/stats</code> korrekte, getestete Daten.“</p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-1-us-3-health-endpunkt-termin-1-ab-0-55"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-1-us-3-health-endpunkt-termin-1-ab-0-55"> <span>erledigt</span></label><h2>Schritt 1: US-3 Health-Endpunkt (Termin 1, ab 0:55)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Story:</strong> Als Entwickler möchte ich einen Health-Endpunkt, damit ich später im Container prüfen kann, ob die App läuft. Akzeptanz: <code>GET /health</code> liefert <code>{"status": "ok"}</code>.</p>
+<p class="label label-handlung"><strong>Test:</strong> steht bereits in <code>test_api.py</code>. <code>pytest</code> ist rot.</p>
+<p class="label label-handlung"><strong>Prompt:</strong></p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Python-Entwickler. Wir bauen mit FastAPI eine kleine
+Fitness-App namens FitTrack. Projektstruktur:
+
+FitTrack/
+├── backend/app/main.py      &lt;- diese Datei gibt es noch nicht
+├── backend/tests/test_api.py
+└── requirements.txt         (fastapi, uvicorn, pytest, httpx2)
+
+Aufgabe: Erstelle backend/app/main.py mit einer FastAPI-App und dem
+Endpunkt GET /health, der {&quot;status&quot;: &quot;ok&quot;} zurückgibt.
+
+Randbedingungen:
+- Nur FastAPI, keine weiteren Pakete
+- Kommentare und Docstrings auf Deutsch, kurz
+- Die App wird so gestartet:
+  uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+- Dieser Test muss bestehen:
+
+from fastapi.testclient import TestClient
+from app.main import app
+client = TestClient(app)
+
+def test_health():
+    antwort = client.get(&quot;/health&quot;)
+    assert antwort.status_code == 200
+    assert antwort.json() == {&quot;status&quot;: &quot;ok&quot;}
+
+Gib nur die Datei main.py aus und erkläre in drei Sätzen deine Entscheidungen.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte:</strong></p>
+<ul>
+<li>Gibt es genau eine Datei? Hat das Modell etwas Ungefragtes ergänzt (Middleware, CORS, Logging)? Weglassen.</li>
+<li>Steht <code>app = FastAPI(...)</code> auf Modulebene? Der Test importiert <code>app</code>.</li>
+<li>Existiert jeder Import?</li>
+</ul>
+<p class="label label-handlung"><strong>WebStorm:</strong> Rechtsklick auf <code>backend/app</code> → <code>New → Python File</code> → <code>main</code>. Code einfügen, <code>⌘⌥L</code> formatieren, speichern.</p>
+<p class="label label-handlung"><strong>Befehle:</strong></p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>pytest                                   # 1 passed
+uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+</code></pre></div>
+<p>Browser: <a href="http://localhost:8000/health">http://localhost:8000/health</a> und <a href="http://localhost:8000/docs">http://localhost:8000/docs</a>. Die automatische Doku ist ein Argument für FastAPI.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>feat(US-3): Health-Endpunkt</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-2-us-1-liste-der-trainingseinheiten-termin"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-2-us-1-liste-der-trainingseinheiten-termin"> <span>erledigt</span></label><h2>Schritt 2: US-1 Liste der Trainingseinheiten (Termin 1, ab 1:05)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Story:</strong> Als Nutzer möchte ich alle meine Trainingseinheiten als JSON abrufen, damit die App sie anzeigen kann. Akzeptanz: <code>GET /api/workouts</code> liefert Status 200 und eine Liste; jedes Element enthält <code>id, datum, sportart, dauer_min, distanz_km, kalorien</code>.</p>
+<p><strong>Test zuerst</strong> (QA ergänzt in <code>test_api.py</code>, dann <code>pytest</code>: 3 failed):</p>
+<div class="block block-datei"><div class="block-kopf"><span>Python-Datei</span><button type="button" class="kopieren">Kopieren</button></div><pre><code># US-1: Liste aller Trainingseinheiten
+def test_workouts_liefert_liste():
+    antwort = client.get(&quot;/api/workouts&quot;)
+    assert antwort.status_code == 200
+    daten = antwort.json()
+    assert isinstance(daten, list)
+    assert len(daten) == 8          # das Fixture hat 8 Einheiten
+
+
+def test_workouts_felder():
+    erstes = client.get(&quot;/api/workouts&quot;).json()[0]
+    erwartete_felder = {&quot;id&quot;, &quot;datum&quot;, &quot;sportart&quot;, &quot;dauer_min&quot;, &quot;distanz_km&quot;, &quot;kalorien&quot;}
+    assert set(erstes.keys()) == erwartete_felder
+
+
+def test_workouts_sortiert_absteigend():
+    daten = client.get(&quot;/api/workouts&quot;).json()
+    assert daten[0][&quot;id&quot;] == 8      # jüngstes Training zuerst (2026-06-21)
+    assert daten[-1][&quot;id&quot;] == 1     # ältestes Training zuletzt (2026-06-01)
+
+
+def test_echtdaten_sind_lesbar():
+    # Rauchtest gegen die echte Datenbank: Sie muss gültig und gefüllt sein.
+    from app.daten import STANDARD_DATEI, lade_workouts
+    echt = lade_workouts(STANDARD_DATEI)
+    assert len(echt) &gt; 250
+    assert {&quot;Laufen&quot;, &quot;Radfahren&quot;, &quot;Schwimmen&quot;, &quot;Wandern&quot;} == {w[&quot;sportart&quot;] for w in echt}
+</code></pre></div>
+<p>Frage an die Gruppe: Warum 8 und nicht 311? Antwort steht in <code>conftest.py</code>: Die Tests bauen bei jedem Lauf eine eigene Datenbank aus <code>schema.sql</code> und <code>workouts_klein.sql</code>. Nur der Rauchtest schaut in die echte Datenbank, und er prüft dort nichts Fachliches.</p>
+<p class="label label-handlung"><strong>Prompt:</strong></p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Python-Entwickler. Wir bauen mit FastAPI eine kleine
+Fitness-App namens FitTrack. Es gibt bereits backend/app/main.py:
+
+from fastapi import FastAPI
+app = FastAPI(title=&quot;FitTrack&quot;, version=&quot;0.1.0&quot;)
+
+@app.get(&quot;/health&quot;)
+def health() -&gt; dict:
+    return {&quot;status&quot;: &quot;ok&quot;}
+
+Die Trainingsdaten liegen in der SQLite-Datenbank backend/app/data/fittrack.db.
+Das Schema (backend/app/data/schema.sql) hat zwei Tabellen und eine Sicht:
+
+CREATE TABLE sportart (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE, einheit TEXT NOT NULL DEFAULT 'km');
+CREATE TABLE workout (id INTEGER PRIMARY KEY, datum TEXT NOT NULL, sportart_id INTEGER NOT NULL REFERENCES sportart(id),
+                      dauer_min INTEGER NOT NULL, distanz_km REAL NOT NULL, kalorien INTEGER NOT NULL);
+CREATE VIEW v_workout AS SELECT w.id, w.datum, s.name AS sportart, w.dauer_min, w.distanz_km, w.kalorien
+                        FROM workout w JOIN sportart s ON s.id = w.sportart_id;
+
+Eine Zeile der Sicht v_workout sieht als Dictionary so aus:
+{&quot;id&quot;: 1, &quot;datum&quot;: &quot;2026-06-01&quot;, &quot;sportart&quot;: &quot;Laufen&quot;,
+ &quot;dauer_min&quot;: 30, &quot;distanz_km&quot;: 5.0, &quot;kalorien&quot;: 350}
+Sportarten: Laufen, Radfahren, Schwimmen, Wandern. datum ist ISO-Format.
+
+Aufgabe: Implementiere GET /api/workouts. Dafür brauche ich drei Dateien:
+1. backend/app/daten.py mit einer Funktion lade_workouts(pfad=None) -&gt; list[dict].
+   Sie liest mit dem Standardmodul sqlite3 aus der Sicht v_workout und gibt
+   eine Liste von Dictionaries zurück (sqlite3.Row als row_factory).
+   Der Pfad zur Datenbank kommt aus der Umgebungsvariable FITTRACK_DATA;
+   ist sie nicht gesetzt, gilt backend/app/data/fittrack.db relativ zur
+   Datei daten.py (nicht relativ zum Arbeitsverzeichnis). Der optionale
+   Parameter pfad überschreibt beides.
+   Sortierung in der SQL-Abfrage: ORDER BY datum DESC, id DESC.
+   Verbindung nach dem Lesen schließen (try/finally).
+2. backend/app/models.py mit einem Pydantic-Modell Workout für die sechs Felder.
+3. Ergänzung in main.py: GET /api/workouts mit response_model=list[Workout].
+
+Randbedingungen:
+- Nur Standardbibliothek (sqlite3, os, pathlib), FastAPI und Pydantic, kein ORM
+- Relative Imports innerhalb von app (from .daten import lade_workouts)
+- Deutsche Bezeichner und kurze deutsche Kommentare
+- Diese Tests müssen bestehen (die Tests setzen FITTRACK_DATA auf eine
+  Testdatenbank mit 8 Einheiten, ids 1 bis 8, Daten vom 2026-06-01 bis 2026-06-21):
+
+[die drei Tests von oben einfügen]
+
+Gib die drei Dateien vollständig aus und erkläre in drei Sätzen deine Entscheidungen.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte:</strong></p>
+<ul>
+<li>Ist der Pfad relativ zur Datei (<code>Path(__file__).parent</code>) und nicht zum Arbeitsverzeichnis? Sonst läuft die App nur aus einem bestimmten Ordner.</li>
+<li>Wird die Umgebungsvariable beim Import gelesen oder bei jedem Aufruf? Beides ist hier in Ordnung, aber die Gruppe sollte es erklären können.</li>
+<li>Sortiert die SQL-Abfrage nach Datum und id absteigend? Ein Modell sortiert gern nur nach Datum oder sortiert in Python nach, statt ORDER BY zu nutzen.</li>
+<li>Liest der Code die Sicht <code>v_workout</code> oder baut er den JOIN selbst nach? Beides funktioniert, die Sicht ist der vereinbarte Weg.</li>
+<li>Wird die Verbindung geschlossen? Offene Verbindungen sind der klassische Fehler bei SQLite.</li>
+<li>Hat das Modell <code>pandas</code> oder ein ORM wie SQLAlchemy eingeschmuggelt?</li>
+</ul>
+<p class="label label-handlung"><strong>WebStorm:</strong> zwei neue Dateien <code>daten.py</code>, <code>models.py</code> in <code>backend/app</code>, <code>main.py</code> ergänzen.</p>
+<p class="label label-handlung"><strong>Befehle:</strong> <code>pytest</code> (5 passed). Server neu laden, <a href="http://localhost:8000/api/workouts">http://localhost:8000/api/workouts</a> zeigt 311 Einheiten.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>feat(US-1): Workouts-Endpunkt mit Datenmodell</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-3-us-2-kennzahlen-termin-1-ab-1-20"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-3-us-2-kennzahlen-termin-1-ab-1-20"> <span>erledigt</span></label><h2>Schritt 3: US-2 Kennzahlen (Termin 1, ab 1:20)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Story:</strong> Als Nutzer möchte ich meine Kennzahlen abrufen, damit ich meinen Fortschritt sehe. Akzeptanz: <code>GET /api/stats</code> liefert <code>gesamt_km</code>, <code>durchschnitt_km_pro_woche</code>, <code>lieblingssportart</code>, <code>anzahl</code>, korrekt berechnet für das Fixture.</p>
+<p><strong>Zuerst rechnen, nicht prompten.</strong> Die Gruppe rechnet die Erwartungswerte aus <code>workouts_klein.sql</code> mit dem Taschenrechner. Definitionen stehen im README. Lösung für den Dozenten: <code>docs/dozent/erwartungswerte.md</code>. Typischer Streitpunkt: Zählt die leere KW 24 mit? Ja, laut Definition. Ergebnis: 87,5 km, 3 Wochen, 29,2 km pro Woche, Radfahren, 8 Einheiten.</p>
+<p><strong>Test zuerst</strong> (<code>pytest</code>: 5 failed):</p>
+<div class="block block-datei"><div class="block-kopf"><span>Python-Datei</span><button type="button" class="kopieren">Kopieren</button></div><pre><code># US-2: Kennzahlen
+# Erwartungswerte von Hand aus dem Fixture berechnet (siehe README, Abschnitt Kennzahlen):
+#   Distanzen: 5 + 20 + 8 + 1.5 + 30 + 9 + 10 + 4 = 87.5 km
+#   Kalenderwochen: KW 23, 24, 25 = 3 Wochen  -&gt;  87.5 / 3 = 29.17 -&gt; 29.2
+#   Je Sportart: Radfahren 50.0, Laufen 26.0, Wandern 10.0, Schwimmen 1.5
+def test_stats_gesamt_km():
+    stats = client.get(&quot;/api/stats&quot;).json()
+    assert stats[&quot;gesamt_km&quot;] == 87.5
+
+
+def test_stats_durchschnitt():
+    stats = client.get(&quot;/api/stats&quot;).json()
+    assert stats[&quot;durchschnitt_km_pro_woche&quot;] == 29.2
+
+
+def test_stats_lieblingssportart():
+    stats = client.get(&quot;/api/stats&quot;).json()
+    assert stats[&quot;lieblingssportart&quot;] == &quot;Radfahren&quot;
+
+
+def test_stats_anzahl():
+    stats = client.get(&quot;/api/stats&quot;).json()
+    assert stats[&quot;anzahl&quot;] == 8
+
+
+def test_stats_leere_liste(monkeypatch):
+    # Randfall: keine Daten. Wir tauschen die Ladefunktion vorübergehend aus.
+    from app import main
+    monkeypatch.setattr(main, &quot;lade_workouts&quot;, lambda: [])
+    stats = client.get(&quot;/api/stats&quot;).json()
+    assert stats == {
+        &quot;gesamt_km&quot;: 0.0,
+        &quot;durchschnitt_km_pro_woche&quot;: 0.0,
+        &quot;lieblingssportart&quot;: None,
+        &quot;anzahl&quot;: 0,
+    }
+</code></pre></div>
+<p>Kurz erklären: <code>monkeypatch</code> ersetzt <code>lade_workouts</code> nur für diesen einen Test. Deshalb muss <code>main.py</code> die Funktion mit <code>from .daten import lade_workouts</code> importieren und beim Aufruf <code>lade_workouts()</code> schreiben, nicht <code>daten.lade_workouts()</code>.</p>
+<p><strong>Prompt</strong> (dieser Prompt ist auch der Vergleichsprompt für die LM-Studio-Demo):</p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Python-Entwickler. Wir bauen mit FastAPI eine kleine
+Fitness-App namens FitTrack. Es gibt eine Funktion lade_workouts() in
+backend/app/daten.py, die eine Liste von Dictionaries liefert:
+{&quot;id&quot;: 1, &quot;datum&quot;: &quot;2026-06-01&quot;, &quot;sportart&quot;: &quot;Laufen&quot;,
+ &quot;dauer_min&quot;: 30, &quot;distanz_km&quot;: 5.0, &quot;kalorien&quot;: 350}
+
+Aufgabe: Implementiere GET /api/stats.
+
+1. Neue Datei backend/app/statistik.py mit einer reinen Funktion
+   berechne_stats(workouts: list[dict]) -&gt; dict, ohne FastAPI-Import.
+   Rückgabe:
+   - gesamt_km: Summe aller distanz_km, gerundet auf 1 Nachkommastelle
+   - durchschnitt_km_pro_woche: gesamt_km geteilt durch die Anzahl der
+     ISO-Kalenderwochen von der Woche des ersten bis zur Woche des letzten
+     Trainings, beide inklusive (Wochen ohne Training zählen mit),
+     gerundet auf 1 Nachkommastelle
+   - lieblingssportart: Sportart mit der größten Summe distanz_km,
+     bei Gleichstand die alphabetisch erste
+   - anzahl: Anzahl der Einheiten
+   Leere Liste: 0.0, 0.0, None, 0
+2. Pydantic-Modell Stats in backend/app/models.py (lieblingssportart: str | None)
+3. Route in main.py: GET /api/stats mit response_model=Stats, die
+   berechne_stats(lade_workouts()) zurückgibt. Import so:
+   from .daten import lade_workouts
+
+Randbedingungen:
+- Nur Standardbibliothek (datetime, collections) und Pydantic
+- Kleine Hilfsfunktionen mit deutschen Namen, je ein Docstring
+- Diese Tests müssen bestehen:
+
+[die fünf Tests von oben einfügen]
+
+Gib statistik.py vollständig und die Ergänzungen für models.py und main.py
+aus. Erkläre in drei Sätzen, wie du die Kalenderwochen zählst.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte:</strong></p>
+<ul>
+<li>Zählt der Code die leere Woche mit? Häufigster Fehler: <code>len(set(wochen))</code> zählt nur Wochen mit Training und liefert 43,75.</li>
+<li>Wird der Montag über <code>isocalendar()</code> oder <code>weekday()</code> bestimmt? Beides richtig, Jahreswechsel bedenken.</li>
+<li>Wo wird gerundet? Erst am Ende, nicht bei jeder Teilsumme.</li>
+<li>Ist der Gleichstand behandelt? Der Test prüft ihn nicht. Diskussion: Was, wenn die KI ihn weglässt? Test ergänzen oder bewusst zurückstellen.</li>
+<li>Enthält <code>statistik.py</code> einen FastAPI-Import? Dann ist die Trennung verfehlt.</li>
+</ul>
+<p class="label label-handlung"><strong>Befehle:</strong> <code>pytest</code> (10 passed). <a href="http://localhost:8000/api/stats">http://localhost:8000/api/stats</a> mit den Echtdaten: 3963 km, 37,7 km pro Woche, Radfahren, 311.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>feat(US-2): Kennzahlen-Endpunkt</code></p>
+<p class="label label-info"><strong>Sprint Review 1 (1:45):</strong> PO ruft jede Story auf. Tests grün? Kriterium im Browser gezeigt? Dann abgenommen.</p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-4-us-4-mobile-first-ger-st-termin-2-ab-0-0"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-4-us-4-mobile-first-ger-st-termin-2-ab-0-0"> <span>erledigt</span></label><h2>Schritt 4: US-4 Mobile-first Gerüst (Termin 2, ab 0:05)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Story:</strong> Als Nutzer möchte ich die App auf dem Smartphone öffnen und ein übersichtliches Dashboard sehen. Akzeptanz: <code>GET /</code> liefert die Seite; bei 375 px Breite kein horizontales Scrollen; Karten stapeln sich; Touch-Targets mindestens 44 px.</p>
+<p><strong>Test zuerst</strong> (<code>pytest</code>: 1 failed):</p>
+<div class="block block-datei"><div class="block-kopf"><span>Python-Datei</span><button type="button" class="kopieren">Kopieren</button></div><pre><code># US-4: Frontend wird von FastAPI ausgeliefert
+def test_index_liefert_html():
+    antwort = client.get(&quot;/&quot;)
+    assert antwort.status_code == 200
+    assert &quot;text/html&quot; in antwort.headers[&quot;content-type&quot;]
+    assert &quot;FitTrack&quot; in antwort.text
+</code></pre></div>
+<p><strong>Mobile-First in drei Regeln</strong> (vorab, 3 Minuten): 1. Basis-CSS für schmale Screens, dann <code>@media (min-width: 768px)</code> erweitern. 2. Flexbox oder Grid statt fester Breiten. 3. Touch-Targets mindestens 44 px, Schrift mindestens 16 px.</p>
+<p class="label label-handlung"><strong>Prompt:</strong></p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Frontend-Entwickler. Wir bauen das Dashboard einer
+Fitness-App namens FitTrack: reines HTML, CSS und Vanilla JS ohne Build-Step.
+Vorbild sind die Dashboards von Garmin Connect, Apple Fitness und RingConn:
+dunkler Hintergrund, abgerundete Karten, große Kennzahlen, ruhige Typografie.
+
+Aufgabe, Teil 1 von 3: nur die Struktur und das Stylesheet, noch keine Daten.
+
+frontend/index.html mit folgenden Bereichen von oben nach unten, alle
+Werte vorerst als Platzhalter „…“:
+1. Kopf: Titel „FitTrack“ und ein &lt;p id=&quot;zeitraum&quot;&gt;
+2. &lt;section id=&quot;woche&quot;&gt;: Wochenziel-Ring. Ein SVG-Kreis (r=52 in einem
+   120er viewBox) mit &lt;circle id=&quot;ring-balken&quot;&gt;, daneben eine
+   Definitionsliste mit &lt;dd id=&quot;woche-km&quot;&gt;, &lt;dd id=&quot;woche-anzahl&quot;&gt;,
+   &lt;dd id=&quot;woche-minuten&quot;&gt;. Titel &lt;h2 id=&quot;woche-titel&quot;&gt;,
+   Untertitel &lt;p id=&quot;woche-untertitel&quot;&gt;.
+3. &lt;section id=&quot;kennzahlen&quot;&gt;: vier Kacheln im 2er-Raster mit den ids
+   stat-gesamt, stat-woche, stat-sport, stat-anzahl
+   (Beschriftungen: Gesamt, Pro Woche, Lieblingssport, Einheiten)
+4. &lt;section id=&quot;diagramm&quot;&gt;: Titel „Kilometer pro Woche“, vier Buttons
+   „8 W“, „6 M“, „1 J“, „Alles“ mit data-wochen=&quot;8|26|52|0&quot;, darunter
+   &lt;canvas id=&quot;wochen-chart&quot;&gt; in einem Container mit fester Höhe 200 px
+5. &lt;section id=&quot;aktivitaeten&quot;&gt;: Titel „Letzte Aktivitäten“,
+   &lt;ol id=&quot;aktivitaeten-liste&quot;&gt;, Button &lt;button id=&quot;mehr-anzeigen&quot; hidden&gt;
+
+frontend/style.css:
+- CSS Custom Properties in :root für alle Farben: --bg #0f1419,
+  --karte #1a2129, --karte-hell #232c36, --linie #2c3641, --text #f2f5f7,
+  --text-2 #8c98a4, --akzent #f5b841, dazu --laufen #ff6b4a,
+  --radfahren #4cc9f0, --schwimmen #7b8cff, --wandern #8bd450
+- Schrift Manrope (Google Fonts) mit system-ui als Fallback,
+  font-size 16px, font-variant-numeric: tabular-nums
+- Mobile zuerst: eine Spalte, max-width 480px, Karten 100 % breit,
+  border-radius 20px, kein Schatten
+- Alle Buttons mindestens 44px hoch
+- Ein Breakpoint @media (min-width: 768px): zwei Spalten per CSS Grid
+  mit grid-template-areas, Diagramm und Liste nebeneinander
+- Der Ring: stroke-dasharray 327 (Umfang bei r=52), stroke-dashoffset 327,
+  SVG um -90deg gedreht, damit der Balken oben startet
+- Sportart-Farbe über [data-sport=&quot;Laufen&quot;] { --sport-farbe: var(--laufen) }
+  usw., damit Listenzeilen später die Farbe per Attribut bekommen
+
+Randbedingungen:
+- &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+- Keine Bilder, keine Emojis, kein Framework, kein Tailwind
+- Kurze deutsche Kommentare, die einem Anfänger erklären, warum
+- Noch kein JavaScript in diesem Schritt
+
+Gib beide Dateien vollständig aus. Erkläre in drei Sätzen, wie das
+Mobile-First-Prinzip im CSS umgesetzt ist.
+</code></pre></div>
+<p><strong>Dann FastAPI die Seite ausliefern lassen</strong> (zweiter, kurzer Prompt oder selbst schreiben):</p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Ergänze in backend/app/main.py: Der Ordner frontend/ (liegt neben backend/
+im Projektordner) soll als statische Dateien unter / ausgeliefert werden,
+sodass GET / die index.html liefert. Nutze fastapi.staticfiles.StaticFiles
+mit html=True. Bestimme den Ordner relativ zu main.py mit pathlib.
+Wichtig: Wo muss der Mount stehen, damit /api/... und /health weiter
+funktionieren? Erkläre das in zwei Sätzen.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte:</strong></p>
+<ul>
+<li>Viewport-Meta vorhanden? Ohne sie zeigt das Handy eine geschrumpfte Desktop-Seite.</li>
+<li>Feste Breiten in Pixeln (<code>width: 400px</code>)? Weg damit.</li>
+<li>Steht der Mount nach den API-Routen? Sonst fängt er <code>/api/...</code> ab und alle Tests außer <code>/</code> werden rot. Guter Moment, das live zu zeigen.</li>
+<li>Alle ids aus dem Prompt vorhanden? Schritt 5 und 6 bauen darauf.</li>
+</ul>
+<p class="label label-handlung"><strong>Befehle:</strong> <code>pytest</code> (11 passed). Browser: Entwicklerwerkzeuge, Gerätesimulation 375 px. Kein horizontaler Scrollbalken? Dann Handy im WLAN.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>feat(US-4): Mobile-first Gerüst des Dashboards</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-5-us-5-kennzahlen-und-liste-per-fetch-term"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-5-us-5-kennzahlen-und-liste-per-fetch-term"> <span>erledigt</span></label><h2>Schritt 5: US-5 Kennzahlen und Liste per fetch (Termin 2, ab 0:25)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Story:</strong> Als Nutzer möchte ich meine Kennzahlen und die letzten Trainings sehen. Akzeptanz: Kennzahl-Karten und Liste werden per fetch aus <code>/api/stats</code> und <code>/api/workouts</code> gefüllt, nichts ist hartkodiert.</p>
+<p class="label label-info"><strong>Kein neuer pytest-Test:</strong> JavaScript im Browser testen wir hier manuell gegen das Kriterium. Frage an die Gruppe: Wie würde man das automatisieren? (Stichwort Playwright, Ausblick.)</p>
+<p class="label label-handlung"><strong>Prompt:</strong></p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Frontend-Entwickler. FitTrack-Dashboard, Teil 2 von 3.
+Es gibt eine index.html mit diesen Elementen (Auszug der ids):
+- #zeitraum (p im Kopf)
+- #stat-gesamt, #stat-woche, #stat-sport, #stat-anzahl (Kennzahl-Kacheln)
+- #aktivitaeten-liste (ol), #mehr-anzeigen (button, anfangs hidden)
+Listenzeilen bekommen die Farbe per Attribut data-sport=&quot;Laufen&quot; usw.
+
+Die API liefert:
+GET /api/stats -&gt;
+  {&quot;gesamt_km&quot;: 3963.0, &quot;durchschnitt_km_pro_woche&quot;: 37.7,
+   &quot;lieblingssportart&quot;: &quot;Radfahren&quot;, &quot;anzahl&quot;: 311}
+  (lieblingssportart kann null sein)
+GET /api/workouts -&gt; Liste, jüngstes Datum zuerst:
+  {&quot;id&quot;: 311, &quot;datum&quot;: &quot;2026-09-05&quot;, &quot;sportart&quot;: &quot;Schwimmen&quot;,
+   &quot;dauer_min&quot;: 43, &quot;distanz_km&quot;: 2.0, &quot;kalorien&quot;: 614}
+
+Aufgabe: Erstelle frontend/app.js mit
+- ladeJson(url): fetch, wirft bei Status != 200 einen Fehler
+- formatDatum(&quot;2026-09-05&quot;) -&gt; &quot;05.09.2026&quot;
+- formatZahl(wert, nachkommastellen): deutsche Schreibweise per toLocaleString
+- zeigeKennzahlen(stats): füllt die vier Kacheln
+- zeigeAktivitaeten(workouts): zeigt die ersten 10 Einheiten als &lt;li&gt;
+  mit data-sport, einem Kürzel im Kreis (La, Ra, Sc, Wa), Sportart,
+  Datum, Distanz, Dauer und Kalorien. Der Button „Mehr anzeigen“ hängt
+  jeweils 10 weitere an und verschwindet, wenn alle sichtbar sind.
+- zeigeZeitraum(workouts): schreibt „&lt;ältestes&gt; bis &lt;jüngstes&gt;“ in #zeitraum
+- start(): ruft alles auf; wenn ein fetch fehlschlägt, steht im
+  betroffenen Bereich ein kurzer Hinweis „… konnten nicht geladen
+  werden. Läuft der Server?“ und der Rest lädt trotzdem.
+- Am Ende: start();
+
+Randbedingungen:
+- Vanilla JS, keine Bibliothek, kein Modul-Bundler, async/await
+- Kleine Funktionen mit deutschen Namen, je ein Kommentar auf Deutsch
+- Keine Werte hartkodieren, alles kommt aus der API
+- In index.html vor &lt;/body&gt; ergänzen: &lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;
+
+Gib app.js vollständig aus und erkläre in drei Sätzen, wie „Mehr anzeigen“
+funktioniert, ohne die API erneut zu fragen.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte:</strong></p>
+<ul>
+<li>Steht eine Zahl im Code, die aus der API kommen müsste? Dann ist das Kriterium verfehlt.</li>
+<li>Was passiert, wenn der Server aus ist? Server stoppen, Seite neu laden, Hinweis sehen, Server starten.</li>
+<li><code>innerHTML</code> mit API-Daten: hier unkritisch, weil die Daten aus der eigenen Datei stammen. Kurz erwähnen, dass fremde Eingaben so nie eingefügt werden dürfen.</li>
+<li>Läuft <code>start()</code> wirklich? Ein Modell vergisst den Aufruf gern.</li>
+</ul>
+<p class="label label-handlung"><strong>Befehle:</strong> Server läuft mit <code>--reload</code>, Browser neu laden. Konsole (F12) ohne rote Meldungen? Handy im WLAN: Liste, Kacheln, Zeitraum.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>feat(US-5): Kennzahlen und Aktivitäten per fetch</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-6-us-6-wochenverlauf-termin-2-ab-0-40"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-6-us-6-wochenverlauf-termin-2-ab-0-40"> <span>erledigt</span></label><h2>Schritt 6: US-6 Wochenverlauf (Termin 2, ab 0:40)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Story:</strong> Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen und den Zeitraum wählen. Akzeptanz: <code>GET /api/stats/wochen</code> liefert pro Kalenderwoche <code>distanz_km</code> und <code>anzahl</code>, auch für Wochen ohne Training; das Diagramm zeigt diese Daten; Umschalter 8 W / 6 M / 1 J / Alles.</p>
+<p>Zwei Teile: erst der Endpunkt mit Test, dann das Diagramm.</p>
+<p class="label label-info"><strong>Hinweis:</strong> Ring und gestapelte Säulen aus Teil B sind bewusst der Erstentwurf. Er besteht alle Tests und ist trotzdem falsch, das zeigt Schritt 6b. Deshalb hier nichts vorwegnehmen, sondern den Entwurf so übernehmen, wie ihn das Modell liefert.</p>
+<p><strong>Test zuerst</strong> (<code>pytest</code>: 3 failed). Erwartungswerte wieder von Hand, siehe <code>erwartungswerte.md</code>:</p>
+<div class="block block-datei"><div class="block-kopf"><span>Python-Datei</span><button type="button" class="kopieren">Kopieren</button></div><pre><code># US-6: Wochenverlauf
+# Fixture: KW 23 (4 Einheiten, 34.5 km, 175 min), KW 24 leer, KW 25 (4 Einheiten, 53.0 km, 285 min)
+def test_wochen_anzahl_und_luecken():
+    wochen = client.get(&quot;/api/stats/wochen&quot;).json()
+    assert len(wochen) == 3
+    assert [w[&quot;kw&quot;] for w in wochen] == [&quot;2026-W23&quot;, &quot;2026-W24&quot;, &quot;2026-W25&quot;]
+    assert wochen[1] == {&quot;kw&quot;: &quot;2026-W24&quot;, &quot;wochenstart&quot;: &quot;2026-06-08&quot;,
+                         &quot;distanz_km&quot;: 0.0, &quot;anzahl&quot;: 0, &quot;dauer_min&quot;: 0}
+
+
+def test_wochen_summen():
+    wochen = client.get(&quot;/api/stats/wochen&quot;).json()
+    assert wochen[0][&quot;wochenstart&quot;] == &quot;2026-06-01&quot;
+    assert wochen[0][&quot;distanz_km&quot;] == 34.5
+    assert wochen[0][&quot;anzahl&quot;] == 4
+    assert wochen[0][&quot;dauer_min&quot;] == 175
+    assert wochen[2][&quot;distanz_km&quot;] == 53.0
+    assert wochen[2][&quot;anzahl&quot;] == 4
+    assert wochen[2][&quot;dauer_min&quot;] == 285
+
+
+def test_wochen_leer(monkeypatch):
+    from app import main
+    monkeypatch.setattr(main, &quot;lade_workouts&quot;, lambda: [])
+    assert client.get(&quot;/api/stats/wochen&quot;).json() == []
+</code></pre></div>
+<p class="label label-handlung"><strong>Prompt Teil A, Backend:</strong></p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Python-Entwickler. FitTrack, FastAPI. In
+backend/app/statistik.py gibt es bereits:
+
+from collections import defaultdict
+from datetime import date, timedelta
+
+def montag_der_woche(datum_text: str) -&gt; date:
+    tag = date.fromisoformat(datum_text)
+    return tag - timedelta(days=tag.weekday())
+
+Workouts sind Dictionaries mit id, datum (ISO), sportart, dauer_min,
+distanz_km, kalorien.
+
+Aufgabe: Ergänze berechne_wochen(workouts: list[dict]) -&gt; list[dict].
+Rückgabe: eine Liste aufsteigend nach Woche, ein Eintrag pro Kalenderwoche
+von der ersten bis zur letzten Trainingswoche. Wochen ohne Training
+erscheinen mit Nullwerten. Jeder Eintrag:
+{&quot;kw&quot;: &quot;2026-W23&quot;, &quot;wochenstart&quot;: &quot;2026-06-01&quot;,
+ &quot;distanz_km&quot;: 34.5, &quot;anzahl&quot;: 4, &quot;dauer_min&quot;: 175}
+kw ist Jahr und ISO-Woche zweistellig, wochenstart der Montag als ISO-Datum,
+distanz_km auf 1 Nachkommastelle gerundet. Leere Liste ergibt [].
+
+Dazu ein Pydantic-Modell WochenEintrag in models.py und in main.py die Route
+GET /api/stats/wochen mit response_model=list[WochenEintrag], die
+berechne_wochen(lade_workouts()) zurückgibt.
+
+Randbedingungen: nur Standardbibliothek und Pydantic, deutsche Namen,
+je ein Docstring. Diese Tests müssen bestehen:
+
+[die drei Tests von oben einfügen]
+
+Erkläre in drei Sätzen, wie du die Lücken erzeugst.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte A:</strong> Lückenwochen wirklich mit 0 statt ausgelassen? Jahreswechsel: <code>isocalendar()</code> liefert das ISO-Jahr, das am 29.12. schon das Folgejahr sein kann. Das Fixture prüft das nicht; die Echtdaten enthalten zwei Jahreswechsel. Im Browser später kontrollieren, ob „2024-W01“ oder „2025-W01“ am richtigen Ort steht.</p>
+<p class="label label-handlung"><strong>Befehle:</strong> <code>pytest</code> (14 passed).</p>
+<p class="label label-handlung"><strong>Prompt Teil B, Frontend:</strong></p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Frontend-Entwickler. FitTrack-Dashboard, Teil 3 von 3.
+In frontend/app.js gibt es bereits ladeJson(url), formatDatum(iso),
+formatZahl(wert, nachkommastellen), zeigeFehler(bereichId, text) und eine
+Funktion start(), die /api/stats und /api/workouts lädt.
+
+Neu ist GET /api/stats/wochen -&gt; Liste aufsteigend, ein Eintrag je Woche:
+{&quot;kw&quot;: &quot;2026-W36&quot;, &quot;wochenstart&quot;: &quot;2026-08-31&quot;,
+ &quot;distanz_km&quot;: 64.4, &quot;anzahl&quot;: 3, &quot;dauer_min&quot;: 295}
+
+In index.html gibt es:
+- #woche-titel (h2), #woche-untertitel (p), #ring-prozent (span),
+  #ring-balken (SVG-circle, r=52, stroke-dasharray und stroke-dashoffset 327),
+  #woche-km, #woche-anzahl, #woche-minuten (dd)
+- #wochen-chart (canvas) und vier Buttons .zeitraum-wahl button mit
+  data-wochen=&quot;8&quot;, &quot;26&quot;, &quot;52&quot;, &quot;0&quot; (0 = alle); der aktive hat class=&quot;aktiv&quot;
+- Chart.js 4 ist per &lt;script&gt; vor app.js eingebunden:
+  https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js
+
+Aufgabe, ergänze app.js:
+1. Konstanten WOCHENZIEL_KM = 40 und RING_UMFANG = 327.
+2. zeigeWoche(wochen): nimmt den letzten Eintrag (jüngste Woche im
+   Datensatz). Titel „Kalenderwoche 36“, Untertitel „ab 31.08.2026,
+   Wochenziel 40 km“. Prozent = distanz_km / Ziel, Text zeigt den echten
+   Wert (auch über 100 %), der Ring ist bei 100 % voll:
+   strokeDashoffset = RING_UMFANG * (1 - min(anteil, 1)). km, Anzahl,
+   Minuten in die dd-Felder.
+3. zeigeDiagramm(wochen, anzahlWochen): Balkendiagramm mit Chart.js.
+   anzahlWochen &gt; 0 -&gt; die letzten n Wochen, 0 -&gt; alle. Beim ersten Aufruf
+   das Chart erzeugen und in einer Variablen merken, bei weiteren Aufrufen
+   nur Daten tauschen und update() aufrufen. Ohne Legende, x-Achse ohne
+   Beschriftung, y-Achse ab 0 mit höchstens 5 Ticks, Balkenfarbe aus der
+   CSS-Variablen --akzent (per getComputedStyle lesen), Tooltip
+   „Kalenderwoche 36“ und „64,4 km“. maintainAspectRatio: false.
+4. verbindeZeitraumWahl(wochen): Klick setzt die Klasse aktiv um und
+   ruft zeigeDiagramm mit Number(button.dataset.wochen) auf.
+5. In start(): zuerst /api/stats/wochen laden, dann zeigeWoche,
+   zeigeDiagramm(wochen, 8), verbindeZeitraumWahl; Fehler wie bisher
+   mit zeigeFehler(&quot;woche&quot;, ...).
+
+Randbedingungen: Vanilla JS, deutsche Namen und Kommentare, keine Werte
+hartkodieren außer den zwei Konstanten. Gib nur die neuen und geänderten
+Funktionen aus. Erkläre in drei Sätzen, warum das Chart beim Umschalten
+nicht neu erzeugt wird.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte B:</strong> Wird bei jedem Klick ein neues Chart erzeugt? Dann flackert es und Chart.js meldet „Canvas is already in use“. Sind die Balken echte API-Daten? Zum Beweis in WebStorm oder DataGrip eine Distanz in <code>fittrack.db</code> ändern (<code>UPDATE workout SET distanz_km = 99 WHERE id = 311;</code>), Seite neu laden, Diagramm ändert sich, Änderung mit <code>git checkout backend/app/data/fittrack.db</code> zurücknehmen.</p>
+<p class="label label-handlung"><strong>Befehle:</strong> Browser neu laden, Umschalter durchklicken, Konsole prüfen. Handy im WLAN: Ring, Diagramm, Tooltip per Tippen.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>feat(US-6): Wochenverlauf mit Diagramm und Zeitraumwahl</code></p>
+<p class="label label-info"><strong>Sprint Review 2 (1:00):</strong> Abnahme am Smartphone gegen US-4 bis US-6. Hier passiert der wichtigste Moment des Kurses, siehe Schritt 6b.</p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-6b-us-7-sch-n-aber-falsch-termin-2-ab-1-00"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-6b-us-7-sch-n-aber-falsch-termin-2-ab-1-00"> <span>erledigt</span></label><h2>Schritt 6b: US-7 Schön, aber falsch (Termin 2, ab 1:00)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Warum dieser Schritt:</strong> Nach Schritt 6 sind alle Tests grün, das Dashboard sieht aus wie eine Sport-App, und die Gruppe ist zufrieden. Genau jetzt die Ansicht auf den Beamer legen und fragen: „Was bedeutet 161 %?“ Der Erstentwurf der KI: Ring geschlossen, „161 % vom Ziel“, über einer Woche, die längst vorbei war, darunter gestapelte Säulen ohne Achse. Nichts davon prüfte ein Test, weil die Tests die API prüfen und nicht die Aussage der Oberfläche. Die Lerneinheit hat zwei Sätze: <strong>Der Eindruck ist kein Prüfkriterium.</strong> Und: <strong>KI allein liefert einen brauchbaren Erstentwurf, KI mit menschlicher Kritik ein gutes Ergebnis.</strong> Der Zweitentwurf ist nicht die KI-Korrektur der KI, sondern das Ergebnis konkreter Vorschläge aus dem Review: Bullet-Graph statt Ring, ein Balken je Woche statt Stapel, Kalender, Kacheln, Status-Badge, alles antippbar. Vorher-Nachher-Bilder liegen in <code>site/assets/img/vergleich-mobile.png</code> und <code>vergleich-desktop.png</code>.</p>
+<p><strong>Was der Erstentwurf falsch machte</strong> (die Liste an die Wand, die Gruppe soll die Punkte selbst finden, bevor sie eingeblendet wird):</p>
+<table>
+<thead>
+<tr>
+<th>Befund im Erstentwurf</th>
+<th>Warum das täuscht</th>
+<th>Zweitentwurf</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ring geschlossen, „161 % vom Ziel“</td>
+<td>Ein Kreis zeigt einen Anteil an einem Ganzen. Eine Woche ist kein Ganzes, sie hat ein Ziel, das man verfehlt oder übertrifft. Ab 100 % ist der Ring voll und sagt nichts mehr, die Zahl hat keine Einheit.</td>
+<td>Bullet-Graph: Balken für 64,4 km, Marke bei 40 km, Skala bis 80 km. Die Übererfüllung liegt sichtbar rechts der Marke. Daneben „24,4 km über dem Ziel“, Badge „Ziel erreicht“, „3 Wochen in Folge“</td>
+</tr>
+<tr>
+<td>„Kalenderwoche 36“ als Fortschritt, obwohl die Woche vorbei ist</td>
+<td>Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis.</td>
+<td>Titel „Letzte Trainingswoche“ mit Datumsspanne; nur bei Daten in der laufenden Woche „Diese Woche, Stand Do“ mit Badge „Auf Kurs“ oder „Im Rückstand“ gegen das anteilige Ziel</td>
+</tr>
+<tr>
+<td>Wochenziel 40 km ohne Bezug</td>
+<td>2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, muss aber dastehen.</td>
+<td>„Ziel 40 km über alle Sportarten“, der Balken im Bullet-Graph ist nach Sportart gefärbt, darunter die Kilometer je Sportart</td>
+</tr>
+<tr>
+<td>Balken ohne x-Achse, Tooltip nur mit Maus</td>
+<td>Welcher Balken ist welche Woche? Raten. Auf dem Handy gibt es keinen Hover.</td>
+<td>Achse „Kalenderwoche“, Ziellinie, Farbe sagt „Ziel erreicht“ oder „unter dem Ziel“, Tippen irgendwo in der Spalte zeigt die Woche mit einem Balken je Sportart unter dem Diagramm</td>
+</tr>
+<tr>
+<td>Gestapelte Säulen, „Alles“ mit 105 Balken</td>
+<td>Stapel sind auf 375 px nicht ablesbar: Teilbalken haben keine gemeinsame Nulllinie. 105 Balken sind unlesbar.</td>
+<td>Ein Balken je Woche, die Sportarten im Detail darunter; ab einem Jahr Monatssummen</td>
+</tr>
+<tr>
+<td>Kürzel „8 W / 6 M / 1 J“, „Sc / Wa / Ra“</td>
+<td>Versteht niemand ohne Einweisung.</td>
+<td>Ausgeschrieben, Symbole je Sportart</td>
+</tr>
+<tr>
+<td>„Einheiten“ zweimal, einmal je Woche, einmal gesamt</td>
+<td>Gleiches Wort, andere Bedeutung.</td>
+<td>„Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Beste Woche, KW 37/2025“</td>
+</tr>
+<tr>
+<td>Schrift 12 px, keine <code>aria-pressed</code>, nur dunkel</td>
+<td>Auf dem Handy in der Sonne unlesbar, für Screenreader nicht lesbar.</td>
+<td>Mindestens 13 px, <code>aria-pressed</code>, sprechende <code>aria-label</code>, Tabelle für Screenreader, helles Thema</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Was der Zweitentwurf zusätzlich bringt,</strong> weil das Review danach gefragt hat, nicht die KI:</p>
+<ul>
+<li><strong>Trainingskalender:</strong> ein Feld je Tag der letzten acht Wochen, Farbe nach Kilometern, Zahl im Feld, Tippen zeigt die Einheit. Zeigt Regelmäßigkeit, die ein Wochenbalken verbirgt.</li>
+<li><strong>Sportarten-Kacheln:</strong> Kilometer, Anteil als Balken, Einheiten je Sportart; Tippen filtert die Aktivitätenliste.</li>
+<li><strong>Status-Badge:</strong> ein Wort für den Stand, dazu die Serie erreichter Wochen.</li>
+<li><strong>Ø je Einheit</strong> in der Wochenkarte, <strong>Beste Woche</strong> in den Kennzahlen.</li>
+<li><strong>Sheet statt Tooltip:</strong> Jedes Objekt öffnet beim Antippen einen Dialog mit Details, auf dem Handy von unten. Die Woche mit Balken je Sportart und ihren Einheiten, der Kalendertag mit seiner Einheit, die Kennzahl mit ihrer Rechnung, die Sportart mit Filterknopf, die Einheit mit Tempo. Die Seite selbst bleibt dadurch ruhig: keine Detailzeilen unter den Grafiken.</li>
+<li><strong>Thema-Umschalter:</strong> hell oder dunkel per Knopf im Kopf, gespeichert im Browser; ohne Wahl gilt das Gerät.</li>
+</ul>
+<p class="label label-info"><strong>Story:</strong> Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard genau das aussagt, was die Daten hergeben. Akzeptanz siehe README (US-7).</p>
+<p><strong>Test zuerst</strong> (<code>pytest</code>: 1 failed). Das Backend liefert die Kilometer je Sportart, damit das Frontend nichts selbst zusammenrechnen muss:</p>
+<div class="block block-datei"><div class="block-kopf"><span>Python-Datei</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>def test_wochen_je_sportart():
+    wochen = client.get(&quot;/api/stats/wochen&quot;).json()
+    assert wochen[0][&quot;je_sportart&quot;] == {&quot;Laufen&quot;: 13.0, &quot;Radfahren&quot;: 20.0, &quot;Schwimmen&quot;: 1.5}
+    assert wochen[1][&quot;je_sportart&quot;] == {}
+    assert wochen[2][&quot;je_sportart&quot;] == {&quot;Laufen&quot;: 13.0, &quot;Radfahren&quot;: 30.0, &quot;Wandern&quot;: 10.0}
+</code></pre></div>
+<p>Der bestehende Test <code>test_wochen_anzahl_und_luecken</code> vergleicht KW 24 als ganzes Dictionary und muss um <code>"je_sportart": {}</code> ergänzt werden. Das ist eine bewusste Änderung der Spezifikation, kein „Test passend machen“: Die Story erweitert die Antwort.</p>
+<p><strong>Prompt, der solche Fehler verhindert</strong> (vor dem Code, nicht danach):</p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Wir bauen das Dashboard von FitTrack (Vanilla JS, Chart.js 4, API-Antworten
+siehe unten). Bevor du Code schreibst, lege die Bedeutung jedes Elements
+fest. Gib eine Tabelle mit den Spalten
+Element | zeigt | Einheit | Zeitbezug | Form | Zustände (0 %, 100 %,
+über 100 %, keine Daten) | Beschriftung im Bild.
+Regeln, die die Tabelle erfüllen muss:
+1. Jede Zahl trägt Einheit und Bezug, z. B. &quot;64,4 km, KW 36, 31.08. bis 06.09.&quot;.
+2. Die Form passt zur Aussage: Ein Kreis nur für Anteile an einem Ganzen.
+   Ein Ziel als Bullet-Graph: Balken für den Ist-Wert, Marke für das Ziel,
+   Skala über das Ziel hinaus, damit Übererfüllung sichtbar bleibt.
+3. Fortschritt nur für laufende Zeiträume. Abgeschlossene Zeiträume
+   heißen Ergebnis.
+4. Jede Achse hat Titel und Einheit, jede Farbe steht in einer Legende.
+   Keine gestapelten Balken auf 375 px; Aufteilungen stehen als eigene
+   Balken im Detail.
+5. Kein Begriff bedeutet an zwei Stellen etwas Verschiedenes, keine
+   Abkürzungen, die nicht im Bild erklärt sind.
+6. Touch zuerst: Jede Grafik ist antippbar und nennt dann ihre Zahl im
+   Klartext. Nichts, was nur mit der Maus erscheint.
+7. Beschreibe, wie die Ansicht bei 0, 1 und 105 Datenpunkten aussieht.
+8. Schrift mindestens 13 px, Bedienelemente 44 px, aria-pressed an
+   Umschaltern, sprechende aria-label, helles und dunkles Thema.
+Erst wenn ich die Tabelle bestätigt habe, schreibst du den Code.
+API-Antworten: [Beispiel von /api/stats und /api/stats/wochen einfügen]
+</code></pre></div>
+<p><strong>Prompt zur Selbstprüfung</strong> (nach jedem Vorschlag, bevor jemand den Code anfasst):</p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Prüfe deinen Vorschlag wie ein kritischer Designer, der ihn zum ersten
+Mal sieht. Gehe jedes sichtbare Element durch und beantworte: Was
+bedeutet es? Woher kommt der Wert? Passt die Form zur Aussage? Was zeigt
+es bei 0, bei mehr als 100 %, bei 105 Datenpunkten, auf 375 px Breite
+ohne Maus? Nenne jede Stelle, an der die Darstellung mehr behauptet als
+die Daten hergeben, und schlage die Korrektur vor. Lobe nichts. Wenn du
+nichts findest, sage das und begründe es je Element.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte:</strong> Die Gruppe geht die Liste „Semantik-Review: Schön, aber falsch“ aus <code>docs/checklisten.md</code> am Beamer durch. Eine Zahl wird nachgerechnet: <code>SELECT sportart, ROUND(SUM(distanz_km),1) FROM v_workout WHERE datum BETWEEN '2026-08-31' AND '2026-09-06' GROUP BY sportart;</code> muss die Aufteilung der Wochenkarte ergeben. Am Handy: einen Balken, ein Kalenderfeld, eine Kennzahl, eine Sportart-Kachel und eine Einheit antippen, jedes Mal öffnet ein Sheet; Tippen daneben schließt es. Den Thema-Knopf drücken, Seite neu laden: Die Wahl bleibt. „Alles“ anklicken. Tab-Taste drücken: Fokusring sichtbar? Systemeinstellung auf hell stellen: lesbar?</p>
+<p class="label label-info"><strong>Botschaft für die Gruppe:</strong> Tests sichern die Daten, nicht die Aussage. Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen. Der Erstentwurf der KI war ein brauchbarer Schritt; gut wurde er erst durch die Kritik eines Menschen, der wusste, was ein Kreis bedeutet und was ein Ziel braucht. Deshalb legt der Prompt Bedeutung und Form vor dem Code fest, und deshalb prüft die QA-Rolle die Oberfläche mit derselben Strenge wie den Code.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>feat(US-7): Zweitentwurf nach Semantik-Review: Bullet-Graph, Kalender, Kacheln</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-7-docker-termin-2-ab-1-10"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-7-docker-termin-2-ab-1-10"> <span>erledigt</span></label><h2>Schritt 7: Docker (Termin 2, ab 1:10)</h2></header><div class="schritt-inhalt">
+<p class="label label-info"><strong>Container in 2 Minuten:</strong> Problem „läuft bei mir“. Lösung: App, Python und Bibliotheken in einem standardisierten Paket. Image ist der Bauplan, Container die laufende Instanz.</p>
+<p><strong>Prompt</strong> (oder die Vorlage aus dem Kurskonzept nehmen und gemeinsam Zeile für Zeile lesen):</p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Erstelle ein Dockerfile für eine FastAPI-App mit dieser Struktur:
+
+FitTrack/
+├── backend/app/main.py      (FastAPI-App, Objekt heißt app)
+├── frontend/                (statische Dateien, von main.py ausgeliefert)
+└── requirements.txt
+
+Anforderungen:
+- Basis python:3.12-slim, Arbeitsverzeichnis /app
+- requirements.txt zuerst kopieren und installieren, damit die Schicht
+  gecacht wird; dann backend/ und frontend/ kopieren
+- Start: uvicorn backend.app.main:app --host 0.0.0.0
+- Der Port kommt aus der Umgebungsvariable PORT, Standard 8000
+  (Render.com setzt PORT); EXPOSE 8000
+- Dazu eine .dockerignore, die .git, .venv, __pycache__, backend/tests
+  und docs ausschließt
+- Jeder Schritt mit einem kurzen deutschen Kommentar, der erklärt, warum
+
+Erkläre in drei Sätzen, warum requirements.txt vor dem Code kopiert wird.
+</code></pre></div>
+<p class="label label-handlung"><strong>Prüfpunkte:</strong> Steht <code>CMD</code> in Shell-Form oder als <code>["sh", "-c", "..."]</code>? Nur dann wird <code>${PORT:-8000}</code> ausgewertet. Ist <code>--host 0.0.0.0</code> gesetzt? Sonst ist der Container von außen nicht erreichbar.</p>
+<p class="label label-handlung"><strong>Befehle (alle machen mit):</strong></p>
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>docker build -t fittrack .
+docker run -p 8000:8000 fittrack
+</code></pre></div>
+<p>Browser <a href="http://localhost:8000/health">http://localhost:8000/health</a>, dann Handy im WLAN. Botschaft: Was hier läuft, läuft identisch auf jedem Server.</p>
+<p>Zweites Terminal: <code>docker ps</code>, <code>docker stop &lt;id&gt;</code>. Dann <code>docker run -p 8000:8000 -e PORT=8000 fittrack</code> als Beweis, dass die Variable gelesen wird.</p>
+<p>Wenn Port 8000 belegt ist: <code>-p 8001:8000</code>.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>build(Sprint 3): Dockerfile für FitTrack</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-8-render-com-termin-2-ab-1-25"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-8-render-com-termin-2-ab-1-25"> <span>erledigt</span></label><h2>Schritt 8: Render.com (Termin 2, ab 1:25)</h2></header><div class="schritt-inhalt">
+<p>Anleitung: <code>docs/dozent/render-deploy.md</code>. Im Kurs zeigen: <code>render.yaml</code> ins Repo, Commit, Push, Render-Dashboard beobachten, URL aufs Handy. Der Free-Plan reicht.</p>
+<p><code>render.yaml</code> mit den Studierenden lesen: <code>runtime: docker</code> (baut unser Dockerfile), <code>healthCheckPath: /health</code> (dafür war US-3), <code>autoDeploy: true</code> (jeder Push deployt).</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>deploy: Render-Blueprint</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-schritt-9-github-actions-optional"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-9-github-actions-optional"> <span>erledigt</span></label><h2>Schritt 9: GitHub Actions (optional)</h2></header><div class="schritt-inhalt">
+<p class="label label-handlung"><strong>Prompt:</strong></p>
+<div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Erstelle .github/workflows/tests.yml für GitHub Actions: bei jedem Push und
+Pull Request auf ubuntu-latest Python 3.12 einrichten,
+pip install -r requirements.txt und pytest ausführen. Schritte auf Deutsch
+benennen, ein Kommentar am Anfang, der erklärt, wo man das Ergebnis sieht.
+</code></pre></div>
+<p>Nach dem Push: Reiter „Actions“ im Repo zeigen. Der grüne Haken ist die maschinelle Definition of Done.</p>
+<p class="label label-handlung"><strong>Commit:</strong> <code>ci: pytest bei jedem Push</code></p>
+<hr />
+</div></section><section class="schritt" id="ablauf-exkurs-lm-studio-termin-2-ab-1-35"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-exkurs-lm-studio-termin-2-ab-1-35"> <span>erledigt</span></label><h2>Exkurs LM Studio (Termin 2, ab 1:35)</h2></header><div class="schritt-inhalt">
+<p>Anleitung: <code>docs/dozent/lmstudio-demo.md</code>. Den Prompt aus Schritt 3 verwenden, Ergebnis in WebStorm einfügen, <code>pytest</code> entscheidet.</p>
+<hr />
+</div></section><section class="schritt" id="ablauf-anhang-wenn-etwas-schiefgeht"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-anhang-wenn-etwas-schiefgeht"> <span>erledigt</span></label><h2>Anhang: Wenn etwas schiefgeht</h2></header><div class="schritt-inhalt">
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Ursache</th>
+<th>Lösung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'app.main'</code> nach Schritt 1</td>
+<td><code>main.py</code> liegt im falschen Ordner</td>
+<td>Muss in <code>backend/app/</code> liegen</td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'fastapi'</code></td>
+<td>venv nicht aktiv</td>
+<td><code>source .venv/bin/activate</code>, in WebStorm Interpreter prüfen</td>
+</tr>
+<tr>
+<td><code>pytest</code> findet keine Tests</td>
+<td>im falschen Ordner gestartet</td>
+<td>Aus dem Projektordner <code>FitTrack/</code> starten, dort liegt <code>pytest.ini</code></td>
+</tr>
+<tr>
+<td><code>/api/workouts</code> liefert 404 nach Schritt 4</td>
+<td>StaticFiles-Mount steht vor den Routen</td>
+<td>Mount ans Ende von <code>main.py</code></td>
+</tr>
+<tr>
+<td><code>Address already in use</code></td>
+<td>Port 8000 belegt</td>
+<td><code>--port 8001</code> oder <code>docker run -p 8001:8000</code></td>
+</tr>
+<tr>
+<td>Handy erreicht den Rechner nicht</td>
+<td>Firewall oder anderes Netz</td>
+<td>Hotspot vom Handy, Rechner damit verbinden, oder Render-URL</td>
+</tr>
+<tr>
+<td>Diagramm leer, Konsole „Canvas is already in use“</td>
+<td>Chart wird mehrfach erzeugt</td>
+<td>Chart in Variable merken, <code>update()</code> nutzen</td>
+</tr>
+<tr>
+<td>Claude-Limit erreicht</td>
+<td></td>
+<td>LM Studio, gleicher Prompt</td>
+</tr>
+<tr>
+<td>Zeitnot in Termin 2</td>
+<td></td>
+<td>Schritt 6 Teil B (Ring) weglassen, Schritt 7 mit fertigem Dockerfile</td>
+</tr>
+</tbody>
+</table></div></section></article><article class="kapitel" id="tests"><h1>Die Tests</h1><p class="kapitel-kurz">Wie die 15 Tests aufgebaut sind, was jeder prüft und wie man sie ausführt.</p><p>Stand 11.09.2026, 15 Tests in <code>backend/tests/test_api.py</code>, alle grün in unter einer Sekunde. Dieses Dokument beschreibt, wie die Tests aufgebaut sind, was jeder einzelne prüft und wie man sie ausführt.</p>
+<section class="schritt" id="tests-ausf-hren"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="tests-ausf-hren"> <span>erledigt</span></label><h2>Ausführen</h2></header><div class="schritt-inhalt">
+<div class="block block-terminal"><div class="block-kopf"><span>Terminal</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>pytest                          # alle Tests, kurze Ausgabe: 15 passed
+pytest -v                       # je Test Name und PASSED/FAILED
+pytest -k test_stats_gesamt_km  # nur ein Test
+</code></pre></div>
+<p>In WebStorm: Rechtsklick auf <code>test_api.py</code>, „Run pytest in test_api.py“. Der Lauf erscheint als Liste mit Haken und Kreuzen, der grüne Pfeil oben rechts wiederholt ihn. <code>pytest.ini</code> legt <code>backend/tests</code> als Testordner fest und blendet eine Warnung von anyio aus.</p>
+<p>Bei jedem Push führt <code>.github/workflows/tests.yml</code> denselben Lauf auf einem frischen Ubuntu-Runner aus: <code>pip install -r requirements.txt</code>, dann <code>pytest</code>. Das Ergebnis steht als Haken oder Kreuz am Commit.</p>
+</div></section><section class="schritt" id="tests-aufbau"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="tests-aufbau"> <span>erledigt</span></label><h2>Aufbau</h2></header><div class="schritt-inhalt">
+<p><strong>Testdaten statt Echtdaten.</strong> Die App liest ihre Datenbank aus dem Pfad in der Umgebungsvariablen <code>FITTRACK_DATA</code>. <code>conftest.py</code> läuft vor allen Tests, legt eine temporäre SQLite-Datei an, führt <code>schema.sql</code> und <code>fixtures/workouts_klein.sql</code> darauf aus und setzt <code>FITTRACK_DATA</code> auf diese Datei, bevor <code>app.main</code> importiert wird. Die Tests sehen also immer dieselben acht Einheiten, unabhängig von <code>fittrack.db</code>. Nach dem Lauf bleibt die Datei im Temp-Ordner liegen; das Betriebssystem räumt sie auf.</p>
+<p><strong>Kein Server.</strong> <code>TestClient(app)</code> aus FastAPI ruft die Routen im selben Prozess auf. <code>client.get("/api/stats")</code> liefert dasselbe Objekt, das ein Browser bekäme, ohne dass uvicorn läuft. Deshalb sind die Tests schnell und brauchen keinen freien Port.</p>
+<p><strong>Erwartungswerte von Hand.</strong> Jeder Zahlenwert in den Tests wurde aus den acht Fixture-Einheiten gerechnet, die Rechnung steht als Kommentar im Test und in <code>erwartungswerte.md</code>. Der Wert kommt nie aus dem Modell.</p>
+<p><strong>Randfälle per monkeypatch.</strong> Für „keine Daten“ tauscht <code>monkeypatch.setattr(main, "lade_workouts", lambda: [])</code> die Ladefunktion für die Dauer eines Tests gegen eine leere Liste aus. Die Datenbank bleibt unberührt, nach dem Test ist die echte Funktion zurück.</p>
+</div></section><section class="schritt" id="tests-das-fixture"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="tests-das-fixture"> <span>erledigt</span></label><h2>Das Fixture</h2></header><div class="schritt-inhalt">
+<p>Acht Einheiten in drei Kalenderwochen, KW 24 bewusst leer:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>Datum</th>
+<th>KW</th>
+<th>Sportart</th>
+<th>min</th>
+<th>km</th>
+<th>kcal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>01.06.2026</td>
+<td>23</td>
+<td>Laufen</td>
+<td>30</td>
+<td>5,0</td>
+<td>350</td>
+</tr>
+<tr>
+<td>2</td>
+<td>03.06.2026</td>
+<td>23</td>
+<td>Radfahren</td>
+<td>60</td>
+<td>20,0</td>
+<td>500</td>
+</tr>
+<tr>
+<td>3</td>
+<td>05.06.2026</td>
+<td>23</td>
+<td>Laufen</td>
+<td>45</td>
+<td>8,0</td>
+<td>560</td>
+</tr>
+<tr>
+<td>4</td>
+<td>06.06.2026</td>
+<td>23</td>
+<td>Schwimmen</td>
+<td>40</td>
+<td>1,5</td>
+<td>400</td>
+</tr>
+<tr>
+<td>5</td>
+<td>15.06.2026</td>
+<td>25</td>
+<td>Radfahren</td>
+<td>90</td>
+<td>30,0</td>
+<td>750</td>
+</tr>
+<tr>
+<td>6</td>
+<td>17.06.2026</td>
+<td>25</td>
+<td>Laufen</td>
+<td>50</td>
+<td>9,0</td>
+<td>630</td>
+</tr>
+<tr>
+<td>7</td>
+<td>19.06.2026</td>
+<td>25</td>
+<td>Wandern</td>
+<td>120</td>
+<td>10,0</td>
+<td>600</td>
+</tr>
+<tr>
+<td>8</td>
+<td>21.06.2026</td>
+<td>25</td>
+<td>Laufen</td>
+<td>25</td>
+<td>4,0</td>
+<td>280</td>
+</tr>
+</tbody>
+</table>
+<p>Daraus: 87,5 km gesamt, 3 Kalenderwochen, Ø 29,2 km, Radfahren 50,0 km vor Laufen 26,0 km; KW 23: 34,5 km, 4 Einheiten, 175 min; KW 25: 53,0 km, 4 Einheiten, 285 min.</p>
+</div></section><section class="schritt" id="tests-die-15-tests"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="tests-die-15-tests"> <span>erledigt</span></label><h2>Die 15 Tests</h2></header><div class="schritt-inhalt">
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Story</th>
+<th>Prüft</th>
+<th>Erwartung</th>
+<th>Warum dieser Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_health</code></td>
+<td>US-3</td>
+<td>Endpunkt antwortet</td>
+<td>200, <code>{"status": "ok"}</code></td>
+<td>Erster Test im Kurs, die Schleife einmal ganz; später Health-Check für Docker und Render</td>
+</tr>
+<tr>
+<td><code>test_workouts_liefert_liste</code></td>
+<td>US-1</td>
+<td>Typ und Anzahl</td>
+<td>Liste mit 8 Einträgen</td>
+<td>Beweist, dass die Testdatenbank gelesen wird, nicht die Echtdaten</td>
+</tr>
+<tr>
+<td><code>test_workouts_felder</code></td>
+<td>US-1</td>
+<td>Struktur</td>
+<td>genau <code>id, datum, sportart, dauer_min, distanz_km, kalorien</code></td>
+<td>Fängt zusätzliche oder fehlende Felder, etwa <code>sportart_id</code> aus der Tabelle statt <code>sportart</code> aus der Sicht</td>
+</tr>
+<tr>
+<td><code>test_workouts_sortiert_absteigend</code></td>
+<td>US-1</td>
+<td>Sortierung in SQL</td>
+<td>id 8 zuerst, id 1 zuletzt</td>
+<td>Die Sortierung liegt im <code>ORDER BY</code> der Abfrage, nicht in Python</td>
+</tr>
+<tr>
+<td><code>test_echtdaten_sind_lesbar</code></td>
+<td>US-1</td>
+<td>Rauchtest gegen <code>fittrack.db</code></td>
+<td>mehr als 250 Zeilen, alle vier Sportarten</td>
+<td>Der einzige Test gegen Echtdaten; fängt eine kaputte oder leere Datenbank im Repo</td>
+</tr>
+<tr>
+<td><code>test_stats_gesamt_km</code></td>
+<td>US-2</td>
+<td>Summe und Rundung</td>
+<td>87,5</td>
+<td>Der Vorführtest: Wert von Hand gerechnet</td>
+</tr>
+<tr>
+<td><code>test_stats_durchschnitt</code></td>
+<td>US-2</td>
+<td>Wochenzählung mit Lücke</td>
+<td>29,2</td>
+<td>Häufigster Fehler: nur Wochen mit Training zählen ergibt 43,75</td>
+</tr>
+<tr>
+<td><code>test_stats_lieblingssportart</code></td>
+<td>US-2</td>
+<td>Definition über Distanz</td>
+<td>Radfahren</td>
+<td>Nach Anzahl wäre es Laufen; zeigt, warum das Kriterium präzise sein muss</td>
+</tr>
+<tr>
+<td><code>test_stats_anzahl</code></td>
+<td>US-2</td>
+<td>Zählung</td>
+<td>8</td>
+<td>Vollständigkeit der Antwort</td>
+</tr>
+<tr>
+<td><code>test_stats_leere_liste</code></td>
+<td>US-2</td>
+<td>Randfall ohne Daten</td>
+<td>0.0, 0.0, null, 0</td>
+<td>Division durch null Wochen, <code>max()</code> auf leerer Liste; per <code>monkeypatch</code></td>
+</tr>
+<tr>
+<td><code>test_index_liefert_html</code></td>
+<td>US-4</td>
+<td>Auslieferung des Frontends</td>
+<td>200, <code>text/html</code>, „FitTrack“</td>
+<td>Fängt den Fehler, <code>app.mount("/")</code> vor den API-Routen zu registrieren</td>
+</tr>
+<tr>
+<td><code>test_wochen_anzahl_und_luecken</code></td>
+<td>US-6</td>
+<td>Lückenwoche mit Nullwerten</td>
+<td>3 Wochen, KW 24 komplett mit Nullen und <code>je_sportart: {}</code></td>
+<td>Wochen ohne Training dürfen nicht fehlen, sonst zeigt das Diagramm Urlaub als Training</td>
+</tr>
+<tr>
+<td><code>test_wochen_summen</code></td>
+<td>US-6</td>
+<td>Summen je Woche</td>
+<td>34,5 / 4 / 175 und 53,0 / 4 / 285</td>
+<td>Aggregation je Kalenderwoche, Montag als <code>wochenstart</code></td>
+</tr>
+<tr>
+<td><code>test_wochen_leer</code></td>
+<td>US-6</td>
+<td>Randfall ohne Daten</td>
+<td>leere Liste</td>
+<td>per <code>monkeypatch</code></td>
+</tr>
+<tr>
+<td><code>test_wochen_je_sportart</code></td>
+<td>US-7</td>
+<td>Kilometer je Sportart und Woche</td>
+<td>KW 23: Laufen 13,0, Radfahren 20,0, Schwimmen 1,5; KW 24: <code>{}</code>; KW 25: Laufen 13,0, Radfahren 30,0, Wandern 10,0</td>
+<td>Das Backend liefert die Aufteilung, das Frontend rechnet nichts selbst</td>
+</tr>
+</tbody>
+</table>
+</div></section><section class="schritt" id="tests-was-die-tests-nicht-pr-fen"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="tests-was-die-tests-nicht-pr-fen"> <span>erledigt</span></label><h2>Was die Tests nicht prüfen</h2></header><div class="schritt-inhalt">
+<p>Sie prüfen die API, nicht die Oberfläche. Ob das Dashboard aus richtigen Zahlen eine wahre Aussage macht (Ring bei 161 %, vergangene Woche als Fortschritt), sieht kein Test. Dafür gibt es den Semantik-Review in <code>docs/checklisten.md</code> und die Abnahme am Gerät: 375 px breit, kein horizontales Scrollen, jedes Objekt antippbar. Ebenso ungeprüft bleiben Docker-Build und Deploy; die prüfen der Health-Check bei Render und der Handy-Test.</p>
+</div></section><section class="schritt" id="tests-tests-ndern"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="tests-tests-ndern"> <span>erledigt</span></label><h2>Tests ändern</h2></header><div class="schritt-inhalt">
+<p>Ein Test wird nie geändert, damit er zum Code passt. Er ändert sich nur, wenn eine Story die Spezifikation erweitert. Beispiel: US-7 fügt <code>je_sportart</code> zur Wochenantwort hinzu, deshalb bekam <code>test_wochen_anzahl_und_luecken</code> das Feld in seinem Vergleichsobjekt, und <code>test_wochen_je_sportart</code> kam dazu, beides vor dem Code und mit Begründung im Commit <code>feat(US-7)</code>.</p>
+</div></section><section class="schritt" id="tests-h-ufige-fehlerbilder"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="tests-h-ufige-fehlerbilder"> <span>erledigt</span></label><h2>Häufige Fehlerbilder</h2></header><div class="schritt-inhalt">
+<table>
+<thead>
+<tr>
+<th>Ausgabe</th>
+<th>Ursache</th>
+<th>Abhilfe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'app.main'</code></td>
+<td><code>main.py</code> fehlt noch (Starter) oder pytest läuft aus dem falschen Ordner</td>
+<td>Im Projektordner starten; im Starter ist das der erwartete rote Zustand</td>
+</tr>
+<tr>
+<td><code>assert 404 == 200</code></td>
+<td>Route fehlt oder heißt anders</td>
+<td>Pfad im Decorator mit dem Test vergleichen</td>
+</tr>
+<tr>
+<td><code>assert 43.8 == 29.2</code></td>
+<td>Nur Wochen mit Training gezählt</td>
+<td>Kalenderwochen von der ersten bis zur letzten Woche zählen</td>
+</tr>
+<tr>
+<td><code>KeyError: 'sportart'</code></td>
+<td>Aus der Tabelle <code>workout</code> statt aus der Sicht <code>v_workout</code> gelesen</td>
+<td><code>SELECT … FROM v_workout</code></td>
+</tr>
+<tr>
+<td>alle API-Tests 404, nur <code>test_index</code> grün</td>
+<td><code>app.mount("/")</code> steht vor den Routen</td>
+<td>Mount als letzte Zeile in <code>main.py</code></td>
+</tr>
+</tbody>
+</table></div></section></article><article class="kapitel" id="checklisten"><h1>Checklisten</h1><p class="kapitel-kurz">Definition of Done, Review-Checkliste, Semantik-Review, Prompt-Regeln, Endabnahme.</p><section class="schritt" id="checklisten-definition-of-done-pro-user-story"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="checklisten-definition-of-done-pro-user-story"> <span>erledigt</span></label><h2>Definition of Done (pro User Story)</h2></header><div class="schritt-inhalt">
+<ul>
+<li>[ ] Code läuft lokal ohne Fehler</li>
+<li>[ ] Zugehörige Tests vorhanden und grün (<code>pytest</code>)</li>
+<li>[ ] Akzeptanzkriterium der Story nachweislich erfüllt (Demo am Handy)</li>
+<li>[ ] Code von mindestens einer Person reviewt (Review-Checkliste unten)</li>
+<li>[ ] Commit mit aussagekräftiger Message und Story-Bezug, z. B. <code>feat(US-2): Kennzahlen-Endpunkt</code></li>
+</ul>
+</div></section><section class="schritt" id="checklisten-review-checkliste-f-r-bernommenen-ki-code-qa-rolle"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="checklisten-review-checkliste-f-r-bernommenen-ki-code-qa-rolle"> <span>erledigt</span></label><h2>Review-Checkliste für übernommenen KI-Code (QA-Rolle)</h2></header><div class="schritt-inhalt">
+<ul>
+<li>[ ] Habe ich jede Funktion verstanden? Kann ich sie in einem Satz erklären?</li>
+<li>[ ] Existieren alle Imports wirklich? (Halluzinierte Pakete oder Funktionen?)</li>
+<li>[ ] Sind Randfälle behandelt: leere Liste, <code>None</code>, ungültige IDs?</li>
+<li>[ ] Gibt es hartkodierte Werte, die in die Daten oder in die Konfiguration gehören?</li>
+<li>[ ] Bestehen die Tests, und testen die Tests wirklich das Verhalten aus der Story?</li>
+<li>[ ] Ist der Code stilistisch konsistent mit dem Rest (Namen, Struktur, Sprache)?</li>
+</ul>
+</div></section><section class="schritt" id="checklisten-semantik-review-sch-n-aber-falsch-vor-jeder-abnahm"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="checklisten-semantik-review-sch-n-aber-falsch-vor-jeder-abnahm"> <span>erledigt</span></label><h2>Semantik-Review: Schön, aber falsch (vor jeder Abnahme einer Oberfläche)</h2></header><div class="schritt-inhalt">
+<p>Ein Vorschlag, der gut aussieht, ist noch nicht richtig. Der Erstentwurf des FitTrack-Dashboards bestand alle Tests und zeigte trotzdem einen geschlossenen Ring mit „161 %“ für eine Woche, die längst vorbei war. Erst die Kritik eines Menschen machte aus dem Erstentwurf den Zweitentwurf: KI allein liefert einen brauchbaren Schritt, KI mit Kritik ein gutes Ergebnis. Die Tests prüfen die API, nicht die Aussage der Oberfläche. Deshalb geht diese Liste vor jeder Abnahme einmal über jedes sichtbare Element.</p>
+<ul>
+<li>[ ] <strong>Bedeutung:</strong> Kann ich zu jeder Zahl sagen, was sie zeigt, in welcher Einheit und für welchen Zeitraum? Steht das auch dran?</li>
+<li>[ ] <strong>Nachrechnen:</strong> Kann ich die Zahl aus den Rohdaten (Datenbank, API-Antwort) selbst herleiten? Stichprobe machen.</li>
+<li>[ ] <strong>Zustände:</strong> Was bedeutet das Element bei 0 %, bei 100 %, bei mehr als 100 %? Was zeigt es, wenn es „voll“ ist? Ist die Aussage dann noch wahr?</li>
+<li>[ ] <strong>Form passt zur Aussage:</strong> Ein Kreis zeigt Anteile an einem Ganzen. Ein Ziel braucht eine Marke am Balken (Bullet-Graph), damit Verfehlen und Übertreffen sichtbar bleiben. Verläufe als ein Balken je Zeitabschnitt; keine Stapel auf 375 px.</li>
+<li>[ ] <strong>Zeitbezug:</strong> Ist der Zeitraum abgeschlossen oder laufend? Ein Fortschrittsbalken für eine vergangene Woche ist ein Ergebnis, kein Fortschritt. Steht an jeder Karte, worauf sich ihre Zahlen beziehen (seit wann, welche Wochen, mit Jahr)? Eine Kalenderwoche ohne Jahr ist kein Zeitbezug.</li>
+<li>[ ] <strong>Achsen und Legende:</strong> Hat jede Achse Titel und Einheit? Ist jede Farbe erklärt? Weiß ich, welcher Balken welche Woche ist?</li>
+<li>[ ] <strong>Gleiche Wörter, gleiche Bedeutung:</strong> Kommt ein Begriff zweimal vor („Einheiten“), meint er beide Male dasselbe? Sonst Bezug ergänzen.</li>
+<li>[ ] <strong>Abkürzungen:</strong> Versteht jemand ohne Einweisung „8 W“, „Sc“, „Ø“? Ausschreiben oder erklären.</li>
+<li>[ ] <strong>Extremfälle:</strong> Sieht die Ansicht mit 0, 1 und 105 Datenpunkten noch sinnvoll aus? „Alles“ ausprobieren.</li>
+<li>[ ] <strong>Schmale Displays:</strong> Bei 320 und 353 px Breite (kleines Handy, Frontdisplay eines Klapphandys) kein horizontales Scrollen, kein abgeschnittener Text. Prüfen mit den Gerätemaßen in den Entwicklerwerkzeugen.</li>
+<li>[ ] <strong>Bedienbarkeit:</strong> Schrift mindestens 13 px, Bedienelemente 44 px, Tastatur (Tab, Fokusring), Screenreader (<code>aria-pressed</code>, sprechende <code>aria-label</code>), Kontrast, helles und dunkles Thema.</li>
+<li>[ ] <strong>Touch:</strong> Jedes Objekt ist antippbar und öffnet dann seine Details im Klartext, etwa in einem Sheet (Balken, Kalenderfeld, Kennzahl, Kachel, Einheit). Kein Tooltip, der nur mit der Maus erscheint. Hell und dunkel per Knopf, nicht nur per Systemeinstellung.</li>
+<li>[ ] <strong>Zehn-Sekunden-Test:</strong> Die Ansicht jemandem zehn Sekunden zeigen und erklären lassen. Was falsch erklärt wird, ist falsch dargestellt.</li>
+</ul>
+<p>Eine Story gilt erst als abgenommen, wenn jeder Punkt entweder erfüllt ist oder bewusst zurückgestellt wurde.</p>
+</div></section><section class="schritt" id="checklisten-prompt-regeln"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="checklisten-prompt-regeln"> <span>erledigt</span></label><h2>Prompt-Regeln</h2></header><div class="schritt-inhalt">
+<ol>
+<li>Eine Story pro Prompt, nicht „bau mir die ganze App“.</li>
+<li>Kontext mitliefern: Datenmodell, genutzte Bibliotheken, bestehender Code als Ausschnitt.</li>
+<li>Randbedingungen nennen: Versionen, verbotene Pakete, Namenskonventionen.</li>
+<li>Erklärung anfordern: „Erkläre in drei Sätzen deine wichtigsten Entscheidungen.“</li>
+<li>Fehlermeldungen wörtlich zurückspielen: Traceback kopieren, nicht paraphrasieren.</li>
+<li>Niemals Unverstandenes committen: Jede Zeile muss jemand in der Gruppe erklären können.</li>
+<li>Bei Oberflächen zuerst die Bedeutung festlegen, dann Code anfordern: Für jedes Element Aussage, Einheit, Zeitbezug, Zustände und die passende Form in einer Tabelle bestätigen lassen (Vorlage im Prompt-Skript, Schritt 6b).</li>
+<li>Jeden Vorschlag vom Modell selbst prüfen lassen: „Nenne jede Stelle, an der die Darstellung mehr behauptet als die Daten hergeben.“ Das ersetzt die eigene Prüfung nicht, findet aber die offensichtlichen Fälle.</li>
+</ol>
+</div></section><section class="schritt" id="checklisten-end-abnahme-termin-2-wird-abgezeichnet"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="checklisten-end-abnahme-termin-2-wird-abgezeichnet"> <span>erledigt</span></label><h2>End-Abnahme (Termin 2, wird abgezeichnet)</h2></header><div class="schritt-inhalt">
+<ul>
+<li>[ ] Alle User Stories aus dem Backlog: erfüllt oder bewusst zurückgestellt (dokumentiert)</li>
+<li>[ ] <code>pytest</code> läuft komplett grün</li>
+<li>[ ] App läuft im Docker-Container (<code>/health</code> antwortet mit <code>{"status": "ok"}</code>)</li>
+<li>[ ] Darstellung auf dem Smartphone geprüft (Breite ≤ 480 px): kein horizontales Scrollen, Karten stapeln sich</li>
+<li>[ ] Diagramm zeigt echte Daten aus der API, nicht hartkodiert</li>
+<li>[ ] Semantik-Review (oben) über das ganze Dashboard, mit Nachrechnen einer Zahl</li>
+<li>[ ] README beschreibt Setup, Test-Ausführung, Docker-Start</li>
+<li>[ ] Git-Historie zeigt sinnvolle Commits mit Bezug zu den Stories</li>
+</ul></div></section></article><article class="kapitel" id="render"><h1>Deploy auf Render</h1><p class="kapitel-kurz">Vom Push zur öffentlichen Adresse, einmalige Einrichtung und Hinweise für die Veranstaltung.</p><p>Render baut das Dockerfile aus dem GitHub-Repo und stellt die App unter einer öffentlichen HTTPS-Adresse bereit. Das ersetzt für die Kickoff-Demo den Handy-Test im WLAN: Die Studierenden öffnen einfach die URL.</p>
+<section class="schritt" id="render-stand"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="render-stand"> <span>erledigt</span></label><h2>Stand</h2></header><div class="schritt-inhalt">
+<p>Eingerichtet am 10.09.2026. URL: <a href="https://fittrack-k7gg.onrender.com">https://fittrack-k7gg.onrender.com</a>, Blueprint „fittrack“, Service-ID <code>srv-daha5ku1egvs73d7r500</code>, Region Oregon, Free-Plan. Jeder Push auf <code>main</code> baut neu.</p>
+</div></section><section class="schritt" id="render-einmalige-einrichtung-ca-10-minuten"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="render-einmalige-einrichtung-ca-10-minuten"> <span>erledigt</span></label><h2>Einmalige Einrichtung (ca. 10 Minuten)</h2></header><div class="schritt-inhalt">
+<ol>
+<li>Auf <a href="https://render.com">https://render.com</a> anmelden, am einfachsten mit dem GitHub-Konto.</li>
+<li><code>New</code> → <code>Blueprint</code>.</li>
+<li>Das Repo <code>swrobuts/FitTrack</code> verbinden. Dafür muss das GitHub-Konto einmal mit Render verbunden werden (GitHub → Connect account).</li>
+<li>Render liest <code>render.yaml</code> und zeigt den Service <code>fittrack</code> an. <code>Apply</code> klicken.</li>
+<li>Der erste Build dauert 2 bis 4 Minuten. Danach steht die URL im Dashboard, etwa <code>https://fittrack-xxxx.onrender.com</code>.</li>
+<li>Prüfen: <code>https://&lt;URL&gt;/health</code> liefert <code>{"status": "ok"}</code>.</li>
+</ol>
+</div></section><section class="schritt" id="render-was-dabei-passiert"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="render-was-dabei-passiert"> <span>erledigt</span></label><h2>Was dabei passiert</h2></header><div class="schritt-inhalt">
+<ul>
+<li>Render klont das Repo, führt <code>docker build</code> aus und startet den Container.</li>
+<li>Render setzt die Umgebungsvariable <code>PORT</code>. Deshalb steht in der Dockerfile-CMD <code>${PORT:-8000}</code> statt einer festen Zahl.</li>
+<li><code>healthCheckPath: /health</code> sorgt dafür, dass Render nur dann Verkehr weiterleitet, wenn die App antwortet. Das ist der Grund für US-3.</li>
+<li><code>autoDeploy: true</code>: Jeder Push auf <code>main</code> baut neu. Für den Kurs bedeutet das: Die Referenzlösung ist immer aktuell.</li>
+</ul>
+</div></section><section class="schritt" id="render-hinweise-f-r-die-veranstaltung"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="render-hinweise-f-r-die-veranstaltung"> <span>erledigt</span></label><h2>Hinweise für die Veranstaltung</h2></header><div class="schritt-inhalt">
+<ul>
+<li>Free-Plan: Der Service schläft nach 15 Minuten ohne Zugriff ein. Der erste Aufruf dauert dann bis zu einer Minute. Vor der Demo einmal die URL aufrufen.</li>
+<li>Die URL auf eine Folie oder an die Tafel. Studierende testen auf dem eigenen Handy, ohne WLAN-Konfiguration.</li>
+<li>Wenn die Gruppen ihre eigene App deployen wollen: gleicher Ablauf mit ihrem Repo. Free-Plan reicht.</li>
+</ul>
+</div></section><section class="schritt" id="render-deploy-in-termin-2-zeigen-schritt-8-im-prompt-skri"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="render-deploy-in-termin-2-zeigen-schritt-8-im-prompt-skri"> <span>erledigt</span></label><h2>Deploy in Termin 2 zeigen (Schritt 8 im Prompt-Skript)</h2></header><div class="schritt-inhalt">
+<p>Nach dem Docker-Schritt: <code>render.yaml</code> ins Repo, committen, pushen, im Render-Dashboard den Build beobachten. Die Botschaft: Was lokal im Container läuft, läuft identisch bei Render, ohne eine Zeile zu ändern.</p></div></section></article><article class="kapitel" id="lmstudio"><h1>Exkurs LM Studio</h1><p class="kapitel-kurz">Derselbe Prompt an ein lokales Modell, zehn Minuten Demo.</p><p>Botschaft: Alles, was wir heute mit Claude im Chat gemacht haben, geht auch lokal, offline und ohne Abo.</p>
+<section class="schritt" id="lmstudio-vorbereitung-vor-der-veranstaltung"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="lmstudio-vorbereitung-vor-der-veranstaltung"> <span>erledigt</span></label><h2>Vorbereitung (vor der Veranstaltung)</h2></header><div class="schritt-inhalt">
+<ol>
+<li>LM Studio öffnen → <code>Discover</code> → nach „Qwen3 Coder 30B A3B“ suchen → Variante <code>Q4_K_M</code> (ca. 18,6 GB) herunterladen. Auf dem Mac ist die MLX-Variante schneller, falls angeboten.</li>
+<li>Stand 10.09.2026 sind auf diesem Rechner installiert: Qwen2.5-14B-Instruct, ein Qwen3.5-27B-Distillat, Gemma 4 12B und 31B, Mistral Small 3.2. Qwen3-Coder fehlt noch. Für den Kontrast „Generalist vs. Spezialist“ reicht Gemma 4 27B/31B gegen Qwen3-Coder.</li>
+<li>Modell laden, Kontextlänge auf mindestens 8192 Token stellen, damit der Prompt mit Tests hineinpasst.</li>
+<li>Den Prompt aus Schritt 3 des Prompt-Skripts (<code>/api/stats</code>) in eine Textdatei legen, um ihn schnell einzufügen.</li>
+</ol>
+</div></section><section class="schritt" id="lmstudio-ablauf"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="lmstudio-ablauf"> <span>erledigt</span></label><h2>Ablauf</h2></header><div class="schritt-inhalt">
+<ol>
+<li>Prompt für <code>/api/stats</code> an Qwen3-Coder stellen. Antwortzeit und Tokens pro Sekunde beobachten.</li>
+<li>Denselben Prompt an Gemma stellen.</li>
+<li>Beide Antworten neben die Claude-Antwort aus Termin 1 legen. Vergleichen:
+   - Besteht der Code die Tests? (In WebStorm einfügen, <code>pytest</code> laufen lassen. Das ist der eigentliche Beweis.)
+   - Wurde die Randbedingung „nur Standardbibliothek“ eingehalten?
+   - Wie ist die Erklärung? Stimmt sie mit dem Code überein?
+   - Wurde die Rundung richtig gemacht? Zählt das Modell die leere Woche mit?</li>
+<li>Diskussionsfragen:
+   - Wann reicht lokal? Datenschutz, Kosten, Offline-Betrieb, Firmencode, der das Haus nicht verlassen darf.
+   - Wann Cloud? Komplexe Aufgaben, langer Kontext, wenn die Hardware fehlt.</li>
+</ol>
+</div></section><section class="schritt" id="lmstudio-typische-beobachtungen"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="lmstudio-typische-beobachtungen"> <span>erledigt</span></label><h2>Typische Beobachtungen</h2></header><div class="schritt-inhalt">
+<ul>
+<li>Kleinere Modelle ignorieren häufiger die Randbedingungen (zusätzliche Pakete, andere Feldnamen).</li>
+<li>Die Erklärung klingt bei allen Modellen sicher. Ob der Code stimmt, zeigen nur die Tests. Das ist der Kern des Testkonzepts.</li>
+<li>Generalisten formatieren schöner, Coding-Modelle halten sich enger an die Tests.</li>
+</ul>
+</div></section><section class="schritt" id="lmstudio-anbindung-an-webstorm-ausblick-2-minuten"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="lmstudio-anbindung-an-webstorm-ausblick-2-minuten"> <span>erledigt</span></label><h2>Anbindung an WebStorm (Ausblick, 2 Minuten)</h2></header><div class="schritt-inhalt">
+<p>LM Studio stellt unter <code>Developer</code> → <code>Start Server</code> eine OpenAI-kompatible Schnittstelle bereit (<code>http://localhost:1234/v1</code>). Das JetBrains-Plugin „Continue“ oder der JetBrains AI Assistant mit lokalem Modell können sie nutzen: Autovervollständigung und Chat komplett lokal.</p></div></section></article>
+</main>
+</div>
+<script>
+(function () {
+  var SCHLUESSEL = "fittrack-anleitung";
+  var stand = {};
+  try { stand = JSON.parse(localStorage.getItem(SCHLUESSEL) || "{}"); } catch (e) {}
+  var kaesten = document.querySelectorAll("input[type=checkbox][data-schritt]");
+  function speichern() { try { localStorage.setItem(SCHLUESSEL, JSON.stringify(stand)); } catch (e) {} }
+  function anzeigen() {
+    var fertig = 0;
+    kaesten.forEach(function (k) {
+      var id = k.dataset.schritt, ist = !!stand[id];
+      k.checked = ist; if (ist) fertig++;
+      k.closest(".schritt").classList.toggle("fertig", ist);
+      var link = document.querySelector('nav a[data-schritt="' + id + '"]');
+      if (link) link.classList.toggle("fertig", ist);
+    });
+    document.getElementById("zaehler").textContent = fertig + " von " + kaesten.length;
+    document.getElementById("balken").style.width = (kaesten.length ? 100 * fertig / kaesten.length : 0) + "%";
+  }
+  kaesten.forEach(function (k) { k.addEventListener("change", function () { stand[k.dataset.schritt] = k.checked; speichern(); anzeigen(); }); });
+  anzeigen();
+  document.getElementById("zuruecksetzen").addEventListener("click", function () { if (confirm("Alle Haken entfernen?")) { stand = {}; speichern(); anzeigen(); } });
+  document.getElementById("alle-zu").addEventListener("click", function () { document.querySelectorAll(".schritt.fertig .schritt-inhalt").forEach(function (e) { e.hidden = true; }); });
+  document.getElementById("alle-auf").addEventListener("click", function () { document.querySelectorAll(".schritt-inhalt").forEach(function (e) { e.hidden = false; }); });
+  document.querySelectorAll(".schritt-kopf h2").forEach(function (h) { h.style.cursor = "pointer"; h.addEventListener("click", function () { var i = h.closest(".schritt").querySelector(".schritt-inhalt"); i.hidden = !i.hidden; }); });
+  // Kopieren: Clipboard-API, sonst Auswahl plus execCommand (für file:// in älteren Browsern)
+  document.querySelectorAll(".kopieren").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var text = b.closest(".block").querySelector("pre").innerText;
+      function fertig() { b.textContent = "Kopiert"; b.classList.add("ok"); setTimeout(function () { b.textContent = "Kopieren"; b.classList.remove("ok"); }, 1500); }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(fertig, function () { ersatz(text); fertig(); }); }
+      else { ersatz(text); fertig(); }
+    });
+  });
+  function ersatz(text) { var t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(t); }
+  // Aktiven Schritt in der Navigation markieren
+  var beobachter = new IntersectionObserver(function (eintraege) {
+    eintraege.forEach(function (e) { if (e.isIntersecting) { document.querySelectorAll("nav a.aktiv").forEach(function (a) { a.classList.remove("aktiv"); }); var a = document.querySelector('nav a[data-schritt="' + e.target.id + '"]'); if (a) a.classList.add("aktiv"); } });
+  }, { rootMargin: "-10% 0px -80% 0px" });
+  document.querySelectorAll(".schritt").forEach(function (s) { beobachter.observe(s); });
+})();
+</script>
+</body>
+</html>
