@@ -49,3 +49,38 @@ def berechne_stats(workouts: list[dict]) -> dict:
         "lieblingssportart": lieblingssportart(workouts),
         "anzahl": len(workouts),
     }
+
+
+def berechne_wochen(workouts: list[dict]) -> list[dict]:
+    """Summiert Distanz, Anzahl und Dauer je Kalenderwoche.
+
+    Wochen ohne Training zwischen der ersten und der letzten Trainingswoche
+    erscheinen mit Nullwerten, damit Lücken im Diagramm sichtbar bleiben.
+    """
+    if not workouts:
+        return []
+
+    # Schritt 1: je Montag aufsummieren
+    summen = defaultdict(lambda: {"distanz_km": 0.0, "anzahl": 0, "dauer_min": 0})
+    for w in workouts:
+        montag = montag_der_woche(w["datum"])
+        summen[montag]["distanz_km"] += w["distanz_km"]
+        summen[montag]["anzahl"] += 1
+        summen[montag]["dauer_min"] += w["dauer_min"]
+
+    # Schritt 2: alle Montage von der ersten bis zur letzten Woche durchlaufen
+    wochen = []
+    montag = min(summen)
+    letzter_montag = max(summen)
+    while montag <= letzter_montag:
+        jahr, kalenderwoche, _ = montag.isocalendar()
+        werte = summen[montag]   # liefert Nullwerte, wenn die Woche fehlt
+        wochen.append({
+            "kw": f"{jahr}-W{kalenderwoche:02d}",
+            "wochenstart": montag.isoformat(),
+            "distanz_km": round(werte["distanz_km"], 1),
+            "anzahl": werte["anzahl"],
+            "dauer_min": werte["dauer_min"],
+        })
+        montag += timedelta(days=7)
+    return wochen

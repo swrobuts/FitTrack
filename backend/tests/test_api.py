@@ -92,3 +92,30 @@ def test_index_liefert_html():
     assert antwort.status_code == 200
     assert "text/html" in antwort.headers["content-type"]
     assert "FitTrack" in antwort.text
+
+
+# US-6: Wochenverlauf
+# Fixture: KW 23 (4 Einheiten, 34.5 km, 175 min), KW 24 leer, KW 25 (4 Einheiten, 53.0 km, 285 min)
+def test_wochen_anzahl_und_luecken():
+    wochen = client.get("/api/stats/wochen").json()
+    assert len(wochen) == 3
+    assert [w["kw"] for w in wochen] == ["2026-W23", "2026-W24", "2026-W25"]
+    assert wochen[1] == {"kw": "2026-W24", "wochenstart": "2026-06-08",
+                         "distanz_km": 0.0, "anzahl": 0, "dauer_min": 0}
+
+
+def test_wochen_summen():
+    wochen = client.get("/api/stats/wochen").json()
+    assert wochen[0]["wochenstart"] == "2026-06-01"
+    assert wochen[0]["distanz_km"] == 34.5
+    assert wochen[0]["anzahl"] == 4
+    assert wochen[0]["dauer_min"] == 175
+    assert wochen[2]["distanz_km"] == 53.0
+    assert wochen[2]["anzahl"] == 4
+    assert wochen[2]["dauer_min"] == 285
+
+
+def test_wochen_leer(monkeypatch):
+    from app import main
+    monkeypatch.setattr(main, "lade_workouts", lambda: [])
+    assert client.get("/api/stats/wochen").json() == []

@@ -10,8 +10,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from .daten import lade_workouts
-from .models import Stats, Workout
-from .statistik import berechne_stats
+from .models import Stats, WochenEintrag, Workout
+from .statistik import berechne_stats, berechne_wochen
 
 FRONTEND_ORDNER = Path(__file__).parent.parent.parent / "frontend"
 
@@ -34,6 +34,12 @@ def workouts() -> list[dict]:
 def stats() -> dict:
     """Kennzahlen über alle Trainingseinheiten."""
     return berechne_stats(lade_workouts())
+
+
+@app.get("/api/stats/wochen", response_model=list[WochenEintrag])
+def wochen() -> list[dict]:
+    """Distanz, Anzahl und Dauer je Kalenderwoche, aufsteigend."""
+    return berechne_wochen(lade_workouts())
 
 
 # Das Frontend liegt als statische Dateien im Ordner frontend/. Der Mount muss

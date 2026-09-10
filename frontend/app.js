@@ -4,6 +4,8 @@
 
 const KUERZEL = { Laufen: "La", Radfahren: "Ra", Schwimmen: "Sc", Wandern: "Wa" };
 const LISTEN_SCHRITT = 10;   // so viele Aktivitäten werden pro Klick auf „Mehr anzeigen“ ergänzt
+const WOCHENZIEL_KM = 40;    // Wochenziel für den Ring
+const RING_UMFANG = 327;     // 2 * pi * 52, muss zu stroke-dasharray in style.css passen
 
 // --- Hilfsfunktionen ---------------------------------------------------------
 
@@ -92,9 +94,101 @@ function zeigeZeitraum(workouts) {
     `${formatDatum(aeltestes)} bis ${formatDatum(juengstes)}`;
 }
 
+// --- Wochenziel-Ring (US-6) --------------------------------------------------
+
+function zeigeWoche(wochen) {
+  // Zeigt die jüngste Woche im Datensatz gegen das Wochenziel.
+  if (wochen.length === 0) return;
+  const woche = wochen[wochen.length - 1];
+  const anteil = woche.distanz_km / WOCHENZIEL_KM;
+  const ringAnteil = Math.min(anteil, 1);   // der Ring ist bei 100 % voll, der Text zeigt den echten Wert
+
+  document.getElementById("woche-titel").textContent = `Kalenderwoche ${woche.kw.slice(-2)}`;
+  document.getElementById("woche-untertitel").textContent =
+    `ab ${formatDatum(woche.wochenstart)}, Wochenziel ${WOCHENZIEL_KM} km`;
+  document.getElementById("ring-prozent").textContent = `${Math.round(anteil * 100)} %`;
+  document.getElementById("ring-balken").style.strokeDashoffset = RING_UMFANG * (1 - ringAnteil);
+  document.getElementById("woche-km").textContent = formatZahl(woche.distanz_km);
+  document.getElementById("woche-anzahl").textContent = woche.anzahl;
+  document.getElementById("woche-minuten").textContent = woche.dauer_min;
+}
+
+// --- Balkendiagramm mit Zeitraumwahl (US-6) ----------------------------------
+
+let wochenChart = null;   // merkt sich das Diagramm, damit wir es beim Umschalten aktualisieren können
+
+function farbeAusCss(name) {
+  // Liest eine CSS-Variable wie --akzent aus, damit Diagramm und Seite dieselben Farben nutzen.
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function zeigeDiagramm(wochen, anzahlWochen) {
+  // anzahlWochen = 0 bedeutet: alle Wochen anzeigen
+  const auswahl = anzahlWochen > 0 ? wochen.slice(-anzahlWochen) : wochen;
+  const beschriftungen = auswahl.map((w) => w.kw);
+  const werte = auswahl.map((w) => w.distanz_km);
+
+  if (wochenChart) {
+    wochenChart.data.labels = beschriftungen;
+    wochenChart.data.datasets[0].data = werte;
+    wochenChart.update();
+    return;
+  }
+
+  wochenChart = new Chart(document.getElementById("wochen-chart"), {
+    type: "bar",
+    data: {
+      labels: beschriftungen,
+      datasets: [{ data: werte, backgroundColor: farbeAusCss("--akzent"), borderRadius: 4 }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (punkte) => `Kalenderwoche ${punkte[0].label.slice(-2)}`,
+            label: (punkt) => `${formatZahl(punkt.parsed.y)} km`,
+          },
+        },
+      },
+      scales: {
+        x: { ticks: { display: false }, grid: { display: false } },
+        y: {
+          beginAtZero: true,
+          ticks: { color: farbeAusCss("--text-2"), maxTicksLimit: 5 },
+          grid: { color: farbeAusCss("--linie") },
+          border: { display: false },
+        },
+      },
+    },
+  });
+}
+
+function verbindeZeitraumWahl(wochen) {
+  const knoepfe = document.querySelectorAll(".zeitraum-wahl button");
+  knoepfe.forEach((knopf) => {
+    knopf.addEventListener("click", () => {
+      knoepfe.forEach((k) => k.classList.remove("aktiv"));
+      knopf.classList.add("aktiv");
+      zeigeDiagramm(wochen, Number(knopf.dataset.wochen));
+    });
+  });
+}
+
 // --- Start ----------------------------------------------------------------------
 
 async function start() {
+  try {
+    const wochen = await ladeJson("/api/stats/wochen");
+    zeigeWoche(wochen);
+    zeigeDiagramm(wochen, 8);
+    verbindeZeitraumWahl(wochen);
+  } catch (fehler) {
+    zeigeFehler("woche", "Wochenverlauf konnte nicht geladen werden. Läuft der Server?");
+    console.error(fehler);
+  }
+
   try {
     const stats = await ladeJson("/api/stats");
     zeigeKennzahlen(stats);

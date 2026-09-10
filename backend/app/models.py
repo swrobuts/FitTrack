@@ -25,3 +25,13 @@ class Stats(BaseModel):
     durchschnitt_km_pro_woche: float
     lieblingssportart: str | None   # None, wenn es keine Daten gibt
     anzahl: int
+
+
+class WochenEintrag(BaseModel):
+    """Eine Kalenderwoche für /api/stats/wochen."""
+
+    kw: str             # z. B. "2026-W23"
+    wochenstart: str    # Montag der Woche, ISO-Format
+    distanz_km: float
+    anzahl: int
+    dauer_min: int
