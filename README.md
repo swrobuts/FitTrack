@@ -154,6 +154,8 @@ Falls Port 8000 auf dem Rechner belegt ist: `docker run -p 8001:8000 fittrack` u
 
 ## Deploy auf Render.com
 
+Die Referenzlösung läuft unter <https://fittrack-k7gg.onrender.com>. Der Free-Plan schläft nach 15 Minuten ohne Zugriff ein, der erste Aufruf dauert dann bis zu einer Minute.
+
 `render.yaml` beschreibt den Web Service. Render baut das Dockerfile aus dem GitHub-Repo und stellt die App unter einer öffentlichen HTTPS-Adresse bereit. Einrichtung: bei Render anmelden, `New → Blueprint`, Repo verbinden, `Apply`. Jeder Push auf `main` löst einen neuen Deploy aus.
 
 ## Tests bei jedem Push (GitHub Actions)
