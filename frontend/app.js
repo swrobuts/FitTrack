@@ -679,27 +679,45 @@ function zeigeAktivitaeten(workouts) {
   const liste = document.getElementById("aktivitaeten-liste");
   const knopfMehr = document.getElementById("mehr-anzeigen");
   const knopfAlle = document.getElementById("alle-anzeigen");
+  const knopfZu = document.getElementById("einklappen");
+  const start = matchMedia("(min-width: 768px)").matches ? LISTEN_START_BREIT : LISTEN_START;
   let sichtbar = 0;
+
+  function knoepfeSetzen() {
+    // Mehr und Alle, solange etwas fehlt; Einklappen, sobald mehr als der Start sichtbar ist
+    const rest = workouts.length - sichtbar;
+    knopfMehr.hidden = knopfAlle.hidden = rest <= 0;
+    knopfMehr.textContent = `${Math.min(rest, LISTEN_SCHRITT)} weitere anzeigen`;
+    knopfZu.hidden = sichtbar <= start;
+  }
 
   function zeigeWeitere(anzahl) {
     const naechste = workouts.slice(sichtbar, sichtbar + anzahl);
     naechste.forEach((workout) => liste.appendChild(baueAktivitaet(workout)));
     sichtbar += naechste.length;
-    const rest = workouts.length - sichtbar;
-    knopfMehr.hidden = knopfAlle.hidden = rest <= 0;
-    knopfMehr.textContent = `${Math.min(rest, LISTEN_SCHRITT)} weitere anzeigen`;
+    knoepfeSetzen();
+  }
+
+  function einklappen() {
+    // Zurück auf den Startumfang und zur Liste scrollen, damit man nicht im Leeren steht
+    [...liste.children].slice(start).forEach((zeile) => zeile.remove());
+    sichtbar = Math.min(sichtbar, start);
+    knoepfeSetzen();
+    document.getElementById("aktivitaeten").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   liste.innerHTML = "";
+  sichtbar = 0;
   if (workouts.length === 0) {
     liste.innerHTML = '<li class="hinweis">Noch keine Trainingseinheiten vorhanden.</li>';
-    knopfMehr.hidden = knopfAlle.hidden = true;
+    knopfMehr.hidden = knopfAlle.hidden = knopfZu.hidden = true;
     return;
   }
-  zeigeWeitere(matchMedia("(min-width: 768px)").matches ? LISTEN_START_BREIT : LISTEN_START);
+  zeigeWeitere(start);
   // Alte Klick-Handler ersetzen, damit ein Filterwechsel keine doppelten Einträge erzeugt
   knopfMehr.onclick = () => zeigeWeitere(LISTEN_SCHRITT);
   knopfAlle.onclick = () => zeigeWeitere(workouts.length);
+  knopfZu.onclick = einklappen;
 }
 
 // --- Start ----------------------------------------------------------------------

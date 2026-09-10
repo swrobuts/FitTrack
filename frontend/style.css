@@ -266,7 +266,8 @@ svg { display: block; }
 .aktivitaet-werte strong { display: block; font-size: 17px; font-weight: 800; }
 .aktivitaet-werte span { color: var(--text-2); }
 
-.liste-aktionen { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.liste-aktionen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.liste-aktionen #einklappen { grid-column: 1 / -1; }   /* über die ganze Breite, unter den beiden anderen */
 .knopf {
   min-height: var(--touch);
   border: 0; border-radius: 12px; padding: 0 8px;
