@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 03 · US-2 Kennzahlen und Erwartungswerte · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-03">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack/tree/us-2" target="_blank" rel="noopener">Stand us-2</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#story">Die Story</a>
+  <a class="sidebar-link" href="#rechnen">Zuerst rechnen</a>
+  <a class="sidebar-link" href="#test">Test zuerst</a>
+  <a class="sidebar-link" href="#prompt">Der Prompt</a>
+  <a class="sidebar-link" href="#pruefen">Prüfpunkte</a>
+  <a class="sidebar-link" href="#technik">Was technisch passiert</a>
+  <a class="sidebar-link" href="#sql">Gegenprobe in SQL</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">03</div>
+  <h1 class="lab-title">US-2: Kennzahlen und Erwartungswerte</h1>
+  <p class="lab-intro">Hier entscheidet sich, ob die Tests etwas beweisen. Die Erwartungswerte für Gesamtdistanz,
+    Wochenschnitt und Lieblingssportart rechnet die Gruppe selbst aus den acht Testdaten, mit dem Taschenrechner, vor
+    dem ersten Prompt. Wer die Werte vom Modell erzeugen lässt, prüft nur, ob die KI mit sich selbst übereinstimmt.
+    Dazu kommt der Randfall, an dem generierter Code am häufigsten versagt: die leere Liste.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Erwartungswerte von Hand</span>
+    <span class="lernziel-chip">statistik.py ohne FastAPI</span>
+    <span class="lernziel-chip">Kalenderwochen mit Lücke</span>
+    <span class="lernziel-chip">Randfall leere Liste</span>
+    <span class="lernziel-chip">monkeypatch</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="story">
+    <h2>Die Story</h2>
+    <div class="story"><strong>US-2 · Kennzahlen.</strong> Als Nutzer möchte ich meine Kennzahlen abrufen, damit ich meinen Fortschritt sehe. <em>Akzeptanz:</em> <code>GET /api/stats</code> liefert gesamt_km, durchschnitt_km_pro_woche, lieblingssportart, anzahl, korrekt berechnet für die Testdaten.</div>
+    <p>„Korrekt berechnet“ braucht eine Definition, sonst ist es nicht prüfbar. Die vier Kennzahlen sind so festgelegt:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Kennzahl</th><th>Definition</th><th>Leere Liste</th></tr></thead>
+        <tbody>
+          <tr><td><code>gesamt_km</code></td><td>Summe aller distanz_km, gerundet auf 1 Nachkommastelle</td><td>0.0</td></tr>
+          <tr><td><code>durchschnitt_km_pro_woche</code></td><td>gesamt_km geteilt durch die Anzahl der ISO-Kalenderwochen von der Woche des ersten bis zur Woche des letzten Trainings, beide inklusive, gerundet auf 1 Nachkommastelle</td><td>0.0</td></tr>
+          <tr><td><code>lieblingssportart</code></td><td>Sportart mit der größten Summe distanz_km, bei Gleichstand die alphabetisch erste</td><td>null</td></tr>
+          <tr><td><code>anzahl</code></td><td>Anzahl der Einheiten</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section-block" id="rechnen">
+    <h2>Zuerst rechnen, nicht prompten</h2>
+    <p>Die Testdatenbank hat acht Einheiten in drei Kalenderwochen. Die mittlere Woche ist leer, mit Absicht.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>id</th><th>Datum</th><th>Tag</th><th>KW</th><th>Sportart</th><th>Dauer</th><th>km</th><th>kcal</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>01.06.2026</td><td>Mo</td><td>23</td><td>Laufen</td><td>30</td><td>5,0</td><td>350</td></tr>
+          <tr><td>2</td><td>03.06.2026</td><td>Mi</td><td>23</td><td>Radfahren</td><td>60</td><td>20,0</td><td>500</td></tr>
+          <tr><td>3</td><td>05.06.2026</td><td>Fr</td><td>23</td><td>Laufen</td><td>45</td><td>8,0</td><td>560</td></tr>
+          <tr><td>4</td><td>06.06.2026</td><td>Sa</td><td>23</td><td>Schwimmen</td><td>40</td><td>1,5</td><td>400</td></tr>
+          <tr><td>5</td><td>15.06.2026</td><td>Mo</td><td>25</td><td>Radfahren</td><td>90</td><td>30,0</td><td>750</td></tr>
+          <tr><td>6</td><td>17.06.2026</td><td>Mi</td><td>25</td><td>Laufen</td><td>50</td><td>9,0</td><td>630</td></tr>
+          <tr><td>7</td><td>19.06.2026</td><td>Fr</td><td>25</td><td>Wandern</td><td>120</td><td>10,0</td><td>600</td></tr>
+          <tr><td>8</td><td>21.06.2026</td><td>So</td><td>25</td><td>Laufen</td><td>25</td><td>4,0</td><td>280</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">gesamt_km</div>
+        <p>5 + 20 + 8 + 1,5 + 30 + 9 + 10 + 4 = <strong>87,5</strong></p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Kalenderwochen</div>
+        <p>KW 23 bis KW 25, beide inklusive = <strong>3</strong>. Die leere KW 24 zählt mit.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">durchschnitt_km_pro_woche</div>
+        <p>87,5 / 3 = 29,166… → <strong>29,2</strong></p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">lieblingssportart</div>
+        <p>Radfahren 50,0 · Laufen 26,0 · Wandern 10,0 · Schwimmen 1,5 → <strong>Radfahren</strong></p>
+      </div>
+    </div>
+    <div class="warn-box">
+      <h3>Der typische Streitpunkt</h3>
+      <p>Wer nur Wochen mit Training zählt, kommt auf 87,5 / 2 = 43,75. Die Definition sagt „von der ersten bis zur
+        letzten Trainingswoche“. Genau solche Diskussionen sind der Grund, warum Akzeptanzkriterien präzise sein
+        müssen, und warum ein Mensch die Erwartung festlegt, nicht das Modell.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="test">
+    <h2>Test zuerst</h2>
+    <pre class="code-block" data-kopieren="Tests für US-2"># US-2: Kennzahlen
+# Erwartungswerte von Hand aus den Testdaten berechnet (siehe README, Abschnitt Kennzahlen):
+#   Distanzen: 5 + 20 + 8 + 1.5 + 30 + 9 + 10 + 4 = 87.5 km
+#   Kalenderwochen: KW 23, 24, 25 = 3 Wochen  ->  87.5 / 3 = 29.17 -> 29.2
+#   Je Sportart: Radfahren 50.0, Laufen 26.0, Wandern 10.0, Schwimmen 1.5
+def test_stats_gesamt_km():
+    stats = client.get("/api/stats").json()
+    assert stats["gesamt_km"] == 87.5
+
+
+def test_stats_durchschnitt():
+    stats = client.get("/api/stats").json()
+    assert stats["durchschnitt_km_pro_woche"] == 29.2
+
+
+def test_stats_lieblingssportart():
+    stats = client.get("/api/stats").json()
+    assert stats["lieblingssportart"] == "Radfahren"
+
+
+def test_stats_anzahl():
+    stats = client.get("/api/stats").json()
+    assert stats["anzahl"] == 8
+
+
+def test_stats_leere_liste(monkeypatch):
+    # Randfall: keine Daten. Wir tauschen die Ladefunktion vorübergehend aus.
+    from app import main
+    monkeypatch.setattr(main, "lade_workouts", lambda: [])
+    stats = client.get("/api/stats").json()
+    assert stats == {
+        "gesamt_km": 0.0,
+        "durchschnitt_km_pro_woche": 0.0,
+        "lieblingssportart": None,
+        "anzahl": 0,
+    }</pre>
+    <div class="info-box">
+      <h3>monkeypatch</h3>
+      <p>Der letzte Test ersetzt <code>lade_workouts</code> nur für diesen einen Test durch eine Funktion, die eine
+        leere Liste liefert. Deshalb muss <code>main.py</code> die Funktion mit <code>from .daten import
+        lade_workouts</code> importieren und beim Aufruf <code>lade_workouts()</code> schreiben, nicht
+        <code>daten.lade_workouts()</code>. Das steht so im Prompt.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="prompt">
+    <h2>Der Prompt</h2>
+    <p>Dieser Prompt ist auch der Vergleichsprompt für Lab 09: derselbe Text an Claude, an Qwen3-Coder und an ein
+      Generalisten-Modell.</p>
+    <pre class="prompt" data-kopieren="Prompt für US-2">Du bist ein erfahrener Python-Entwickler. Wir bauen mit FastAPI eine kleine
+Fitness-App namens FitTrack. Es gibt eine Funktion lade_workouts() in
+backend/app/daten.py, die eine Liste von Dictionaries liefert:
+{"id": 1, "datum": "2026-06-01", "sportart": "Laufen",
+ "dauer_min": 30, "distanz_km": 5.0, "kalorien": 350}
+
+Aufgabe: Implementiere GET /api/stats.
+
+1. Neue Datei backend/app/statistik.py mit einer reinen Funktion
+   berechne_stats(workouts: list[dict]) -> dict, ohne FastAPI-Import.
+   Rückgabe:
+   - gesamt_km: Summe aller distanz_km, gerundet auf 1 Nachkommastelle
+   - durchschnitt_km_pro_woche: gesamt_km geteilt durch die Anzahl der
+     ISO-Kalenderwochen von der Woche des ersten bis zur Woche des letzten
+     Trainings, beide inklusive (Wochen ohne Training zählen mit),
+     gerundet auf 1 Nachkommastelle
+   - lieblingssportart: Sportart mit der größten Summe distanz_km,
+     bei Gleichstand die alphabetisch erste
+   - anzahl: Anzahl der Einheiten
+   Leere Liste: 0.0, 0.0, None, 0
+2. Pydantic-Modell Stats in backend/app/models.py (lieblingssportart: str | None)
+3. Route in main.py: GET /api/stats mit response_model=Stats, die
+   berechne_stats(lade_workouts()) zurückgibt. Import so:
+   from .daten import lade_workouts
+
+Randbedingungen:
+- Nur Standardbibliothek (datetime, collections) und Pydantic
+- Kleine Hilfsfunktionen mit deutschen Namen, je ein Docstring
+- Diese Tests müssen bestehen:
+
+[die fünf Tests von oben einfügen]
+
+Gib statistik.py vollständig und die Ergänzungen für models.py und main.py
+aus. Erkläre in drei Sätzen, wie du die Kalenderwochen zählst.</pre>
+  </section>
+
+  <section class="section-block" id="pruefen">
+    <h2>Prüfpunkte für die Antwort</h2>
+    <ul class="pruefpunkte">
+      <li><strong>Zählt der Code die leere Woche mit?</strong> <code>len(set(wochen))</code> zählt nur Wochen mit Training und liefert 43,75. Der Test fängt das.</li>
+      <li><strong>Wo wird gerundet?</strong> Erst am Ende, nicht bei jeder Teilsumme.</li>
+      <li><strong>Ist der Gleichstand behandelt?</strong> Der Test prüft ihn nicht. Was tun, wenn das Modell ihn weglässt? Test ergänzen oder bewusst zurückstellen, aber entscheiden.</li>
+      <li><strong>Enthält <code>statistik.py</code> einen FastAPI-Import?</strong> Dann ist die Trennung verfehlt.</li>
+      <li><strong>Montag über <code>isocalendar()</code> oder <code>weekday()</code>?</strong> Beides richtig. Am Jahreswechsel zeigt sich, ob der Code das ISO-Jahr nimmt.</li>
+    </ul>
+    <pre class="code-block" data-kopieren="backend/app/statistik.py (Auszug)">def montag_der_woche(datum_text: str) -> date:
+    """Gibt den Montag der Kalenderwoche zurück, in der das Datum liegt."""
+    tag = date.fromisoformat(datum_text)
+    return tag - timedelta(days=tag.weekday())
+
+
+def anzahl_kalenderwochen(workouts: list[dict]) -> int:
+    """Zählt die Kalenderwochen von der ersten bis zur letzten Trainingswoche, beide inklusive."""
+    montage = [montag_der_woche(w["datum"]) for w in workouts]
+    erste, letzte = min(montage), max(montage)
+    return (letzte - erste).days // 7 + 1
+
+
+def lieblingssportart(workouts: list[dict]) -> str:
+    """Sportart mit der größten Gesamtdistanz. Bei Gleichstand die alphabetisch erste."""
+    summe_je_sportart = defaultdict(float)
+    for w in workouts:
+        summe_je_sportart[w["sportart"]] += w["distanz_km"]
+    rangliste = sorted(summe_je_sportart.items(), key=lambda paar: (-paar[1], paar[0]))
+    return rangliste[0][0]</pre>
+  </section>
+
+  <section class="section-block" id="technik">
+    <h2>Was technisch passiert</h2>
+    <div class="diagramm">
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant B as Browser
+    participant F as FastAPI (main.py)
+    participant S as statistik.py
+    participant D as daten.py
+    participant DB as fittrack.db
+    B->>F: GET /api/stats
+    F->>D: lade_workouts()
+    D->>DB: SELECT … FROM v_workout
+    DB-->>D: Zeilen
+    D-->>F: Liste von Dictionaries
+    F->>S: berechne_stats(workouts)
+    S-->>F: gesamt_km, durchschnitt, lieblingssportart, anzahl
+    F-->>B: JSON, geprüft gegen Stats
+      </pre>
+      <div class="unterschrift">Die Rechenlogik kennt weder FastAPI noch SQLite. Sie bekommt eine Liste und gibt ein Dictionary zurück. Genau deshalb lässt sie sich mit acht Zeilen Testdaten prüfen.</div>
+    </div>
+    <div class="concept-box">
+      <h3>Warum die Trennung zählt</h3>
+      <p><code>statistik.py</code> läuft in der Python-Konsole ohne Server, ohne Datenbank, ohne HTTP. Die Tests über
+        den TestClient prüfen die Integration, die Funktionen selbst wären auch einzeln testbar. Das ist die
+        Testpyramide aus Lab 05, hier zum ersten Mal im Code sichtbar.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="sql">
+    <h2>Gegenprobe in SQL</h2>
+    <p>Die Kennzahlen lassen sich auch direkt in der Datenbank nachrechnen. Das ist eine gute zweite Quelle für die
+      Erwartungswerte, unabhängig vom Python-Code.</p>
+    <div data-datenbank></div>
+    <div data-sql-konsole data-start="SELECT ROUND(SUM(distanz_km), 1) AS gesamt_km, COUNT(*) AS anzahl FROM v_workout;"></div>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Vier Übungen: einmal rechnen, einmal SQL, einmal Randfälle zuordnen, einmal zu Rundung und Wochenzählung.</p>
+    <div data-uebung="P03-01"></div>
+    <div data-uebung="P03-02"></div>
+    <div data-uebung="P03-03"></div>
+    <div data-uebung="P03-04"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Erwartungswerte kommen aus den Testdaten und vom Menschen, nie vom Modell. Sonst prüft der Test nur Konsistenz.</li>
+      <li>Jede Kennzahl hat eine Definition, die den Randfall benennt. Ohne Definition ist „korrekt berechnet“ nicht prüfbar.</li>
+      <li>Die Rechenlogik liegt in einer Datei ohne Framework. Sie nimmt eine Liste und gibt ein Dictionary zurück.</li>
+      <li><code>monkeypatch</code> tauscht die Ladefunktion für einen Test aus. Deshalb der Import <code>from .daten import lade_workouts</code>.</li>
+      <li>Auf den Echtdaten: 3963 km, 37,7 km pro Woche, Radfahren, 311 Einheiten.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 03 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 07 · Render und GitHub Actions · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-07">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://fittrack-k7gg.onrender.com" target="_blank" rel="noopener">Live-App</a>
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack/actions" target="_blank" rel="noopener">Actions</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#statisch">Auslieferung oder Ausführung</a>
+  <a class="sidebar-link" href="#pipeline">Die Pipeline</a>
+  <a class="sidebar-link" href="#blueprint">Render per Blueprint</a>
+  <a class="sidebar-link" href="#freetier">Der Free-Plan</a>
+  <a class="sidebar-link" href="#ci">GitHub Actions</a>
+  <a class="sidebar-link" href="#prompt">Der Prompt</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">07</div>
+  <h1 class="lab-title">Render und GitHub Actions</h1>
+  <p class="lab-intro">Ein Push, und Render baut dasselbe Image, das Sie in Lab 06 lokal gebaut haben, startet den
+    Container und stellt ihn unter einer öffentlichen HTTPS-Adresse bereit. Parallel lässt GitHub Actions
+    <code>pytest</code> laufen. Deployment ist damit kein Handgriff am Server, sondern Teil der Kette: Commit, Push,
+    Tests, Build, Betrieb. Und die Frage, warum diese Lernumgebung auf GitHub Pages liegt, die App aber nicht.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Statisch vs. Web Service</span>
+    <span class="lernziel-chip">render.yaml</span>
+    <span class="lernziel-chip">Health-Check</span>
+    <span class="lernziel-chip">Auto-Deploy</span>
+    <span class="lernziel-chip">GitHub Actions</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="statisch">
+    <h2>Auslieferung oder Ausführung</h2>
+    <p>Die Frage kommt in jedem Kurs: Warum nicht einfach GitHub Pages? Weil Pages nur Dateien ausliefert, während
+      FastAPI auf einem Server rechnen und aus der Datenbank lesen muss.</p>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Statisches Hosting · GitHub Pages</div>
+        <p>Liefert Dateien aus. HTML, CSS und JavaScript gehen unverändert an den Browser. Diese Lernumgebung liegt
+          hier, samt SQLite im Browser. Für FitTrack zu wenig: Die Kennzahlen entstehen im Backend.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Web Service · Render</div>
+        <p>Führt die Anwendung aus. Baut aus dem Repository mit demselben Dockerfile wie lokal, startet den Container,
+          leitet Verkehr weiter, sobald <code>/health</code> antwortet.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block" id="pipeline">
+    <h2>Die Pipeline</h2>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart LR
+    DEV["WebStorm<br/>git commit, git push"] --> GH["GitHub<br/>swrobuts/FitTrack"]
+    GH --> CI["GitHub Actions<br/>pip install, pytest"]
+    GH --> R["Render.com<br/>docker build aus dem Dockerfile"]
+    R --> C["Container<br/>uvicorn, PORT von Render"]
+    C --> URL["https://fittrack-….onrender.com<br/>Health-Check auf /health"]
+    GH --> P["GitHub Pages<br/>FitTrack-Lab, statisch"]
+      </pre>
+      <div class="unterschrift">Ein Push auf <code>main</code> löst drei Dinge aus: Tests, Deploy der App, Deploy dieser Seiten. Was wo läuft, ist an der Kante ablesbar.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="blueprint">
+    <h2>Render per Blueprint</h2>
+    <p>Alles geschieht im Browser. Die Datei <code>render.yaml</code> im Repository beschreibt den Dienst, Render liest
+      sie und legt ihn an. Vier Schritte statt eines Klickpfads durch Formulare.</p>
+    <pre class="code-block" data-kopieren="render.yaml">services:
+  - type: web
+    name: fittrack
+    runtime: docker          # Render baut das Dockerfile im Repo
+    plan: free               # schläft nach 15 Minuten ohne Zugriff ein
+    healthCheckPath: /health # Render fragt diesen Pfad, um zu prüfen, ob die App läuft
+    autoDeploy: true         # jeder Push auf main löst einen neuen Deploy aus</pre>
+    <ol>
+      <li>Bei render.com anmelden, am einfachsten mit dem GitHub-Konto.</li>
+      <li>New → Blueprint, GitHub verbinden, das Repository wählen.</li>
+      <li>Render zeigt den Dienst aus <code>render.yaml</code>. Apply.</li>
+      <li>Nach zwei bis vier Minuten steht die URL im Dashboard. <code>/health</code> aufrufen.</li>
+    </ol>
+    <div class="shot">
+      <img src="assets/img/render-service.png" alt="Render-Dashboard des Web Service fittrack mit Docker, Blueprint managed, Live-Status und Deploy-Liste" loading="lazy">
+      <div class="unterschrift">Der Dienst <code>fittrack</code> bei Render: Docker, Free, Blueprint managed, Live. Jede Zeile in der Deploy-Liste ist ein Push mit seiner Commit-Nachricht.</div>
+    </div>
+    <div class="info-box">
+      <h3>Dafür war US-3</h3>
+      <p><code>healthCheckPath: /health</code> ist der Grund, warum der Health-Endpunkt eine eigene Story war. Render
+        leitet erst Verkehr weiter, wenn dieser Pfad mit 200 antwortet. Und der Port: Render setzt <code>PORT</code>,
+        das Dockerfile liest ihn. Ohne diese Zeile startet der Dienst, antwortet aber nie.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="freetier">
+    <h2>Der Free-Plan</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Kontingent</th><th>Free</th><th>Bedeutung für den Kurs</th></tr></thead>
+        <tbody>
+          <tr><td>RAM</td><td>512 MB</td><td>Reicht für FastAPI und SQLite mit großem Abstand</td></tr>
+          <tr><td>Instanzstunden je Monat</td><td>750</td><td>Ein Dienst rund um die Uhr, oder mehrere Gruppen-Dienste, die meist schlafen</td></tr>
+          <tr><td>Build-Minuten je Monat</td><td>500</td><td>Ein Build dauert etwa 30 Sekunden; das sind rund 1000 Pushes</td></tr>
+          <tr><td>Bandbreite je Monat</td><td>5 GB</td><td>Das Dashboard überträgt wenige hundert Kilobyte je Aufruf</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn-box">
+      <h3>Cold Start</h3>
+      <p>Nach 15 Minuten ohne Verkehr schläft der Dienst ein. Der nächste Aufruf wartet bis zu einer Minute. Vor
+        einer Demo die URL einmal aufrufen, sonst wartet der Raum mit. Teuer wird es nie: Bei Erreichen der Grenzen
+        hält Render an, statt abzurechnen.</p>
+    </div>
+    <p>Quelle: Preisseite und Dokumentation von Render, Stand September 2026.</p>
+  </section>
+
+  <section class="section-block" id="ci">
+    <h2>GitHub Actions</h2>
+    <p>Eine Datei im Repository, und bei jedem Push läuft <code>pytest</code> auf einem frischen Rechner bei GitHub. Das
+      Ergebnis erscheint als Haken oder Kreuz am Commit. Rote Tests fallen so auf, bevor jemand den Stand übernimmt.</p>
+    <pre class="code-block" data-kopieren=".github/workflows/tests.yml">name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Python 3.12 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: Tests ausführen
+        run: pytest</pre>
+    <div class="shot">
+      <img src="assets/img/github-actions.png" alt="GitHub Actions, Reiter Workflow runs, mit erfolgreichen Läufen des Workflows Tests" loading="lazy">
+      <div class="unterschrift">Jeder Lauf gehört zu einem Commit. Der grüne Haken ist die maschinelle Definition of Done, ohne dass jemand etwas tun muss.</div>
+    </div>
+    <div class="concept-box">
+      <h3>Warum ein fremder Rechner</h3>
+      <p>Auf dem eigenen Rechner sind die Pakete schon da, die Umgebung ist eingerichtet, ein vergessener Eintrag in
+        <code>requirements.txt</code> fällt nicht auf. Der Runner bei GitHub fängt bei null an. Besteht der Test dort,
+        besteht er überall. Dasselbe Argument wie beim Container.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="prompt">
+    <h2>Der Prompt</h2>
+    <pre class="prompt" data-kopieren="Prompt für GitHub Actions">Erstelle .github/workflows/tests.yml für GitHub Actions: bei jedem Push und
+Pull Request auf ubuntu-latest Python 3.12 einrichten,
+pip install -r requirements.txt und pytest ausführen. Schritte auf Deutsch
+benennen, ein Kommentar am Anfang, der erklärt, wo man das Ergebnis sieht.</pre>
+    <ul class="pruefpunkte">
+      <li><strong>Aktuelle Versionen der Actions?</strong> <code>checkout@v4</code>, <code>setup-python@v5</code>. Modelle schlagen gern ältere vor.</li>
+      <li><strong>Läuft <code>pytest</code> aus dem Projektordner?</strong> Dort liegt <code>pytest.ini</code> mit dem Testpfad.</li>
+      <li><strong>Nichts Ungefragtes?</strong> Kein Linting, keine Matrix über fünf Python-Versionen, kein Cache. Das kann später kommen.</li>
+    </ul>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Drei Übungen: Was wo läuft, die Pipeline zuordnen, und der Push an der Konsole.</p>
+    <div data-uebung="P07-01"></div>
+    <div data-uebung="P07-02"></div>
+    <div data-uebung="P07-03"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Statisches Hosting liefert Dateien aus, ein Web Service führt die App aus. FitTrack braucht den Web Service, diese Seiten nicht.</li>
+      <li><code>render.yaml</code> beschreibt den Dienst. Render baut mit demselben Dockerfile wie lokal.</li>
+      <li>Der Health-Check auf <code>/health</code> und die <code>PORT</code>-Variable sind die zwei Dinge, die den Betrieb mit der Entwicklung verbinden.</li>
+      <li>Der Free-Plan reicht für den Kurs. Cold Start nach 15 Minuten, vor der Demo einmal aufrufen.</li>
+      <li>GitHub Actions führt die Tests auf einem frischen Rechner aus. Der grüne Haken gehört zur Definition of Done.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 07 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

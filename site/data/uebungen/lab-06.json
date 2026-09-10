@@ -1,0 +1,119 @@
+{
+  "konsolen": {
+    "frei": { "begruessung": [ { "de": "Freie Konsole. Beginnen Sie mit cd FitTrack. Bekannte Abbilder: python, hello-world, nginx, und nach docker build auch fittrack.", "en": "Free console. Start with cd FitTrack." } ] }
+  },
+  "befehle": {
+    "B01": {
+      "titel": { "de": "Image bauen", "en": "Build the image" },
+      "befehl": "docker build -t fittrack .",
+      "teile": [
+        { "was": "build", "bedeutet": { "de": "Liest das Dockerfile und erzeugt daraus das Image, Schicht für Schicht.", "en": "Reads the Dockerfile and creates the image layer by layer." } },
+        { "was": "-t fittrack", "bedeutet": { "de": "Gibt dem Image einen Namen. Ohne Namen hat es nur eine Kennung aus Hexziffern.", "en": "Names the image. Without a name it only has a hex id." } },
+        { "was": ".", "bedeutet": { "de": "Der Bau-Kontext: der aktuelle Ordner. Alles darin kann per COPY ins Image, außer was in .dockerignore steht.", "en": "The build context: the current folder." } }
+      ]
+    },
+    "B02": {
+      "titel": { "de": "Container starten", "en": "Start the container" },
+      "befehl": "docker run -d -p 8000:8000 --name fittrack fittrack",
+      "teile": [
+        { "was": "-d", "bedeutet": { "de": "Im Hintergrund. Ohne -d bleibt das Terminal am Log hängen, das ist beim ersten Mal auch lehrreich.", "en": "Detached, in the background." } },
+        { "was": "-p 8000:8000", "bedeutet": { "de": "Port des Rechners auf Port des Containers. Danach antwortet http://localhost:8000 und im WLAN http://<IP>:8000.", "en": "Host port to container port." } },
+        { "was": "--name fittrack fittrack", "bedeutet": { "de": "Erst der Name des Containers, dann der Name des Images. Der Containername macht docker stop und docker logs lesbar.", "en": "Container name first, then image name." } }
+      ]
+    },
+    "B03": {
+      "titel": { "de": "Kontrollieren und stoppen", "en": "Check and stop" },
+      "befehl": "docker ps\ncurl localhost:8000/health\ndocker logs fittrack\ndocker stop fittrack",
+      "teile": [
+        { "was": "docker ps", "bedeutet": { "de": "Zeigt laufende Container mit Ports. Mit -a auch die gestoppten.", "en": "Shows running containers with ports; -a includes stopped ones." } },
+        { "was": "curl …/health", "bedeutet": { "de": "Die Antwort {\"status\": \"ok\"} kommt aus dem Container. Das ist die Demo für den PO, danach das Handy im WLAN.", "en": "The answer comes from the container." } },
+        { "was": "docker logs fittrack", "bedeutet": { "de": "Zeigt die Ausgabe von uvicorn, also jede Anfrage. Erster Griff bei Fehlern.", "en": "Shows uvicorn's output, every request." } },
+        { "was": "docker stop fittrack", "bedeutet": { "de": "Hält den Container an. Er bleibt mit docker ps -a sichtbar und lässt sich mit docker start fittrack wieder starten.", "en": "Stops the container; it stays visible with ps -a." } }
+      ]
+    },
+    "B04": {
+      "titel": { "de": "Mit Compose starten und stoppen", "en": "Start and stop with Compose" },
+      "befehl": "docker compose up --build -d\ndocker compose ps\ndocker compose down",
+      "teile": [
+        { "was": "up --build -d", "bedeutet": { "de": "Baut das Image, wenn nötig, und startet den Dienst im Hintergrund. Mit FITTRACK_PORT=8001 davor oder in einer .env-Datei wechselt der Port.", "en": "Builds if needed and starts in the background." } },
+        { "was": "compose ps", "bedeutet": { "de": "Zeigt die Container dieses Compose-Projekts, hier genau einen: fittrack-fittrack-1.", "en": "Shows this project's containers." } },
+        { "was": "compose down", "bedeutet": { "de": "Entfernt Container und Netzwerk. Zum bloßen Anhalten: docker compose stop.", "en": "Removes container and network; to merely pause: docker compose stop." } }
+      ]
+    }
+  },
+  "uebungen": [
+    {
+      "id": "P06-01", "typ": "terminal",
+      "titel": { "de": "Das Image bauen", "en": "Build the image" },
+      "aufgabe": { "de": "<p>Wechseln Sie in den Projektordner, bauen Sie das Image mit dem Namen <code>fittrack</code> und prüfen Sie mit <code>docker images</code>, dass es da ist. Versuchen Sie den Build vorher einmal im Heimatverzeichnis und lesen Sie die Fehlermeldung.</p>", "en": "<p>Change into the project folder, build the image named fittrack and check with docker images.</p>" },
+      "begruessung": [ { "de": "Auftrag 1 von 3. Das Dockerfile liegt in ~/FitTrack.", "en": "Assignment 1 of 3. The Dockerfile sits in ~/FitTrack." } ],
+      "schritte": [
+        { "text": { "de": "In den Ordner FitTrack wechseln", "en": "Change into FitTrack" }, "zustand": { "pfad": "FitTrack" } },
+        { "text": { "de": "Image bauen: docker build -t fittrack .", "en": "Build: docker build -t fittrack ." }, "muster": "^docker\\s+build\\b.*-t\\s+fittrack", "zustand": { "abbild": "fittrack" } },
+        { "text": { "de": "Images auflisten", "en": "List images" }, "muster": "^docker\\s+images\\b" }
+      ],
+      "rueckmeldung": { "de": "Ohne Dockerfile im aktuellen Ordner meldet Docker „failed to read dockerfile“. Der Punkt am Ende ist der Bau-Kontext.", "en": "Without a Dockerfile in the current folder Docker reports “failed to read dockerfile”." }
+    },
+    {
+      "id": "P06-02", "typ": "terminal",
+      "titel": { "de": "Container starten, prüfen, stoppen", "en": "Start, check, stop a container" },
+      "aufgabe": { "de": "<p>Starten Sie aus dem Image einen Container im Hintergrund mit dem Namen <code>fittrack</code> und Port 8000 auf 8000. Prüfen Sie mit <code>docker ps</code>, stoppen Sie ihn danach.</p>", "en": "<p>Run a container from the image in the background named fittrack with port 8000 to 8000, check with docker ps, then stop it.</p>" },
+      "begruessung": [ { "de": "Auftrag 2 von 3. Falls das Image fehlt: erst cd FitTrack und docker build -t fittrack .", "en": "Assignment 2 of 3." } ],
+      "schritte": [
+        { "text": { "de": "Container im Hintergrund starten (-d), Port 8000:8000, Name fittrack", "en": "Run in background with port 8000:8000, name fittrack" }, "zustand": { "containerLaeuft": "fittrack", "portGebunden": "8000:8000" } },
+        { "text": { "de": "Laufende Container anzeigen", "en": "Show running containers" }, "muster": "^docker\\s+ps\\s*$" },
+        { "text": { "de": "Container stoppen", "en": "Stop the container" }, "muster": "^docker\\s+stop\\b" }
+      ],
+      "rueckmeldung": { "de": "Auf dem eigenen Rechner jetzt: http://localhost:8000/health im Browser, dann http://<IP>:8000 auf dem Handy. Botschaft: Was hier läuft, läuft identisch auf jedem Server.", "en": "On your own machine now: localhost:8000/health, then the phone." }
+    },
+    {
+      "id": "P06-03", "typ": "quiz",
+      "titel": { "de": "Das Dockerfile lesen", "en": "Reading the Dockerfile" },
+      "aufgabe": { "de": "<p>Drei Fragen zu Reihenfolge, Port und Host.</p>", "en": "<p>Three questions on order, port and host.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Warum steht COPY requirements.txt mit pip install vor COPY backend/?", "en": "Why does COPY requirements.txt with pip install come before COPY backend/?" },
+          "optionen": [
+            { "de": "Weil Docker jede Schicht cacht. Ändert sich nur der Code, bleibt die teure pip-Schicht erhalten und der Build dauert Sekunden statt Minuten.", "en": "Because Docker caches every layer." },
+            { "de": "Weil pip ohne den Code nicht weiß, was es installieren soll.", "en": "Because pip needs the code to know what to install." },
+            { "de": "Weil COPY nur einmal pro Dockerfile erlaubt ist.", "en": "Because COPY is allowed only once." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Selten Geändertes nach vorn, oft Geändertes nach hinten. Das ist die wichtigste Regel für schnelle Builds.", "en": "Rarely changed things first, frequently changed things last." }
+        },
+        {
+          "frage": { "de": "Der Container startet, aber weder Browser noch Handy bekommen eine Antwort. docker logs zeigt „Uvicorn running on http://127.0.0.1:8000“. Ursache?", "en": "The container starts but nothing answers. docker logs shows “Uvicorn running on http://127.0.0.1:8000”. Cause?" },
+          "optionen": [
+            { "de": "uvicorn bindet nur an localhost im Container. Es fehlt --host 0.0.0.0.", "en": "uvicorn binds only to localhost inside the container; --host 0.0.0.0 is missing." },
+            { "de": "Das Image ist zu groß.", "en": "The image is too big." },
+            { "de": "Docker Desktop läuft nicht.", "en": "Docker Desktop is not running." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "127.0.0.1 im Container ist ein anderes localhost als das des Rechners. 0.0.0.0 bindet an alle Adressen, dann greift die Port-Weiterleitung.", "en": "127.0.0.1 inside the container is a different localhost." }
+        },
+        {
+          "frage": { "de": "Bei Render startet der Dienst nicht, obwohl er lokal läuft. Die CMD lautet CMD [\"uvicorn\", \"backend.app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"${PORT:-8000}\"]. Was ist falsch?", "en": "On Render the service does not start although it runs locally. The CMD is the exec form with ${PORT:-8000}. What is wrong?" },
+          "optionen": [
+            { "de": "In der Exec-Form gibt es keine Shell, ${PORT:-8000} bleibt wörtlich stehen. Die CMD braucht sh -c, damit die Variable ausgewertet wird.", "en": "The exec form has no shell; ${PORT:-8000} stays literal." },
+            { "de": "Render unterstützt kein uvicorn.", "en": "Render does not support uvicorn." },
+            { "de": "Der Port muss immer 8000 sein.", "en": "The port must always be 8000." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Render setzt PORT auf einen eigenen Wert und erwartet, dass die App dort lauscht. Lokal fällt der Fehler nicht auf, weil ohne PORT der Standard gilt.", "en": "Render sets PORT to its own value." }
+        }
+      ]
+    },
+    {
+      "id": "P06-04", "typ": "terminal",
+      "titel": { "de": "Compose auf und ab", "en": "Compose up and down" },
+      "aufgabe": { "de": "<p>Im Projektordner liegt <code>docker-compose.yml</code>. Fahren Sie den Dienst hoch, sehen Sie mit <code>docker ps</code> nach, welcher Container läuft, und fahren Sie ihn wieder herunter.</p>", "en": "<p>Bring the service up, check with docker ps which container runs, and bring it down again.</p>" },
+      "begruessung": [ { "de": "Auftrag 3 von 3. Vorher cd FitTrack.", "en": "Assignment 3 of 3. cd FitTrack first." } ],
+      "schritte": [
+        { "text": { "de": "docker compose up -d", "en": "docker compose up -d" }, "muster": "^docker\\s+compose\\s+up\\b", "zustand": { "containerLaeuft": "fittrack-fittrack-1" } },
+        { "text": { "de": "Laufende Container anzeigen", "en": "Show running containers" }, "muster": "^docker\\s+(compose\\s+)?ps\\b" },
+        { "text": { "de": "docker compose down", "en": "docker compose down" }, "muster": "^docker\\s+compose\\s+down\\b", "zustand": { "containerWeg": "fittrack-fittrack-1" } }
+      ],
+      "rueckmeldung": { "de": "Compose benennt den Container nach Projekt und Dienst: fittrack-fittrack-1. Genau diesen Namen zeigt Docker Desktop.", "en": "Compose names the container after project and service." }
+    }
+  ]
+}

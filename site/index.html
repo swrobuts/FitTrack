@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitTrack-Lab · Ein Softwareprojekt in neun Schritten · THWS Business School</title>
+  <meta name="description" content="Interaktive Lernumgebung zum Kurs FitTrack: Micro-Scrum, Test-First, KI-gestütztes Entwickeln im Chat, SQLite, FastAPI, mobile-first Frontend, Docker und Deployment auf Render. Mit Prompts, Diagrammen, Konsole und Übungen." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html"><span class="mark">FitTrack</span>-Lab</a>
+    <span class="header-back">THWS Business School · Wirtschaftsinformatik · KI-gestützt entwickeln</span>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack" target="_blank" rel="noopener">Repository</a>
+    <a class="btn-mini" href="https://fittrack-k7gg.onrender.com" target="_blank" rel="noopener">Live-App</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-tag">Lernumgebung · Ein Softwareprojekt from scratch</span>
+    <h1 class="hero-title">FitTrack</h1>
+    <p class="hero-subtitle">Ein vollständiges Softwareprojekt, klein genug für vier Stunden</p>
+    <p class="hero-desc">Neun Schritte führen von der User Story über den roten Test und den Prompt im Chat bis zum Container
+      und zur öffentlichen Adresse. Jeder Schritt zeigt, was technisch passiert, welcher Prompt ihn auslöst und woran
+      man prüft, ob er gelungen ist. Die Konsole in diesen Seiten ist nachgebildet, die Datenbank ist echt: SQLite
+      läuft mit dem Schema der App in Ihrem Browserfenster.</p>
+    <div class="hero-badges">
+      <span class="hero-badge">Micro-Scrum</span>
+      <span class="hero-badge">Test-First · pytest</span>
+      <span class="hero-badge">SQLite · FastAPI</span>
+      <span class="hero-badge">HTML · CSS · JS · Chart.js</span>
+      <span class="hero-badge">WebStorm</span>
+      <span class="hero-badge">Docker</span>
+      <span class="hero-badge">GitHub · Render</span>
+      <span class="hero-badge">Claude · LM Studio</span>
+      <span class="hero-badge">Ohne Anmeldung</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn solid" href="lab-00-setup.html" data-lab-link>Mit Lab 00 beginnen</a>
+      <a class="btn" href="#labs">Alle Labs ansehen</a>
+      <a class="btn" href="#bauweg">Der Bauweg</a>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stats-grid">
+    <div class="stat-item"><div class="stat-value">10</div><div class="stat-label">Labs</div></div>
+    <div class="stat-item"><div class="stat-value">38</div><div class="stat-label">Übungen</div></div>
+    <div class="stat-item"><div class="stat-value">6</div><div class="stat-label">User Stories</div></div>
+    <div class="stat-item"><div class="stat-value">0 €</div><div class="stat-label">Kosten</div></div>
+  </div>
+</div>
+
+<main>
+
+<section class="section" id="bauweg">
+  <div class="section-head">
+    <span class="badge">Der Bauweg</span>
+    <div class="accent-line"></div>
+    <h2>Neun Schritte, ein Commit je Schritt</h2>
+    <p>Die Referenzlösung im Repository trägt für jeden Schritt einen Git-Tag. Wer einen Stand sehen will, holt ihn
+      mit <code>git checkout &lt;tag&gt;</code>. Die Studierenden beginnen auf dem Branch <code>starter</code>, der
+      genau dem Stand nach Schritt 0 entspricht: Struktur, Datenbank, Testdaten und ein roter Test.</p>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Schritt</th><th>Tag</th><th>Story</th><th>Was entsteht</th><th>Lab</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>0</td><td><code>sprint-0</code></td><td>Starter</td><td>Struktur, <code>schema.sql</code>, <code>fittrack.db</code>, SQL-Fixture, roter Health-Test</td><td><a href="lab-00-setup.html" data-lab-link>Lab 00</a></td></tr>
+        <tr><td>1</td><td><code>us-3</code></td><td>US-3</td><td><code>GET /health</code>, die Schleife einmal ganz</td><td><a href="lab-01-health.html" data-lab-link>Lab 01</a></td></tr>
+        <tr><td>2</td><td><code>us-1</code></td><td>US-1</td><td><code>daten.py</code> liest die Sicht <code>v_workout</code>, <code>GET /api/workouts</code></td><td><a href="lab-02-daten.html" data-lab-link>Lab 02</a></td></tr>
+        <tr><td>3</td><td><code>us-2</code></td><td>US-2</td><td><code>statistik.py</code>, <code>GET /api/stats</code>, Erwartungswerte von Hand</td><td><a href="lab-03-kennzahlen.html" data-lab-link>Lab 03</a></td></tr>
+        <tr><td>4</td><td><code>us-4</code></td><td>US-4</td><td>Mobile-first Gerüst, FastAPI liefert <code>frontend/</code> aus</td><td rowspan="3"><a href="lab-04-frontend.html" data-lab-link>Lab 04</a></td></tr>
+        <tr><td>5</td><td><code>us-5</code></td><td>US-5</td><td>Kennzahlen und Aktivitäten per <code>fetch</code></td></tr>
+        <tr><td>6</td><td><code>us-6</code></td><td>US-6</td><td><code>GET /api/stats/wochen</code>, Ring, Chart.js, Zeitraumwahl</td></tr>
+        <tr><td>7</td><td><code>docker</code></td><td>Sprint 3</td><td>Dockerfile, Image, Container, Handy-Test</td><td><a href="lab-06-docker.html" data-lab-link>Lab 06</a></td></tr>
+        <tr><td>8</td><td><code>render</code></td><td>Sprint 3</td><td><code>render.yaml</code>, öffentliche Adresse, Health-Check</td><td rowspan="2"><a href="lab-07-deploy.html" data-lab-link>Lab 07</a></td></tr>
+        <tr><td>9</td><td><code>ci</code></td><td>optional</td><td>GitHub Actions führt pytest bei jedem Push aus</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="karten">
+    <div class="karte">
+      <h3>Termin 1 · Konzeption und Sprint 1</h3>
+      <p>Kickoff mit der Live-App auf dem Smartphone, Setup-Check, agiles Setup mit Vision, Stories und Rollen,
+        Testkonzept, dann Sprint 1: Health, Datenhaltung, Workouts-API, Kennzahlen. Am Ende nimmt der Product Owner jede
+        Story gegen Test und Kriterium ab. Labs 00 bis 03.</p>
+    </div>
+    <div class="karte">
+      <h3>Termin 2 · Sprint 2 und 3</h3>
+      <p>Sprint 2 baut das Dashboard: Gerüst, Daten per fetch, Wochenverlauf. Abnahme am Smartphone. Sprint 3
+        verpackt die App in einen Container, deployt sie auf Render und lässt GitHub Actions die Tests laufen.
+        Exkurs zu lokalen Modellen, dann Endabnahme und Retrospektive. Labs 04 bis 09.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="labs">
+  <div class="section-head">
+    <span class="badge">Die zehn Labs</span>
+    <div class="accent-line"></div>
+    <h2>Vom roten Test zur öffentlichen Adresse</h2>
+    <p>Die Labs folgen dem Bauweg. Jedes erklärt zuerst, was in dem Schritt technisch passiert, zeigt dann den
+      Prompt, mit dem der Schritt im Chat ausgelöst wird, nennt die Prüfpunkte für die Antwort und lässt Sie zuletzt
+      ausprobieren, was Sie gelesen haben.</p>
+  </div>
+  <div data-fortschritt></div>
+  <div class="labs-grid">
+
+    <a class="lab-card" href="lab-00-setup.html" data-lab-link>
+      <div class="lab-num">00</div>
+      <h3>Setup und Micro-Scrum</h3>
+      <div class="sub">Repo, venv, Rollen, Definition of Done</div>
+      <div class="desc">Werkzeugkette in Betrieb nehmen, Starter klonen, den ersten Test rot sehen. Vision, User Stories,
+        drei rotierende Rollen und die Liste, die entscheidet, wann etwas fertig ist.</div>
+      <div class="meta">4 Übungen · 45 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-01-health.html" data-lab-link>
+      <div class="lab-num">01</div>
+      <h3>US-3: Der Health-Endpunkt</h3>
+      <div class="sub">Test rot, Prompt, Prüfen, Test grün, Commit</div>
+      <div class="desc">Der kleinste Endpunkt der App, gewählt, weil er die ganze Schleife in zehn Minuten zeigt. Und
+        weil der Container und Render ihn später als Lebenszeichen brauchen.</div>
+      <div class="meta">3 Übungen · 30 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-02-daten.html" data-lab-link>
+      <div class="lab-num">02</div>
+      <h3>US-1: Datenhaltung und Workouts-API</h3>
+      <div class="sub">SQLite, Schema, Sicht, sqlite3, Pydantic</div>
+      <div class="desc">Zwei Tabellen und eine Sicht statt einer losen Datei. Warum die Sportart eine eigene Tabelle ist,
+        was ein Fremdschlüssel schützt und wie die API nur die Sicht sieht. Mit SQL im Browser.</div>
+      <div class="meta">5 Übungen · 60 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-03-kennzahlen.html" data-lab-link>
+      <div class="lab-num">03</div>
+      <h3>US-2: Kennzahlen und Erwartungswerte</h3>
+      <div class="sub">statistik.py, Fixture, monkeypatch</div>
+      <div class="desc">Die Erwartungswerte rechnet die Gruppe selbst, sonst prüft der Test nur, ob die KI mit sich
+        selbst übereinstimmt. Randfall leere Liste, Rundung, Kalenderwochen mit Lücke.</div>
+      <div class="meta">4 Übungen · 45 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-04-frontend.html" data-lab-link>
+      <div class="lab-num">04</div>
+      <h3>US-4 bis US-6: Das Dashboard</h3>
+      <div class="sub">Mobile-first, fetch, Chart.js</div>
+      <div class="desc">Ein Dashboard im Stil von Garmin und Apple Fitness aus drei Dateien ohne Build-Schritt. Jede
+        Zahl kommt aus der API, der Wochenverlauf aus einem eigenen Endpunkt mit Zeitraumwahl.</div>
+      <div class="meta">4 Übungen · 75 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-05-tests.html" data-lab-link>
+      <div class="lab-num">05</div>
+      <h3>Testkonzept und Abnahme</h3>
+      <div class="sub">Testpyramide, DoD, Abnahmekriterien</div>
+      <div class="desc">14 Tests, drei Ebenen, zwei Datenbanken. Was die Maschine prüft, was der Mensch am Gerät prüft,
+        und warum KI-erzeugte Tests für KI-erzeugten Code kein Qualitätsnachweis sind.</div>
+      <div class="meta">4 Übungen · 45 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-06-docker.html" data-lab-link>
+      <div class="lab-num">06</div>
+      <h3>Docker: Image und Container</h3>
+      <div class="sub">Dockerfile, build, run, compose</div>
+      <div class="desc">Acht Zeilen Dockerfile, drei Befehle, ein Handy im WLAN. Warum die Abhängigkeiten vor dem Code
+        kopiert werden und wieso der Port aus einer Variablen kommt. Mit Konsole zum Üben.</div>
+      <div class="meta">4 Übungen · 45 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-07-deploy.html" data-lab-link>
+      <div class="lab-num">07</div>
+      <h3>Render und GitHub Actions</h3>
+      <div class="sub">render.yaml, Health-Check, CI</div>
+      <div class="desc">Ein Push, und Render baut dasselbe Image wie Sie lokal. GitHub Actions lässt pytest laufen.
+        Warum GitHub Pages diese Seite tragen kann, die App aber nicht.</div>
+      <div class="meta">3 Übungen · 30 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-08-ki-workflow.html" data-lab-link>
+      <div class="lab-num">08</div>
+      <h3>Der KI-Workflow</h3>
+      <div class="sub">Prompt-Vorlage, Review-Checkliste</div>
+      <div class="desc">Vier Teile eines tragfähigen Prompts, sechs Regeln für den Betrieb, sechs Fragen an jeden
+        übernommenen Code. Vibe Coding, Chat-Workflow und Agentic Coding auf zwei Achsen.</div>
+      <div class="meta">4 Übungen · 45 Min</div>
+    </a>
+
+    <a class="lab-card" href="lab-09-lokal.html" data-lab-link>
+      <div class="lab-num">09</div>
+      <h3>Lokale Modelle mit LM Studio</h3>
+      <div class="sub">Qwen3-Coder, Gemma, Vergleich</div>
+      <div class="desc">Derselbe Prompt, ein Modell auf dem eigenen Rechner. Was ein Coding-Spezialist anders macht als
+        ein Generalist, und warum am Ende pytest entscheidet, nicht der Eindruck.</div>
+      <div class="meta">3 Übungen · 30 Min</div>
+    </a>
+
+  </div>
+</section>
+
+<section class="section soft">
+  <div class="inner">
+    <div class="section-head">
+      <span class="badge dark">Wie das hier funktioniert</span>
+      <div class="accent-line"></div>
+      <h2>Ausprobieren, nicht nachlesen</h2>
+    </div>
+    <div class="labs-grid">
+      <div class="concept-box">
+        <h3>Eine Konsole, die nichts kaputt macht</h3>
+        <p>Die Kommandozeile in diesen Seiten ist nachgebildet: ein Dateibaum mit dem FitTrack-Projekt im
+          Arbeitsspeicher, dazu <code>git</code> und <code>docker</code> mit ihren wichtigsten Befehlen. Ein Tippfehler
+          wird genauso zurückgewiesen wie auf dem eigenen Rechner. Nichts verlässt den Browser.</p>
+      </div>
+      <div class="concept-box">
+        <h3>Eine Datenbank, die echt ist</h3>
+        <p>SQLite läuft als WebAssembly im Browser, mit <code>schema.sql</code> und den 311 Einheiten der App. Was Sie
+          hier abfragen, ist genau das, was <code>daten.py</code> im Backend abfragt. Die Übungen vergleichen Ihr
+          Ergebnis mit der Referenzabfrage, Zeile für Zeile.</p>
+      </div>
+      <div class="concept-box">
+        <h3>Prompts zum Kopieren</h3>
+        <p>Jeder Schritt hat den Prompt, der ihn im Chat auslöst, mit Kontext, Aufgabe und Randbedingungen. Die
+          Antworten von Claude oder einem lokalen Modell weichen von der Referenz ab. Das ist in Ordnung: Maßstab sind
+          die Tests und das Akzeptanzkriterium.</p>
+      </div>
+      <div class="concept-box">
+        <h3>Fortschritt bleibt bei Ihnen</h3>
+        <p>Gelöste Übungen merkt sich der Browser lokal. Es gibt kein Konto und keinen Server, der mitliest. Der Stand
+          lässt sich jederzeit zurücksetzen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · THWS Business School · Stand 09/2026 · <a href="https://github.com/swrobuts/FitTrack">github.com/swrobuts/FitTrack</a></p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+</body>
+</html>

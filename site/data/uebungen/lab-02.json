@@ -1,0 +1,103 @@
+{
+  "befehle": {
+    "B01": {
+      "titel": { "de": "Die API im Browser und mit curl prüfen", "en": "Check the API in the browser and with curl" },
+      "befehl": "curl -s localhost:8000/api/workouts | head -c 300",
+      "ausgabe": "[{\"id\":311,\"datum\":\"2026-09-05\",\"sportart\":\"Schwimmen\",\"dauer_min\":43,\"distanz_km\":2.0,\"kalorien\":614},{\"id\":310, …",
+      "teile": [
+        { "was": "curl -s …", "bedeutet": { "de": "Holt die Antwort ohne Fortschrittsanzeige. Im Browser geht dieselbe Adresse, dort ist das JSON aufgeklappt lesbar. Unter /docs lässt sich der Endpunkt mit „Try it out“ ausführen.", "en": "Fetches the answer without a progress bar. The same address works in the browser." } },
+        { "was": "| head -c 300", "bedeutet": { "de": "Zeigt nur die ersten 300 Zeichen. 311 Einheiten wären sonst ein langer Bildschirm.", "en": "Shows only the first 300 characters." } }
+      ]
+    }
+  },
+  "uebungen": [
+    {
+      "id": "P02-01", "typ": "sql",
+      "titel": { "de": "Die fünf jüngsten Einheiten", "en": "The five most recent sessions" },
+      "aufgabe": { "de": "<p>Genau die Abfrage, die <code>daten.py</code> stellt, nur auf fünf Zeilen begrenzt: alle Spalten der Sicht <code>v_workout</code>, jüngstes Datum zuerst, bei gleichem Datum höhere id zuerst.</p>", "en": "<p>Exactly the query daten.py runs, limited to five rows: all columns of v_workout, most recent date first, higher id first on the same date.</p>" },
+      "start": "SELECT * FROM v_workout\n",
+      "loesung": "SELECT * FROM v_workout ORDER BY datum DESC, id DESC LIMIT 5;",
+      "sortiert": true,
+      "hinweis": { "de": "<p><code>ORDER BY</code> nimmt mehrere Spalten, durch Komma getrennt. <code>DESC</code> gilt je Spalte.</p>", "en": "<p>ORDER BY takes several columns separated by commas; DESC applies per column.</p>" },
+      "rueckmeldung": { "de": "Die Sortierung liegt in SQL, nicht in Python. So kommt die Liste in der Reihenfolge an, in der das Frontend sie zeigt.", "en": "Sorting lives in SQL, not in Python." }
+    },
+    {
+      "id": "P02-02", "typ": "sql",
+      "titel": { "de": "Kilometer je Sportart", "en": "Kilometres per sport" },
+      "aufgabe": { "de": "<p>Für jede Sportart die Summe der Kilometer, gerundet auf eine Nachkommastelle, als Spalte <code>km</code>. Sortiert nach km absteigend. Das ist die Rechnung hinter der Lieblingssportart in Lab 03.</p>", "en": "<p>For each sport the sum of kilometres rounded to one decimal as column km, sorted by km descending.</p>" },
+      "start": "SELECT sportart, \n",
+      "loesung": "SELECT sportart, ROUND(SUM(distanz_km), 1) AS km FROM v_workout GROUP BY sportart ORDER BY km DESC;",
+      "sortiert": true,
+      "hinweis": { "de": "<p><code>GROUP BY sportart</code> bildet die Gruppen, <code>SUM(distanz_km)</code> summiert je Gruppe, <code>ROUND(…, 1)</code> rundet.</p>", "en": "<p>GROUP BY forms the groups, SUM adds up per group, ROUND rounds.</p>" },
+      "rueckmeldung": { "de": "Radfahren liegt mit rund 1992 km vorn, obwohl Laufen mehr Einheiten hat. Die Story definiert die Lieblingssportart über Distanz, und genau das prüft der Test in Lab 03.", "en": "Cycling leads by distance although running has more sessions." }
+    },
+    {
+      "id": "P02-03", "typ": "quiz",
+      "titel": { "de": "Schema-Begriffe", "en": "Schema concepts" },
+      "aufgabe": { "de": "<p>Drei Fragen zu Fremdschlüssel, Sicht und Regeln.</p>", "en": "<p>Three questions on foreign key, view and constraints.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Jemand versucht, eine Einheit mit sportart_id = 9 einzufügen. Es gibt nur die ids 1 bis 4. Was passiert bei eingeschaltetem PRAGMA foreign_keys?", "en": "Someone tries to insert a session with sportart_id = 9 while only ids 1 to 4 exist. What happens with PRAGMA foreign_keys on?" },
+          "optionen": [
+            { "de": "SQLite weist die Zeile mit „FOREIGN KEY constraint failed“ ab. Die Regel schützt die Daten, bevor die App sie sieht.", "en": "SQLite rejects the row with “FOREIGN KEY constraint failed”." },
+            { "de": "Die Zeile wird gespeichert, die Sicht zeigt die Sportart als NULL.", "en": "The row is stored, the view shows the sport as NULL." },
+            { "de": "SQLite legt automatisch eine Sportart 9 an.", "en": "SQLite creates sport 9 automatically." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Ein Fremdschlüssel ist eine Zusage: Jede sportart_id verweist auf eine existierende Zeile. Ohne das PRAGMA prüft SQLite den Fremdschlüssel nicht, deshalb steht es ganz oben im Schema.", "en": "A foreign key is a promise that every sportart_id points to an existing row." }
+        },
+        {
+          "frage": { "de": "Warum liest daten.py die Sicht v_workout und nicht die Tabelle workout?", "en": "Why does daten.py read the view v_workout and not the table workout?" },
+          "optionen": [
+            { "de": "Weil die Sicht den JOIN mit sportart schon enthält und den Namen liefert. Die App muss das Schema nicht kennen.", "en": "Because the view already contains the join with sportart and delivers the name." },
+            { "de": "Weil Tabellen in SQLite nicht direkt lesbar sind.", "en": "Because tables cannot be read directly in SQLite." },
+            { "de": "Weil eine Sicht schneller ist als eine Tabelle.", "en": "Because a view is faster than a table." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Die Sicht ist die Schnittstelle zwischen Datenbank und App. Ändert sich das Schema dahinter, bleibt die Sicht gleich, und daten.py muss nicht angefasst werden.", "en": "The view is the interface between database and app." }
+        },
+        {
+          "frage": { "de": "Welche Regeln stehen im Schema? Mehrere Antworten sind richtig.", "en": "Which rules are in the schema? Several answers are correct." },
+          "mehrfach": true,
+          "optionen": [
+            { "de": "Der Name der Sportart ist eindeutig (UNIQUE)", "en": "The sport name is unique" },
+            { "de": "Die Dauer ist größer als 0 (CHECK)", "en": "Duration is greater than 0" },
+            { "de": "Das Datum hat genau 10 Zeichen (CHECK)", "en": "The date has exactly 10 characters" },
+            { "de": "Die Distanz darf höchstens 100 km sein", "en": "Distance is at most 100 km" }
+          ],
+          "richtig": [0, 1, 2],
+          "erklaerung": { "de": "Eine Obergrenze für die Distanz gibt es nicht. Ob sie sinnvoll wäre, ist eine gute Diskussion: Was ist ein plausibler Wert, und wo gehört die Prüfung hin, in die Datenbank oder in die App?", "en": "There is no upper bound on distance." }
+        }
+      ]
+    },
+    {
+      "id": "P02-04", "typ": "zuordnen",
+      "titel": { "de": "Datei und Verantwortung", "en": "File and responsibility" },
+      "aufgabe": { "de": "<p>Fünf Dateien, fünf Aufgaben. Ordnen Sie zu.</p>", "en": "<p>Five files, five responsibilities.</p>" },
+      "ziele": [
+        { "id": "schema", "text": { "de": "schema.sql", "en": "schema.sql" } },
+        { "id": "daten", "text": { "de": "daten.py", "en": "daten.py" } },
+        { "id": "models", "text": { "de": "models.py", "en": "models.py" } },
+        { "id": "conftest", "text": { "de": "conftest.py", "en": "conftest.py" } },
+        { "id": "generator", "text": { "de": "generate_workouts.py", "en": "generate_workouts.py" } }
+      ],
+      "paare": [
+        { "begriff": { "de": "Beschreibt Tabellen, Regeln und die Sicht, versioniert im Repository", "en": "Describes tables, rules and the view, versioned in the repository" }, "ziel": "schema" },
+        { "begriff": { "de": "Öffnet die Datenbank, liest v_workout, schließt die Verbindung", "en": "Opens the database, reads v_workout, closes the connection" }, "ziel": "daten" },
+        { "begriff": { "de": "Beschreibt die Form einer Antwort, FastAPI prüft dagegen", "en": "Describes the shape of a response, FastAPI validates against it" }, "ziel": "models" },
+        { "begriff": { "de": "Baut vor dem ersten Test eine eigene Datenbank und setzt FITTRACK_DATA", "en": "Builds a dedicated database before the first test and sets FITTRACK_DATA" }, "ziel": "conftest" },
+        { "begriff": { "de": "Erzeugt fittrack.db reproduzierbar aus Schema und Zufall mit festem Seed", "en": "Creates fittrack.db reproducibly from schema and seeded randomness" }, "ziel": "generator" }
+      ],
+      "rueckmeldung": { "de": "Jede Datei hat eine Aufgabe. Wer daten.py gegen PostgreSQL tauscht, fasst die anderen nicht an.", "en": "Each file has one job." }
+    },
+    {
+      "id": "P02-05", "typ": "sql",
+      "titel": { "de": "Einheiten im Jahr 2026", "en": "Sessions in 2026" },
+      "aufgabe": { "de": "<p>Wie viele Einheiten liegen im Jahr 2026? Eine Zeile, eine Spalte <code>anzahl</code>. Das Datum ist Text im ISO-Format, ein Vergleich mit <code>'2026-01-01'</code> funktioniert deshalb direkt.</p>", "en": "<p>How many sessions are in 2026? One row, one column anzahl.</p>" },
+      "start": "SELECT COUNT(*) AS anzahl FROM workout\n",
+      "loesung": "SELECT COUNT(*) AS anzahl FROM workout WHERE datum >= '2026-01-01' AND datum < '2027-01-01';",
+      "hinweis": { "de": "<p><code>WHERE datum >= '2026-01-01' AND datum < '2027-01-01'</code>. Alternativ <code>substr(datum, 1, 4) = '2026'</code>, das nutzt aber den Index nicht.</p>", "en": "<p>WHERE datum >= '2026-01-01' AND datum < '2027-01-01'.</p>" },
+      "rueckmeldung": { "de": "ISO-Daten als Text sortieren und vergleichen sich richtig. Genau deshalb steht im Schema CHECK (length(datum) = 10).", "en": "ISO dates as text sort and compare correctly." }
+    }
+  ]
+}

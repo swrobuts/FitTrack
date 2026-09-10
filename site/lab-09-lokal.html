@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 09 · Lokale Modelle mit LM Studio · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-09">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://lmstudio.ai" target="_blank" rel="noopener">LM Studio</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#botschaft">Die Botschaft</a>
+  <a class="sidebar-link" href="#modelle">Modelle und Hardware</a>
+  <a class="sidebar-link" href="#demo">Die Demo</a>
+  <a class="sidebar-link" href="#vergleich">Worauf man achtet</a>
+  <a class="sidebar-link" href="#ide">Anbindung an WebStorm</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">09</div>
+  <h1 class="lab-title">Lokale Modelle mit LM Studio</h1>
+  <p class="lab-intro">Alles, was im Kurs mit Claude im Chat entstanden ist, geht auch mit einem Modell auf dem eigenen
+    Rechner: offline, ohne Abo, ohne dass Code das Haus verlässt. Der Preis ist Arbeitsspeicher und etwas Tempo. Die
+    Demo stellt denselben Prompt an einen Coding-Spezialisten und einen Generalisten und lässt am Ende pytest
+    entscheiden, nicht den Eindruck.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">LM Studio</span>
+    <span class="lernziel-chip">Qwen3-Coder · Gemma</span>
+    <span class="lernziel-chip">Spezialist vs. Generalist</span>
+    <span class="lernziel-chip">Lokal vs. Cloud</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="botschaft">
+    <h2>Die Botschaft</h2>
+    <div class="concept-box">
+      <h3>Der Workflow ist derselbe, nur der Anbieter wechselt.</h3>
+      <p>Story, Test rot, Prompt, Prüfen, Übernahme, Test grün, Commit. Ob der Vorschlag von Claude, von Qwen3-Coder
+        auf dem eigenen Laptop oder von einem anderen Modell kommt, ändert an der Prüfstelle nichts. Das ist auch der
+        Plan B, wenn das Kontingent im Chat erschöpft ist.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="modelle">
+    <h2>Modelle und Hardware</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Modell</th><th>Größe (Q4_K_M)</th><th>Braucht</th><th>Stärke</th><th>Einsatz</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Qwen3-Coder-30B-A3B</strong></td><td>ca. 19 GB</td><td>32 bis 48 GB RAM</td><td>Coding-Spezialist, nur ein Bruchteil der Parameter aktiv, langer Kontext</td><td>Demo, starke Rechner</td></tr>
+          <tr><td>Qwen2.5-Coder 7B</td><td>ca. 5 GB</td><td>8 bis 16 GB RAM</td><td>Solider Einstieg fürs Programmieren</td><td>übliche Laptops</td></tr>
+          <tr><td>Gemma 4 12B / 27B</td><td>ca. 8 / 17 GB</td><td>16 / 32 GB RAM</td><td>Starker Generalist, beim Code schwächer als der Spezialist</td><td>Kontrast im Vergleich</td></tr>
+          <tr><td>Gemma 4 4B</td><td>ca. 3 GB</td><td>8 GB RAM</td><td>Kleinster brauchbarer Einstieg</td><td>ältere Rechner</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Angaben nach dem Modellkatalog von LM Studio, Stand September 2026. Die Zahlen ändern sich mit jeder
+      Modellgeneration, die Einteilung in Spezialist und Generalist bleibt.</p>
+    <div class="info-box">
+      <h3>Vorbereitung</h3>
+      <p>Das große Modell vor der Veranstaltung herunterladen, im Raum dauert das zu lange. In LM Studio: Discover,
+        nach „Qwen3 Coder 30B A3B“ suchen, Q4_K_M laden. Kontextlänge auf mindestens 8192 Token stellen, damit der
+        Prompt mit Tests hineinpasst.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="demo">
+    <h2>Die Demo in zehn Minuten</h2>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart LR
+    P["Prompt für US-2<br/>aus Lab 03"] --> Q["Qwen3-Coder<br/>lokal"]
+    P --> G["Gemma<br/>lokal"]
+    P --> C["Claude<br/>Chat, aus Sprint 1"]
+    Q --> T["Code in WebStorm,<br/>pytest"]
+    G --> T
+    C --> T
+    T --> V["Vergleich: Tests, Randbedingungen,<br/>Erklärung, Stil"]
+      </pre>
+      <div class="unterschrift">Derselbe Prompt, drei Modelle, ein Schiedsrichter: pytest. Verglichen wird nicht nur das Ergebnis, sondern auch die Erklärung.</div>
+    </div>
+    <ol>
+      <li>Prompt für <code>/api/stats</code> aus Lab 03 an Qwen3-Coder stellen. Antwortzeit und Tokens pro Sekunde beobachten.</li>
+      <li>Denselben Prompt an Gemma stellen.</li>
+      <li>Beide Antworten in WebStorm einfügen, <code>pytest</code> laufen lassen. Das ist der eigentliche Beweis.</li>
+      <li>Neben die Claude-Antwort aus Sprint 1 legen und vergleichen.</li>
+      <li>Diskussion: Wann reicht lokal? Wann Cloud?</li>
+    </ol>
+  </section>
+
+  <section class="section-block" id="vergleich">
+    <h2>Worauf man achtet</h2>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Besteht der Code die Tests?</div>
+        <p>Die einzige Frage, die zählt. Zählt das Modell die leere Woche mit? Rundet es am Ende? Behandelt es die
+          leere Liste?</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Hält es die Randbedingungen?</div>
+        <p>Nur Standardbibliothek. Kleinere Modelle ignorieren Randbedingungen häufiger und bringen pandas mit.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Stimmt die Erklärung mit dem Code überein?</div>
+        <p>Die Erklärung klingt bei allen Modellen sicher. Ob sie stimmt, sieht man erst beim Lesen des Codes.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Stil</div>
+        <p>Generalisten formatieren schöner, Coding-Modelle halten sich enger an die Tests. Beides ist beobachtbar.</p>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th></th><th>Lokal</th><th>Cloud</th></tr></thead>
+        <tbody>
+          <tr><td>Datenschutz</td><td>Nichts verlässt den Rechner. Für Firmencode oft die einzige Option.</td><td>Code geht zum Anbieter, Vertragslage prüfen.</td></tr>
+          <tr><td>Kosten</td><td>Einmal Hardware, danach null.</td><td>Abo oder Kontingent.</td></tr>
+          <tr><td>Verfügbarkeit</td><td>Offline, im Zug, im Raum ohne WLAN.</td><td>Braucht Netz und ein Konto.</td></tr>
+          <tr><td>Leistung</td><td>Für Stories dieser Größe ausreichend.</td><td>Stärker bei komplexen Aufgaben und langem Kontext.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section-block" id="ide">
+    <h2>Anbindung an WebStorm</h2>
+    <p>LM Studio stellt unter Developer → Start Server eine OpenAI-kompatible Schnittstelle bereit, meist unter
+      <code>http://localhost:1234/v1</code>. Damit lässt sich der Editor anbinden: Das JetBrains-Plugin „Continue“ oder
+      der JetBrains AI Assistant mit lokalem Modell bieten Autovervollständigung und Chat, vollständig lokal und
+      kostenfrei. Für den Kurs bleibt der Chat-Weg der Standard, die Anbindung ist der Ausblick.</p>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Drei Übungen: lokal oder Cloud, die Demo vorbereiten, Ergebnisse bewerten.</p>
+    <div data-uebung="P09-01"></div>
+    <div data-uebung="P09-02"></div>
+    <div data-uebung="P09-03"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Derselbe Workflow, ein anderer Anbieter. Die Prüfstelle bleibt.</li>
+      <li>Coding-Spezialist gegen Generalist: gleicher Prompt, spürbar anderer Code. Das ist der Anlass, über Modellwahl zu sprechen.</li>
+      <li>Modelle vorab laden, Kontextlänge hochsetzen, den Prompt bereithalten.</li>
+      <li>Lokal, wo Datenschutz, Kosten oder Offline-Betrieb zählen. Cloud, wo Komplexität und Kontextlänge zählen.</li>
+      <li>Am Ende entscheidet pytest, nicht der Eindruck.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 09 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

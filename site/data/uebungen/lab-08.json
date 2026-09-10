@@ -1,0 +1,103 @@
+{
+  "uebungen": [
+    {
+      "id": "P08-01", "typ": "quiz",
+      "titel": { "de": "Die vier Teile", "en": "The four parts" },
+      "aufgabe": { "de": "<p>Ein Prompt aus einer Gruppe lautete: „Mach mir bitte den Stats-Endpunkt fertig, so wie im Konzept.“ Drei Fragen dazu.</p>", "en": "<p>A group's prompt read: “Please finish the stats endpoint like in the concept.” Three questions.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Welche Teile fehlen dem Prompt? Mehrere Antworten sind richtig.", "en": "Which parts are missing? Several answers are correct." },
+          "mehrfach": true,
+          "optionen": [
+            { "de": "Kontext: Datenmodell und vorhandener Code", "en": "Context" },
+            { "de": "Aufgabe mit Ergebnisform: welche Felder, welche Definition", "en": "Task with result shape" },
+            { "de": "Randbedingungen: Pakete, Tests, Erklärpflicht", "en": "Constraints" },
+            { "de": "Eine Begrüßung", "en": "A greeting" }
+          ],
+          "richtig": [0, 1, 2],
+          "erklaerung": { "de": "Das Modell kennt weder „das Konzept“ noch den Code. Es wird etwas Plausibles erfinden: andere Feldnamen, eine andere Definition der Lieblingssportart, ein Paket, das nicht in requirements.txt steht.", "en": "The model knows neither the concept nor the code." }
+        },
+        {
+          "frage": { "de": "Warum steht in jedem Prompt der Referenzlösung „Erkläre in drei Sätzen deine Entscheidungen“?", "en": "Why does every reference prompt end with “explain your decisions in three sentences”?" },
+          "optionen": [
+            { "de": "Weil die Erklärung gelesen werden muss, und wer sie liest, liest auch den Code. Außerdem zeigt sie, ob das Modell die Randbedingung verstanden hat, etwa die Wochenzählung.", "en": "Because the explanation has to be read, and reading it means reading the code." },
+            { "de": "Weil das Modell sonst keinen Code ausgibt.", "en": "Because otherwise the model outputs no code." },
+            { "de": "Weil die Erklärung in den Commit gehört.", "en": "Because the explanation belongs in the commit." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Die Erklärung ist der Anlass für die Prüfung. Stimmt sie nicht mit dem Code überein, ist das selbst ein Befund.", "en": "The explanation is the trigger for the review." }
+        },
+        {
+          "frage": { "de": "Der Test ist nach der Übernahme rot. Welche Rückmeldung an den Chat ist richtig?", "en": "The test is red after adoption. Which feedback to the chat is right?" },
+          "optionen": [
+            { "de": "Der komplette Traceback aus pytest, unverändert.", "en": "The complete pytest traceback, unchanged." },
+            { "de": "„Der Durchschnitt stimmt irgendwie nicht.“", "en": "“The average is somehow wrong.”" },
+            { "de": "„Bitte den Test anpassen.“", "en": "“Please adjust the test.”" }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Der Traceback enthält Datei, Zeile, Erwartung und tatsächlichen Wert: 29.2 erwartet, 43.75 bekommen. Das Modell sieht sofort, dass es Wochen falsch zählt.", "en": "The traceback contains file, line, expectation and actual value." }
+        }
+      ]
+    },
+    {
+      "id": "P08-02", "typ": "zuordnen",
+      "titel": { "de": "Fehler und Regel", "en": "Mistake and rule" },
+      "aufgabe": { "de": "<p>Welche Regel hätte den Fehler verhindert?</p>", "en": "<p>Which rule would have prevented the mistake?</p>" },
+      "ziele": [
+        { "id": "eine", "text": { "de": "Eine Story je Prompt", "en": "One story per prompt" } },
+        { "id": "kontext", "text": { "de": "Kontext mitliefern", "en": "Provide context" } },
+        { "id": "rand", "text": { "de": "Randbedingungen nennen", "en": "Name constraints" } },
+        { "id": "woertlich", "text": { "de": "Fehlermeldungen wörtlich", "en": "Error messages verbatim" } },
+        { "id": "verstanden", "text": { "de": "Nichts Unverstandenes committen", "en": "Commit nothing you do not understand" } }
+      ],
+      "paare": [
+        { "begriff": { "de": "Das Modell liefert main.py, models.py, statistik.py, app.js und ein Dockerfile in einer Antwort, und nichts davon passt zusammen", "en": "The model delivers five files at once and nothing fits" }, "ziel": "eine" },
+        { "begriff": { "de": "Der Code ruft lade_daten() auf, die Funktion heißt aber lade_workouts()", "en": "The code calls lade_daten() but the function is lade_workouts()" }, "ziel": "kontext" },
+        { "begriff": { "de": "import pandas as pd in daten.py, GitHub Actions rot", "en": "import pandas in daten.py, Actions red" }, "ziel": "rand" },
+        { "begriff": { "de": "Drei Runden Chat, weil „geht nicht“ als Rückmeldung nichts erklärt", "en": "Three chat rounds because “does not work” explains nothing" }, "ziel": "woertlich" },
+        { "begriff": { "de": "Im Review kann niemand sagen, was die Middleware in main.py tut", "en": "In review nobody can say what the middleware does" }, "ziel": "verstanden" }
+      ],
+      "rueckmeldung": { "de": "Jede Regel zielt auf einen konkreten Zeitverlust im Sprint, nicht auf eine Methodenlehre.", "en": "Every rule targets a concrete loss of time in the sprint." }
+    },
+    {
+      "id": "P08-03", "typ": "quiz",
+      "titel": { "de": "Drei Arbeitsweisen", "en": "Three ways of working" },
+      "aufgabe": { "de": "<p>Zwei Fragen zu den Achsen.</p>", "en": "<p>Two questions on the axes.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Ein Editor-Agent hat 14 Dateien geändert und die Tests selbst laufen lassen, alle grün. Ist das Vibe Coding?", "en": "An editor agent changed 14 files and ran the tests itself, all green. Is that vibe coding?" },
+          "optionen": [
+            { "de": "Nicht zwingend. Vibe Coding beschreibt, ob geprüft wird, agentisch beschreibt, wer handelt. Liest der Mensch den Diff und beurteilt das Ergebnis, ist es Agentic Engineering; übernimmt er ungelesen, ist es Vibe Coding mit einem Agenten.", "en": "Not necessarily. Vibe describes whether you review, agentic describes who acts." },
+            { "de": "Ja, weil ein Agent beteiligt war.", "en": "Yes, because an agent was involved." },
+            { "de": "Nein, weil die Tests grün sind.", "en": "No, because the tests are green." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Zwei Achsen, zwei Entscheidungen. Der FitTrack-Workflow ist bewusst wenig autonom und voll geprüft, beides lässt sich später unabhängig voneinander verändern.", "en": "Two axes, two decisions." }
+        },
+        {
+          "frage": { "de": "Wofür ist Vibe Coding im Kurs der richtige Modus?", "en": "Where is vibe coding the right mode in the course?" },
+          "optionen": [
+            { "de": "Für Dinge, von denen nichts abhängt: ein Layoutversuch, ein Wegwerf-Skript zum Datenimport, das erste Gefühl für Chart.js.", "en": "For things nothing depends on." },
+            { "de": "Für den Kennzahlen-Endpunkt, weil er klein ist.", "en": "For the stats endpoint because it is small." },
+            { "de": "Nie.", "en": "Never." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Sobald eine Story abgenommen wird, gilt die Prüfstelle. Davor darf ausprobiert werden, was man danach wegwirft.", "en": "Once a story gets accepted, the checkpoint applies." }
+        }
+      ]
+    },
+    {
+      "id": "P08-04", "typ": "checkliste",
+      "titel": { "de": "Ein Review an einem Beispiel", "en": "A review on an example" },
+      "aufgabe": { "de": "<p>Ein Modell hat für US-2 diesen Ausschnitt geliefert:</p><pre class=\"code-block\">import pandas as pd\n\ndef berechne_stats(workouts):\n    df = pd.DataFrame(workouts)\n    wochen = df['datum'].str[:7].nunique()\n    return {'gesamt_km': round(df.distanz_km.sum(), 1),\n            'durchschnitt_km_pro_woche': round(df.distanz_km.sum() / wochen, 1),\n            'lieblingssportart': df.groupby('sportart').distanz_km.sum().idxmax(),\n            'anzahl': len(df)}</pre><p>Gehen Sie die Review-Fragen durch und haken Sie jede ab, für die Sie einen Befund gefunden haben.</p>", "en": "<p>A model delivered this snippet for US-2. Go through the review questions and tick each one where you found an issue.</p>" },
+      "schritte": [
+        { "text": { "de": "Existiert alles? <code>pandas</code> steht nicht in <code>requirements.txt</code> und war als Randbedingung ausgeschlossen.", "en": "Does everything exist? pandas is not in requirements.txt." } },
+        { "text": { "de": "Randfälle? Bei leerer Liste hat der DataFrame keine Spalte <code>datum</code>, der Code wirft einen KeyError statt 0.0, 0.0, None, 0.", "en": "Edge cases? An empty list raises KeyError." } },
+        { "text": { "de": "Stimmt die Rechnung? <code>str[:7]</code> zählt Monate, nicht ISO-Kalenderwochen, und nur solche mit Training. Der Test erwartet 29,2.", "en": "Is the calculation right? str[:7] counts months, not ISO weeks." } },
+        { "text": { "de": "Gleichstand? <code>idxmax()</code> nimmt den ersten Treffer in Gruppenreihenfolge, nicht den alphabetisch ersten.", "en": "Ties? idxmax() takes the first hit in group order." } },
+        { "text": { "de": "Stil? Englische Namen wie <code>df</code>, keine Docstrings, keine Hilfsfunktionen wie im übrigen Projekt.", "en": "Style? English names, no docstrings, no helpers." } }
+      ],
+      "rueckmeldung": { "de": "Fünf Befunde in neun Zeilen, und der Code sieht auf den ersten Blick elegant aus. Genau deshalb wird gelesen, bevor übernommen wird.", "en": "Five findings in nine lines, and the code looks elegant at first sight." }
+    }
+  ]
+}

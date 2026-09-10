@@ -1,0 +1,84 @@
+{
+  "uebungen": [
+    {
+      "id": "P03-01", "typ": "quiz",
+      "titel": { "de": "Erwartungswerte aus den Testdaten", "en": "Expected values from the test data" },
+      "aufgabe": { "de": "<p>Rechnen Sie mit der Tabelle oben. Taschenrechner erlaubt, Chat nicht.</p>", "en": "<p>Calculate with the table above. Calculator allowed, chat not.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Wie groß ist gesamt_km?", "en": "What is gesamt_km?" },
+          "optionen": [ { "de": "87,5", "en": "87.5" }, { "de": "86,0", "en": "86.0" }, { "de": "88,5", "en": "88.5" } ],
+          "richtig": [0],
+          "erklaerung": { "de": "5 + 20 + 8 + 1,5 + 30 + 9 + 10 + 4 = 87,5.", "en": "5 + 20 + 8 + 1.5 + 30 + 9 + 10 + 4 = 87.5." }
+        },
+        {
+          "frage": { "de": "Wie groß ist durchschnitt_km_pro_woche nach der Definition im README?", "en": "What is durchschnitt_km_pro_woche by the README definition?" },
+          "optionen": [ { "de": "29,2", "en": "29.2" }, { "de": "43,8", "en": "43.8" }, { "de": "10,9", "en": "10.9" } ],
+          "richtig": [0],
+          "erklaerung": { "de": "Drei Kalenderwochen von KW 23 bis KW 25, die leere KW 24 zählt mit: 87,5 / 3 = 29,17 → 29,2. Wer 43,8 gerechnet hat, hat nur Wochen mit Training gezählt. Wer 10,9 hat, hat durch die 8 Einheiten geteilt.", "en": "Three calendar weeks, the empty one counts: 87.5 / 3 = 29.2." }
+        },
+        {
+          "frage": { "de": "Welche Sportart ist die Lieblingssportart nach der Definition?", "en": "Which sport is the favourite by definition?" },
+          "optionen": [ { "de": "Radfahren, 50,0 km", "en": "Cycling, 50.0 km" }, { "de": "Laufen, 4 Einheiten", "en": "Running, 4 sessions" }, { "de": "Wandern, längste Dauer", "en": "Hiking, longest duration" } ],
+          "richtig": [0],
+          "erklaerung": { "de": "Die Story definiert die Lieblingssportart über die Summe der Distanz. Nach Anzahl wäre es Laufen, nach Dauer Wandern. Deshalb muss das Kriterium die Kennzahl benennen.", "en": "The story defines favourite by total distance." }
+        }
+      ]
+    },
+    {
+      "id": "P03-02", "typ": "sql",
+      "titel": { "de": "Die Kennzahlen auf den Echtdaten", "en": "The metrics on the real data" },
+      "aufgabe": { "de": "<p>Eine Abfrage, die für die 311 Einheiten <code>gesamt_km</code> (gerundet auf 1 Stelle) und <code>anzahl</code> in einer Zeile liefert. Der Endpunkt /api/stats meldet 3963,0 und 311. Stimmt die Datenbank zu?</p>", "en": "<p>One query returning gesamt_km (rounded to 1 decimal) and anzahl for the 311 sessions in one row.</p>" },
+      "start": "SELECT \n",
+      "loesung": "SELECT ROUND(SUM(distanz_km), 1) AS gesamt_km, COUNT(*) AS anzahl FROM v_workout;",
+      "hinweis": { "de": "<p><code>SUM</code> und <code>COUNT(*)</code> ohne GROUP BY liefern genau eine Zeile.</p>", "en": "<p>SUM and COUNT(*) without GROUP BY return exactly one row.</p>" },
+      "rueckmeldung": { "de": "Zwei unabhängige Wege, ein Ergebnis. Wenn Python und SQL dieselbe Zahl liefern, ist die Rechenlogik sehr wahrscheinlich richtig.", "en": "Two independent routes, one result." }
+    },
+    {
+      "id": "P03-03", "typ": "zuordnen",
+      "titel": { "de": "Test und Randfall", "en": "Test and edge case" },
+      "aufgabe": { "de": "<p>Welcher Test fängt welchen Fehler, den generierter Code typischerweise macht?</p>", "en": "<p>Which test catches which typical mistake of generated code?</p>" },
+      "ziele": [
+        { "id": "durchschnitt", "text": { "de": "test_stats_durchschnitt", "en": "test_stats_durchschnitt" } },
+        { "id": "leer", "text": { "de": "test_stats_leere_liste", "en": "test_stats_leere_liste" } },
+        { "id": "lieblings", "text": { "de": "test_stats_lieblingssportart", "en": "test_stats_lieblingssportart" } },
+        { "id": "gesamt", "text": { "de": "test_stats_gesamt_km", "en": "test_stats_gesamt_km" } }
+      ],
+      "paare": [
+        { "begriff": { "de": "Nur Wochen mit Training gezählt, Ergebnis 43,75", "en": "Only weeks with training counted, result 43.75" }, "ziel": "durchschnitt" },
+        { "begriff": { "de": "max() auf einer leeren Liste wirft ValueError", "en": "max() on an empty list raises ValueError" }, "ziel": "leer" },
+        { "begriff": { "de": "Sportart nach Anzahl der Einheiten statt nach Distanz gewählt", "en": "Sport chosen by number of sessions instead of distance" }, "ziel": "lieblings" },
+        { "begriff": { "de": "Bei jeder Teilsumme gerundet statt am Ende", "en": "Rounded at every partial sum instead of at the end" }, "ziel": "gesamt" },
+        { "begriff": { "de": "Division durch null Wochen", "en": "Division by zero weeks" }, "ziel": "leer" }
+      ],
+      "rueckmeldung": { "de": "Jeder Test hat einen Grund. Ein Test, dessen Fehlerfall niemand benennen kann, prüft vermutlich nichts.", "en": "Every test has a reason." }
+    },
+    {
+      "id": "P03-04", "typ": "quiz",
+      "titel": { "de": "Rundung und Wochen", "en": "Rounding and weeks" },
+      "aufgabe": { "de": "<p>Zwei Fragen, die in fast jeder Antwort des Modells eine Rolle spielen.</p>", "en": "<p>Two questions that matter in almost every model answer.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Der 29.12.2025 ist ein Montag. In welcher ISO-Kalenderwoche liegt er?", "en": "29 December 2025 is a Monday. Which ISO calendar week is it in?" },
+          "optionen": [
+            { "de": "2026-W01. Die ISO-Woche 1 ist die Woche mit dem ersten Donnerstag des Jahres, und die beginnt hier noch im Dezember.", "en": "2026-W01." },
+            { "de": "2025-W53", "en": "2025-W53" },
+            { "de": "2025-W52", "en": "2025-W52" }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "date.isocalendar() liefert (2026, 1, 1). Wer das Jahr aus datum[:4] nimmt, bekommt 2025-W01 und sortiert die Woche ans falsche Ende. Die Echtdaten enthalten zwei Jahreswechsel, das Diagramm in Lab 04 zeigt, ob es stimmt.", "en": "date.isocalendar() returns (2026, 1, 1)." }
+        },
+        {
+          "frage": { "de": "Warum steht round() nur einmal am Ende von berechne_stats und nicht in jeder Hilfsfunktion?", "en": "Why is round() used only once at the end and not in every helper?" },
+          "optionen": [
+            { "de": "Weil Zwischenrundungen den Fehler aufsummieren. 87,5 / 3 gerundet ergibt 29,2; wer vorher rundet, kann daneben liegen.", "en": "Because intermediate rounding accumulates error." },
+            { "de": "Weil round() in Python nur einmal pro Programm aufgerufen werden darf.", "en": "Because round() may be called only once per program." },
+            { "de": "Weil Pydantic keine gerundeten Zahlen annimmt.", "en": "Because Pydantic does not accept rounded numbers." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Rechnen mit voller Genauigkeit, runden bei der Ausgabe. Das gilt für Kennzahlen jeder Art.", "en": "Calculate at full precision, round at output." }
+        }
+      ]
+    }
+  ]
+}

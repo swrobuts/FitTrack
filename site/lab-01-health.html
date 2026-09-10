@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 01 · US-3 Health-Endpunkt · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-01">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack/tree/us-3" target="_blank" rel="noopener">Stand us-3</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#story">Die Story</a>
+  <a class="sidebar-link" href="#schleife">Die Schleife</a>
+  <a class="sidebar-link" href="#test">Test zuerst</a>
+  <a class="sidebar-link" href="#prompt">Der Prompt</a>
+  <a class="sidebar-link" href="#pruefen">Prüfpunkte</a>
+  <a class="sidebar-link" href="#technik">Was technisch passiert</a>
+  <a class="sidebar-link" href="#commit">Grün, Demo, Commit</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">01</div>
+  <h1 class="lab-title">US-3: Der Health-Endpunkt</h1>
+  <p class="lab-intro">Der kleinste Endpunkt der App, und trotzdem die wichtigste Übung des Kurses: An ihm läuft die
+    Schleife zum ersten Mal vollständig. Test rot, Prompt in den Chat, Antwort lesen und prüfen, Code in WebStorm,
+    Test grün, Demo, Commit. Wer diese Folge einmal an einer Zeile Code durchlaufen hat, kann sie an jeder Story
+    wiederholen.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Test rot → grün</span>
+    <span class="lernziel-chip">Prompt mit Kontext</span>
+    <span class="lernziel-chip">FastAPI · uvicorn</span>
+    <span class="lernziel-chip">/docs</span>
+    <span class="lernziel-chip">Commit mit Story-Bezug</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="story">
+    <h2>Die Story</h2>
+    <div class="story"><strong>US-3 · Health.</strong> Als Entwickler möchte ich einen Health-Endpunkt, damit ich später im Container prüfen kann, ob die App läuft. <em>Akzeptanz:</em> <code>GET /health</code> liefert <code>{"status": "ok"}</code>.</div>
+    <p>Der Endpunkt sieht überflüssig aus und ist es nicht. Der Container fragt ihn, Render fragt ihn vor jedem
+      Weiterleiten von Verkehr, und im Kurs ist er der Ort, an dem die Gruppe die Methode lernt, ohne über Fachlogik
+      nachdenken zu müssen.</p>
+  </section>
+
+  <section class="section-block" id="schleife">
+    <h2>Die Schleife</h2>
+    <p>Der Ablauf ist bewusst nicht agentisch: Das Modell schlägt vor, übernommen wird von Hand. Die Prüfstelle zwischen
+      Vorschlag und Editor ist der Ort, an dem aus Textproduktion Entwicklung wird.</p>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart TD
+    A["User Story mit Akzeptanzkriterium<br/>(Product Owner)"] --> B["Test schreiben, pytest: ROT<br/>(Quality)"]
+    B --> C["Prompt im Chat<br/>(Developer)"]
+    C --> D["Antwort lesen und prüfen<br/>Review-Checkliste"]
+    D --> E["Code in WebStorm übernehmen"]
+    E --> F{"pytest"}
+    F -- "rot" --> G["Fehlermeldung wörtlich<br/>zurück in den Chat"]
+    G --> C
+    F -- "grün" --> H["Demo am Gerät,<br/>PO nimmt ab"]
+    H --> I["Commit mit Story-Bezug, Push"]
+      </pre>
+      <div class="unterschrift">Die Schleife hat genau eine Rückführung: Ist der Test nach der Übernahme rot, geht die Fehlermeldung wörtlich zurück in den Chat, nicht sinngemäß.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="test">
+    <h2>Test zuerst</h2>
+    <p>Der Test liegt schon im Starter. Lesen Sie ihn, bevor Sie prompten: Er ist die Spezifikation, gegen die später
+      geprüft wird.</p>
+    <pre class="code-block">from fastapi.testclient import TestClient
+
+from app.main import app
+
+client = TestClient(app)
+
+
+# US-3: Health-Endpunkt
+def test_health():
+    antwort = client.get("/health")
+    assert antwort.status_code == 200
+    assert antwort.json() == {"status": "ok"}</pre>
+    <div class="info-box">
+      <h3>Was der rote Lauf beweist</h3>
+      <p>Ein Test, der von Beginn an grün ist, hat nichts belegt. Der rote Lauf zeigt, dass der Test überhaupt greift.
+        Im Starter scheitert er schon am Import: <code>ModuleNotFoundError: No module named 'app.main'</code>.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="prompt">
+    <h2>Der Prompt</h2>
+    <p>Der Chat sieht das Repository nicht. Deshalb steht alles Nötige im Prompt: Rolle, Kontext, Aufgabe,
+      Randbedingungen und der Test, der bestehen muss. Die Aufforderung zur Erklärung sorgt dafür, dass die Antwort
+      gelesen wird.</p>
+    <pre class="prompt" data-kopieren="Prompt für US-3">Du bist ein erfahrener Python-Entwickler. Wir bauen mit FastAPI eine kleine
+Fitness-App namens FitTrack. Projektstruktur:
+
+FitTrack/
+├── backend/app/main.py      &lt;- diese Datei gibt es noch nicht
+├── backend/tests/test_api.py
+└── requirements.txt         (fastapi, uvicorn, pytest, httpx2)
+
+Aufgabe: Erstelle backend/app/main.py mit einer FastAPI-App und dem
+Endpunkt GET /health, der {"status": "ok"} zurückgibt.
+
+Randbedingungen:
+- Nur FastAPI, keine weiteren Pakete
+- Kommentare und Docstrings auf Deutsch, kurz
+- Die App wird so gestartet:
+  uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+- Dieser Test muss bestehen:
+
+from fastapi.testclient import TestClient
+from app.main import app
+client = TestClient(app)
+
+def test_health():
+    antwort = client.get("/health")
+    assert antwort.status_code == 200
+    assert antwort.json() == {"status": "ok"}
+
+Gib nur die Datei main.py aus und erkläre in drei Sätzen deine Entscheidungen.</pre>
+  </section>
+
+  <section class="section-block" id="pruefen">
+    <h2>Prüfpunkte für die Antwort</h2>
+    <ul class="pruefpunkte">
+      <li><strong>Genau eine Datei?</strong> Hat das Modell etwas Ungefragtes ergänzt, etwa Middleware, CORS oder Logging? Weglassen.</li>
+      <li><strong>Steht <code>app = FastAPI(...)</code> auf Modulebene?</strong> Der Test importiert <code>app</code> aus <code>app.main</code>.</li>
+      <li><strong>Existiert jeder Import?</strong> Halluzinierte Pakete sind der häufigste Fehler generierten Codes.</li>
+      <li><strong>Können Sie jede Zeile erklären?</strong> Wenn nicht, nachfragen, bevor Sie übernehmen.</li>
+    </ul>
+    <p>So sieht die Referenzlösung aus. Ihre Antwort aus dem Chat darf anders aussehen, solange sie die Prüfpunkte und
+      den Test besteht.</p>
+    <pre class="code-block" data-kopieren="backend/app/main.py">"""FitTrack – FastAPI-Anwendung.
+
+Start lokal (aus dem Projektordner FitTrack/):
+    uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+"""
+
+from fastapi import FastAPI
+
+app = FastAPI(title="FitTrack", version="0.1.0")
+
+
+@app.get("/health")
+def health() -> dict:
+    """Antwortet mit ok, wenn die App läuft. Wird später vom Container genutzt."""
+    return {"status": "ok"}</pre>
+  </section>
+
+  <section class="section-block" id="technik">
+    <h2>Was technisch passiert</h2>
+    <p>Drei Dinge greifen ineinander, und jedes davon taucht in den nächsten Labs wieder auf.</p>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">FastAPI</div>
+        <p>Ein Dekorator <code>@app.get("/health")</code> verbindet einen Pfad mit einer Funktion. Der Rückgabewert wird
+          automatisch zu JSON. Aus denselben Dekoratoren erzeugt FastAPI die Dokumentation unter <code>/docs</code>.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">uvicorn</div>
+        <p>Der Server, der die App ausführt. <code>--reload</code> startet bei jeder Dateiänderung neu,
+          <code>--host 0.0.0.0</code> macht sie im WLAN erreichbar, später im Container unverzichtbar.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">TestClient</div>
+        <p>Der Test startet keinen Server. Der TestClient ruft die App direkt im Prozess auf. Deshalb laufen alle
+          Tests in unter einer Sekunde.</p>
+      </div>
+    </div>
+    <div class="shot">
+      <img src="assets/img/swagger-docs.png" alt="Automatische API-Dokumentation von FastAPI unter /docs mit den vier Endpunkten" loading="lazy">
+      <div class="unterschrift">Die Dokumentation unter <code>/docs</code> entsteht aus dem Code. Nach Lab 04 stehen hier vier Endpunkte und drei Schemas.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="commit">
+    <h2>Grün, Demo, Commit</h2>
+    <div data-befehl="B01"></div>
+    <div data-befehl="B02"></div>
+    <p>Demo für den Product Owner: <a href="http://localhost:8000/health" target="_blank" rel="noopener">localhost:8000/health</a>
+      im Browser, dazu <code>/docs</code>. Dann der Commit. Die Nachricht trägt die Story, damit die Historie später
+      zeigt, welcher Commit welche Anforderung erfüllt.</p>
+    <div data-befehl="B03"></div>
+    <div class="tip-box">
+      <h3>In WebStorm ohne Terminal</h3>
+      <p>Rechtsklick auf <code>test_api.py</code> → Run 'pytest in test_api.py'. Commit über Git → Commit (⌘K), geänderte
+        Dateien anhaken, Nachricht eintragen, Commit and Push.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Drei Übungen: eine zur Reihenfolge, eine zu den Rollen in der Schleife, eine an der Konsole.</p>
+    <div data-uebung="P01-01"></div>
+    <div data-uebung="P01-02"></div>
+    <div data-uebung="P01-03"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Der Test steht vor dem Prompt. Der rote Lauf beweist, dass er greift.</li>
+      <li>Der Prompt trägt Rolle, Kontext, Aufgabe, Randbedingungen und den Test. Der Chat sieht das Repository nicht.</li>
+      <li>Die Antwort wird gelesen und geprüft, bevor sie in WebStorm landet. Ungefragte Zutaten fliegen raus.</li>
+      <li>Ist der Test danach rot, geht der Traceback wörtlich zurück in den Chat.</li>
+      <li>Grün, Demo unter <code>/health</code>, Commit mit <code>feat(US-3)</code>. Damit ist die Story nach Definition of Done fertig.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 01 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

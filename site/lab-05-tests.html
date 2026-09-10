@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 05 · Testkonzept und Abnahme · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-05">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack/blob/main/backend/tests/test_api.py" target="_blank" rel="noopener">test_api.py</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#grundsatz">Der Grundsatz</a>
+  <a class="sidebar-link" href="#pyramide">Die Testpyramide</a>
+  <a class="sidebar-link" href="#tests">Die 14 Tests</a>
+  <a class="sidebar-link" href="#daten">Testdaten und Echtdaten</a>
+  <a class="sidebar-link" href="#kriterien">Akzeptanzkriterien</a>
+  <a class="sidebar-link" href="#dod">Definition of Done</a>
+  <a class="sidebar-link" href="#review">Review-Checkliste</a>
+  <a class="sidebar-link" href="#endabnahme">Endabnahme</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">05</div>
+  <h1 class="lab-title">Testkonzept und Abnahme</h1>
+  <p class="lab-intro">Generierter Code und generierte Tests stammen aus derselben Quelle. Stimmen sie überein, belegt
+    das wenig. Das Testkonzept von FitTrack trennt deshalb drei Dinge: wer die Erwartung festlegt, was die Maschine
+    prüft und was der Mensch am Gerät prüft. Dieses Lab zeigt an den 14 Tests der Referenzlösung, wie Testpyramide,
+    Akzeptanzkriterien und Definition of Done zusammenspielen.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Testpyramide</span>
+    <span class="lernziel-chip">Test-First</span>
+    <span class="lernziel-chip">Akzeptanzkriterium</span>
+    <span class="lernziel-chip">Definition of Done</span>
+    <span class="lernziel-chip">Review-Checkliste</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="grundsatz">
+    <h2>Der Grundsatz</h2>
+    <div class="concept-box">
+      <h3>Wir schreiben die Tests, bevor die KI den Code schreibt.</h3>
+      <p>Dann prüfen wir gegen das Sollverhalten aus der Story, nicht gegen das, was die KI zufällig gebaut hat. Die
+        Reihenfolge ist der Wirkstoff: Danach ist ein Test nur noch eine Beschreibung des Vorhandenen.</p>
+    </div>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Erwartung aus der Story</div>
+        <p>Der Erwartungswert kommt aus dem Akzeptanzkriterium und aus den Testdaten, gerechnet von einem Menschen.
+          Nie aus der Antwort des Modells.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Randfälle mitdenken</div>
+        <p>Leere Liste, eine einzige Einheit, Wochen ohne Training, Jahreswechsel. Hier versagt generierter Code
+          erfahrungsgemäß zuerst.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Grenze der Selbstprüfung</div>
+        <p>KI-erzeugte Tests für KI-erzeugten Code sind ein Konsistenznachweis, kein Qualitätsnachweis.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block" id="pyramide">
+    <h2>Die Testpyramide</h2>
+    <p>Auch ein Projekt dieser Größe trägt die volle Struktur: viele schnelle Prüfungen der Rechenlogik, weniger
+      Prüfungen der API, wenige Prüfungen am Gerät. Nach oben nimmt der Aufwand je Prüfung zu und die Zahl ab.</p>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart TB
+    A["Abnahme am Gerät<br/>Checkliste, Smartphone im WLAN<br/>Darstellung, Bedienbarkeit, echte Daten"]
+    B["Integrationstests · API<br/>pytest mit TestClient<br/>Status 200, Struktur, Sortierung, Randfälle"]
+    C["Unit-Ebene · Rechenlogik<br/>statistik.py ohne Framework<br/>Kennzahlen, Kalenderwochen, Lücken"]
+    A --> B --> C
+      </pre>
+      <div class="unterschrift">Von unten nach oben: schnell und viele, langsam und wenige. Steht die Form auf dem Kopf, wird lange getestet und wenig erfahren.</div>
+    </div>
+    <div class="info-box">
+      <h3>Wo die Ebenen im Code liegen</h3>
+      <p>Die Tests in <code>test_api.py</code> laufen alle über den TestClient, prüfen aber verschiedene Dinge:
+        <code>test_stats_durchschnitt</code> prüft eine Rechenregel, <code>test_workouts_felder</code> die Struktur der
+        Antwort, <code>test_index_liefert_html</code> die Auslieferung. Die Funktionen in <code>statistik.py</code>
+        ließen sich auch ohne TestClient prüfen, das wäre die reine Unit-Ebene.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="tests">
+    <h2>Die 14 Tests</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Test</th><th>Story</th><th>Prüft</th><th>Erwartung</th></tr></thead>
+        <tbody>
+          <tr><td><code>test_health</code></td><td>US-3</td><td>Endpunkt antwortet</td><td>200, <code>{"status": "ok"}</code></td></tr>
+          <tr><td><code>test_workouts_liefert_liste</code></td><td>US-1</td><td>Typ und Anzahl</td><td>Liste mit 8 Einträgen</td></tr>
+          <tr><td><code>test_workouts_felder</code></td><td>US-1</td><td>Struktur</td><td>genau die sechs Felder</td></tr>
+          <tr><td><code>test_workouts_sortiert_absteigend</code></td><td>US-1</td><td>Sortierung in SQL</td><td>id 8 zuerst, id 1 zuletzt</td></tr>
+          <tr><td><code>test_echtdaten_sind_lesbar</code></td><td>US-1</td><td>Rauchtest Echtdaten</td><td>mehr als 250 Zeilen, vier Sportarten</td></tr>
+          <tr><td><code>test_stats_gesamt_km</code></td><td>US-2</td><td>Summe und Rundung</td><td>87.5</td></tr>
+          <tr><td><code>test_stats_durchschnitt</code></td><td>US-2</td><td>Wochenzählung mit Lücke</td><td>29.2</td></tr>
+          <tr><td><code>test_stats_lieblingssportart</code></td><td>US-2</td><td>Definition über Distanz</td><td>Radfahren</td></tr>
+          <tr><td><code>test_stats_anzahl</code></td><td>US-2</td><td>Zählung</td><td>8</td></tr>
+          <tr><td><code>test_stats_leere_liste</code></td><td>US-2</td><td>Randfall ohne Daten</td><td>0.0, 0.0, null, 0</td></tr>
+          <tr><td><code>test_index_liefert_html</code></td><td>US-4</td><td>Auslieferung des Frontends</td><td>200, text/html, „FitTrack“</td></tr>
+          <tr><td><code>test_wochen_anzahl_und_luecken</code></td><td>US-6</td><td>Lückenwoche mit Nullwerten</td><td>3 Wochen, KW 24 leer</td></tr>
+          <tr><td><code>test_wochen_summen</code></td><td>US-6</td><td>Summen je Woche</td><td>34.5 / 4 / 175 und 53.0 / 4 / 285</td></tr>
+          <tr><td><code>test_wochen_leer</code></td><td>US-6</td><td>Randfall ohne Daten</td><td>leere Liste</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Jeder Test nennt seine Story. Wer einen Test nicht einer Story zuordnen kann, hat entweder eine Story
+      vergessen oder einen Test, der nichts prüft.</p>
+  </section>
+
+  <section class="section-block" id="daten">
+    <h2>Testdaten und Echtdaten</h2>
+    <p>Die Tests laufen gegen acht Einheiten, die Gruppe mit dem Taschenrechner nachrechnen kann. Die App läuft gegen
+      311. Beides nutzt dasselbe Schema, und die Umgebungsvariable <code>FITTRACK_DATA</code> entscheidet.</p>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart LR
+    subgraph Test["pytest"]
+        CF["conftest.py"]
+        SQL["workouts_klein.sql<br/>8 Einheiten"]
+        TDB[("Test-Datenbank<br/>temporär, je Lauf neu")]
+    end
+    subgraph App["App"]
+        SCH["schema.sql"]
+        DAT["daten.py"]
+        DB[("fittrack.db<br/>311 Einheiten")]
+    end
+    SCH --> TDB
+    SQL --> CF --> TDB
+    CF -- "FITTRACK_DATA" --> DAT
+    TDB --> DAT
+    DB -. "nur Rauchtest" .-> DAT
+      </pre>
+      <div class="unterschrift">Testdaten sind nicht Produktionsdaten. Die Testdatenbank entsteht bei jedem Lauf neu, deshalb kann kein Test einen anderen beeinflussen.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="kriterien">
+    <h2>Akzeptanzkriterien</h2>
+    <p>Ein Akzeptanzkriterium ist ein Satz, den man in einen Test oder in eine Prüfung am Gerät übersetzen kann. Zwei
+      Beispiele aus dem Backlog, einmal maschinell, einmal menschlich prüfbar.</p>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Maschinell prüfbar</div>
+        <p><em>GET /api/stats liefert gesamt_km, durchschnitt_km_pro_woche, lieblingssportart, anzahl, korrekt berechnet
+          für die Testdaten.</em> Daraus werden fünf Tests mit handgerechneten Werten.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Am Gerät prüfbar</div>
+        <p><em>Bei 375 px Breite kein horizontales Scrollen; Karten stapeln sich; Touch-Targets mindestens 44 px.</em>
+          Daraus wird eine Checkliste für das Smartphone, mit messbaren Zahlen.</p>
+      </div>
+    </div>
+    <div class="warn-box">
+      <h3>Nicht prüfbar</h3>
+      <p>„Die App soll schön aussehen“ oder „die Kennzahlen sollen stimmen“ sind Wünsche, keine Kriterien. Wer sie so
+        stehen lässt, streitet im Review darüber, was gemeint war. Die Definition im README, was „stimmen“ heißt, ist
+        die Antwort auf genau dieses Problem.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="dod">
+    <h2>Definition of Done</h2>
+    <p>Gilt für jede Story gleich und wird nicht je Fall verhandelt.</p>
+    <ul>
+      <li>Code läuft lokal ohne Fehler</li>
+      <li>Zugehörige Tests vorhanden und grün (<code>pytest</code>)</li>
+      <li>Akzeptanzkriterium der Story nachweislich erfüllt, Demo am Handy</li>
+      <li>Code von mindestens einer weiteren Person nach der Review-Checkliste geprüft</li>
+      <li>Commit mit aussagekräftiger Nachricht und Story-Bezug</li>
+    </ul>
+    <div class="shot">
+      <img src="assets/img/github-actions.png" alt="GitHub Actions: Workflow-Läufe mit grünem Haken für pytest" loading="lazy">
+      <div class="unterschrift">Ab Lab 07 prüft GitHub Actions den zweiten Punkt bei jedem Push. Der grüne Haken ist die maschinelle Definition of Done.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="review">
+    <h2>Review-Checkliste für übernommenen Code</h2>
+    <p>Die Rolle Quality arbeitet die Liste ab, bevor etwas committet wird. Die Fragen zielen auf die Stellen, an denen
+      generierter Code typischerweise nachgibt.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Frage</th><th>Worauf sie zielt</th></tr></thead>
+        <tbody>
+          <tr><td>Kann ich jede Funktion in einem Satz erklären, ohne nachzusehen?</td><td>Verständnis. Was niemand erklären kann, wird nicht committet.</td></tr>
+          <tr><td>Gibt es jede importierte Bibliothek und jede aufgerufene Funktion wirklich?</td><td>Halluzinierte Pakete und Methoden.</td></tr>
+          <tr><td>Leere Liste, fehlender Wert, ungültige Kennung: Was passiert dann?</td><td>Randfälle.</td></tr>
+          <tr><td>Steht etwas im Code, das in die Daten oder die Konfiguration gehört?</td><td>Hartkodierte Werte, etwa ein Pfad oder ein Port.</td></tr>
+          <tr><td>Prüfen die Tests das Verhalten aus der Story oder nur sich selbst?</td><td>Tests, die vom Modell mitgeliefert wurden.</td></tr>
+          <tr><td>Benennung und Struktur wie im übrigen Projekt?</td><td>Fremdkörper, englische Namen neben deutschen, andere Ordnerlogik.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section-block" id="endabnahme">
+    <h2>Endabnahme</h2>
+    <p>Am Schluss steht kein Eindruck, sondern eine Durchsicht mit sieben Punkten, die abgehakt wird.</p>
+    <ul>
+      <li>Alle User Stories aus dem Backlog: erfüllt oder bewusst zurückgestellt, dokumentiert</li>
+      <li><code>pytest</code> läuft komplett grün</li>
+      <li>App läuft im Docker-Container, <code>/health</code> antwortet</li>
+      <li>Darstellung auf dem Smartphone geprüft: keine horizontalen Scrollbalken, Karten stapeln sich</li>
+      <li>Diagramm zeigt echte Daten aus der API, nichts hartkodiert</li>
+      <li>README beschreibt Setup, Testlauf und Docker-Start</li>
+      <li>Git-Historie zeigt sinnvolle Commits mit Bezug zu den Stories</li>
+    </ul>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Vier Übungen: Tests den Ebenen zuordnen, Kriterien bewerten, Stories und Kriterien verbinden, ein Review durchführen.</p>
+    <div data-uebung="P05-01"></div>
+    <div data-uebung="P05-02"></div>
+    <div data-uebung="P05-03"></div>
+    <div data-uebung="P05-04"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Tests vor dem Code, Erwartungswerte vom Menschen. Sonst ist ein grüner Test ein Konsistenznachweis.</li>
+      <li>Drei Ebenen: Rechenlogik, API, Gerät. Viele schnelle Prüfungen unten, wenige aufwendige oben.</li>
+      <li>14 Tests, jeder mit Story und Erwartung. Testdaten getrennt von Echtdaten, dasselbe Schema.</li>
+      <li>Ein Akzeptanzkriterium ist ein Satz, der sich in einen Test oder eine Messung am Gerät übersetzen lässt.</li>
+      <li>Definition of Done und Review-Checkliste gelten für jede Story gleich. GitHub Actions prüft den Testlauf bei jedem Push.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 05 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

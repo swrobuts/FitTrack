@@ -1,0 +1,82 @@
+{
+  "uebungen": [
+    {
+      "id": "P09-01", "typ": "quiz",
+      "titel": { "de": "Lokal oder Cloud", "en": "Local or cloud" },
+      "aufgabe": { "de": "<p>Drei Situationen, eine Entscheidung.</p>", "en": "<p>Three situations, one decision each.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Ein Praktikumsbetrieb verbietet, dass Quellcode an externe Dienste geht. Welcher Weg bleibt für den Chat-Workflow?", "en": "An internship company forbids sending source code to external services. Which route remains?" },
+          "optionen": [
+            { "de": "Ein lokales Modell in LM Studio. Der Workflow ist identisch, der Code bleibt auf dem Rechner.", "en": "A local model in LM Studio." },
+            { "de": "Keiner, ohne Cloud geht der Workflow nicht.", "en": "None, the workflow needs the cloud." },
+            { "de": "Den Code vor dem Prompt anonymisieren.", "en": "Anonymise the code before prompting." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Datensouveränität ist der stärkste Grund für lokale Modelle. Die Prüfstelle im Workflow bleibt genau dieselbe.", "en": "Data sovereignty is the strongest reason for local models." }
+        },
+        {
+          "frage": { "de": "Das Kontingent im Chat ist mitten im Sprint erschöpft. Was ändert sich am Vorgehen?", "en": "The chat quota runs out mid-sprint. What changes?" },
+          "optionen": [
+            { "de": "Nur der Anbieter. Derselbe Prompt geht an das lokale Modell, Test rot, Prüfen, Test grün, Commit wie zuvor.", "en": "Only the provider." },
+            { "de": "Der Sprint wird abgebrochen.", "en": "The sprint is cancelled." },
+            { "de": "Die Tests werden weggelassen, um Zeit zu sparen.", "en": "Tests are dropped to save time." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Das ist Plan B aus dem Kurskonzept. Weil der Workflow nicht am Werkzeug hängt, kostet der Wechsel nur die Ladezeit des Modells.", "en": "That is plan B from the course concept." }
+        },
+        {
+          "frage": { "de": "Ein Laptop hat 8 GB RAM. Welches Modell ist realistisch?", "en": "A laptop has 8 GB RAM. Which model is realistic?" },
+          "optionen": [
+            { "de": "Gemma 4 4B oder ein anderes Modell um 3 GB. Qwen3-Coder-30B braucht 32 GB und mehr.", "en": "Gemma 4 4B or another model around 3 GB." },
+            { "de": "Qwen3-Coder-30B, wenn man Geduld hat.", "en": "Qwen3-Coder-30B with patience." },
+            { "de": "Keines, lokale Modelle brauchen immer eine große Grafikkarte.", "en": "None, local models always need a big GPU." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Die Größe der Modelldatei muss in den Arbeitsspeicher passen, mit Reserve für das System. Kleine Modelle sind beim Code schwächer, aber für den Health-Endpunkt reichen sie.", "en": "The model file must fit into RAM with headroom." }
+        }
+      ]
+    },
+    {
+      "id": "P09-02", "typ": "checkliste",
+      "titel": { "de": "Die Demo vorbereiten", "en": "Prepare the demo" },
+      "aufgabe": { "de": "<p>Für die Vorführung in Termin 2. Alles, was Bandbreite braucht, gehört in die Woche davor.</p>", "en": "<p>For the demonstration. Everything that needs bandwidth belongs in the week before.</p>" },
+      "schritte": [
+        { "text": { "de": "LM Studio installiert, Discover geöffnet, „Qwen3 Coder 30B A3B“ in Q4_K_M oder MLX heruntergeladen", "en": "LM Studio installed, Qwen3 Coder 30B A3B downloaded" } },
+        { "text": { "de": "Ein Generalist als Kontrast geladen, etwa Gemma 4", "en": "A generalist loaded as contrast" } },
+        { "text": { "de": "Kontextlänge auf mindestens 8192 Token gestellt", "en": "Context length set to at least 8192 tokens" } },
+        { "text": { "de": "Der Prompt für US-2 mit den fünf Tests liegt als Textdatei bereit", "en": "The US-2 prompt with the five tests is ready as a text file" } },
+        { "text": { "de": "WebStorm mit dem Projekt auf Stand <code>us-1</code> geöffnet, damit die Antwort direkt getestet werden kann", "en": "WebStorm open at tag us-1 so the answer can be tested directly" } },
+        { "text": { "de": "Einmal komplett durchgespielt und die Zeit gestoppt", "en": "Run through once completely and timed" } }
+      ],
+      "rueckmeldung": { "de": "Die Demo dauert zehn Minuten, wenn die Modelle geladen sind, und dreißig, wenn nicht.", "en": "The demo takes ten minutes if the models are loaded, thirty if not." }
+    },
+    {
+      "id": "P09-03", "typ": "quiz",
+      "titel": { "de": "Ergebnisse bewerten", "en": "Judging results" },
+      "aufgabe": { "de": "<p>Zwei Antworten auf denselben Prompt. Welche ist besser?</p>", "en": "<p>Two answers to the same prompt. Which is better?</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Antwort A: elegant formatiert, ausführliche Erklärung, nutzt pandas, Test für den Durchschnitt rot. Antwort B: karg, drei Sätze Erklärung, nur Standardbibliothek, alle fünf Tests grün. Welche übernimmt die Gruppe?", "en": "Answer A: elegant, verbose, uses pandas, average test red. Answer B: plain, three sentences, standard library only, all five tests green. Which does the group adopt?" },
+          "optionen": [
+            { "de": "B. Sie erfüllt die Randbedingung und besteht die Tests. A hat die Randbedingung ignoriert und rechnet falsch, so gut sie auch aussieht.", "en": "B. It meets the constraint and passes the tests." },
+            { "de": "A, weil die Erklärung ausführlicher ist.", "en": "A, because the explanation is longer." },
+            { "de": "Beide mischen.", "en": "Mix both." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Der Eindruck täuscht systematisch: Schön formatierter Code mit sicherer Erklärung wirkt richtig. Deshalb entscheidet der Testlauf, und deshalb wurden die Tests vor dem Prompt geschrieben.", "en": "Impressions mislead systematically; the test run decides." }
+        },
+        {
+          "frage": { "de": "Ein lokales Modell antwortet in 90 Sekunden, Claude in 8. Was folgt daraus für den Kurs?", "en": "A local model answers in 90 seconds, Claude in 8. What follows for the course?" },
+          "optionen": [
+            { "de": "Wenig. Eine Story je Prompt heißt wenige Prompts je Sprint, und das Lesen der Antwort dauert länger als das Warten. Die Wahl richtet sich nach Datenschutz, Kosten und Verfügbarkeit.", "en": "Little. One story per prompt means few prompts per sprint." },
+            { "de": "Lokale Modelle sind für den Kurs unbrauchbar.", "en": "Local models are unusable for the course." },
+            { "de": "Man sollte mehrere Stories in einen Prompt packen, um Zeit zu sparen.", "en": "One should pack several stories into one prompt to save time." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Die Prüfung ist der Engpass, nicht die Erzeugung. Das ist der Kern des ganzen Konzepts.", "en": "Review is the bottleneck, not generation." }
+        }
+      ]
+    }
+  ]
+}

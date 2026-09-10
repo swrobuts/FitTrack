@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 08 · Der KI-Workflow · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-08">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack/blob/main/docs/dozent/prompt-skript.md" target="_blank" rel="noopener">Prompt-Skript</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#achsen">Zwei Achsen</a>
+  <a class="sidebar-link" href="#vorlage">Ein Prompt hat vier Teile</a>
+  <a class="sidebar-link" href="#regeln">Sechs Regeln</a>
+  <a class="sidebar-link" href="#review">Review wie ein fremder Pull Request</a>
+  <a class="sidebar-link" href="#fehler">Typische Fehler generierten Codes</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">08</div>
+  <h1 class="lab-title">Der KI-Workflow</h1>
+  <p class="lab-intro">Vibe Coding heißt, generierten Code ungelesen zu übernehmen. Agentic Coding heißt, dass das
+    Werkzeug selbst Dateien ändert und Befehle ausführt. Der FitTrack-Workflow ist beides nicht: wenig Autonomie beim
+    Werkzeug, volle Prüfung beim Menschen. Dieses Lab sammelt, was den Chat-Weg tragfähig macht: die Prompt-Vorlage,
+    sechs Regeln für den Betrieb und die Fragen, die an jeden übernommenen Code gestellt werden.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Vibe · Chat · Agentic</span>
+    <span class="lernziel-chip">Rolle · Kontext · Aufgabe · Randbedingungen</span>
+    <span class="lernziel-chip">Eine Story je Prompt</span>
+    <span class="lernziel-chip">Review-Checkliste</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="achsen">
+    <h2>Zwei Achsen, zwei Entscheidungen</h2>
+    <p>Die Begriffe werden oft vermischt, beantworten aber verschiedene Fragen. Die eine Achse ist die Autonomie des
+      Werkzeugs, die andere die Prüfung durch den Menschen.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th></th><th>Vibe Coding</th><th>FitTrack-Workflow</th><th>Agentic Coding</th></tr></thead>
+        <tbody>
+          <tr><td>Wer schreibt den Code?</td><td>Das Modell, auf Zuruf im Chat oder Editor</td><td>Das Modell im Chat, Übernahme von Hand</td><td>Ein Agent ändert Dateien und führt Befehle aus</td></tr>
+          <tr><td>Wer prüft ihn?</td><td>Niemand vor dem Start, „Accept All“</td><td>Die Gruppe: lesen, Test rot → grün, Review, Commit</td><td>Der Mensch prüft Diff, Testlauf und Ergebnis</td></tr>
+          <tr><td>Fertig heißt</td><td>Es läuft, die Fehlermeldung ist weg</td><td>Akzeptanzkriterium erfüllt, Test grün, PO nimmt ab</td><td>Aufgabe erledigt, Tests grün, Pull Request reviewt</td></tr>
+          <tr><td>Geeignet für</td><td>Wegwerf-Prototyp, Layoutversuch</td><td>Kleines Projekt mit Abnahme, Lernsituation</td><td>Große Codebasis mit Testsuite, erfahrenes Team</td></tr>
+          <tr><td>Wo es eng wird</td><td>Sicherheit, Wartbarkeit, Verantwortung</td><td>Tempo bei vielen Dateien, Kontextgröße</td><td>Kosten, Nebenwirkungen, Prompt Injection</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="concept-box">
+      <h3>Einordnung für FitTrack</h3>
+      <p>Vibe Coding ist der richtige Modus, wo nichts davon abhängt: ein Layoutversuch, ein Wegwerf-Skript, das
+        erste Gefühl für eine Bibliothek. Sobald eine Story abgenommen wird, gilt die Prüfstelle. Nicht aus Misstrauen,
+        sondern weil die Gruppe den Code später erklären muss.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="vorlage">
+    <h2>Ein tragfähiger Prompt hat vier Teile</h2>
+    <p>Rolle, Kontext, Aufgabe und Randbedingungen. Fehlt einer davon, füllt das Modell die Lücke selbst, oft
+      plausibel, aber falsch.</p>
+    <pre class="prompt" data-kopieren="Prompt-Vorlage">Du bist ein erfahrener Python-Entwickler.                     ← Rolle
+
+Kontext: Wir bauen mit FastAPI eine kleine Fitness-App.       ← Kontext
+Es gibt eine Funktion lade_workouts() in backend/app/daten.py,
+die eine Liste von Dictionaries liefert:
+{"id": 1, "datum": "2026-06-01", "sportart": "Laufen",
+ "dauer_min": 30, "distanz_km": 5.0, "kalorien": 350}
+
+Aufgabe: Implementiere GET /api/stats mit der Rückgabe        ← Aufgabe
+{gesamt_km, durchschnitt_km_pro_woche, lieblingssportart, anzahl}.
+lieblingssportart = Sportart mit größter Gesamtdistanz.
+
+Randbedingungen:                                              ← Randbedingungen
+- Nur Standardbibliothek und FastAPI/Pydantic
+- Der Code muss diese Tests bestehen: [Tests einfügen]
+- Erkläre in drei Sätzen deine wichtigsten Entscheidungen.</pre>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Rolle</div>
+        <p>Setzt Erwartung an Stil und Tiefe der Antwort.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Kontext</div>
+        <p>Datenmodell, Bibliotheken, vorhandener Code als Ausschnitt. Der Chat sieht das Repository nicht.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Aufgabe</div>
+        <p>Genau eine Story, mit Ergebnisform statt Wunschbeschreibung.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Randbedingungen</div>
+        <p>Versionen, verbotene Pakete, Tests, Erklärpflicht. Sie sparen die zweite Runde.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block" id="regeln">
+    <h2>Sechs Regeln für den Betrieb</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Regel</th><th>Was sie verhindert</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Eine Story je Prompt.</strong> Nicht die ganze Anwendung auf einmal.</td><td>Sonst wird nichts prüfbar.</td></tr>
+          <tr><td><strong>Kontext mitliefern.</strong> Datenmodell, Bibliotheken, vorhandener Code als Ausschnitt.</td><td>Erfundene Funktionsnamen und Strukturen.</td></tr>
+          <tr><td><strong>Randbedingungen nennen.</strong> Versionen, verbotene Pakete, Namenskonventionen.</td><td>Die zweite Runde.</td></tr>
+          <tr><td><strong>Erklärung anfordern.</strong> Drei Sätze zu den Entscheidungen.</td><td>Ungelesene Übernahme.</td></tr>
+          <tr><td><strong>Fehlermeldungen wörtlich.</strong> Traceback kopieren, nicht paraphrasieren.</td><td>Raten auf beiden Seiten.</td></tr>
+          <tr><td><strong>Nichts Unverstandenes committen.</strong> Jede Zeile muss jemand in der Gruppe erklären können.</td><td>Code, den niemand verantworten kann.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section-block" id="review">
+    <h2>Review wie ein fremder Pull Request</h2>
+    <p>Übernommener Code wird gelesen wie der Beitrag einer neuen Kollegin: wohlwollend, aber vollständig. Sechs
+      Fragen, und wer eine nicht beantworten kann, hat den Befund schon gefunden.</p>
+    <ul>
+      <li><strong>Verstanden?</strong> Kann ich jede Funktion in einem Satz erklären, ohne nachzusehen?</li>
+      <li><strong>Existiert alles?</strong> Gibt es jede importierte Bibliothek und jede aufgerufene Funktion wirklich?</li>
+      <li><strong>Randfälle?</strong> Leere Liste, fehlender Wert, ungültige Kennung: Was passiert dann?</li>
+      <li><strong>Hartkodiert?</strong> Steht etwas im Code, das in die Daten oder die Konfiguration gehört?</li>
+      <li><strong>Testen die Tests?</strong> Prüfen sie das Verhalten aus der Story oder nur sich selbst?</li>
+      <li><strong>Passt der Stil?</strong> Benennung und Struktur wie im übrigen Projekt, oder ein Fremdkörper?</li>
+    </ul>
+  </section>
+
+  <section class="section-block" id="fehler">
+    <h2>Typische Fehler generierten Codes, aus diesem Projekt</h2>
+    <p>Jeder dieser Punkte ist in der Referenzlösung als Prüfpunkt hinterlegt, weil Modelle ihn erfahrungsgemäß
+      machen.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Fehler</th><th>Wo</th><th>Wie er auffällt</th></tr></thead>
+        <tbody>
+          <tr><td>Nur Wochen mit Training gezählt</td><td>US-2</td><td><code>test_stats_durchschnitt</code> erwartet 29,2, bekommt 43,8</td></tr>
+          <tr><td>Datenbankpfad relativ zum Arbeitsverzeichnis</td><td>US-1</td><td>Tests grün, Container liefert 500</td></tr>
+          <tr><td>Sortierung in Python statt in SQL, nur nach Datum</td><td>US-1</td><td><code>test_workouts_sortiert_absteigend</code></td></tr>
+          <tr><td>StaticFiles-Mount vor den Routen</td><td>US-4</td><td>alle API-Tests rot, nur <code>/</code> grün</td></tr>
+          <tr><td>Chart bei jedem Klick neu erzeugt</td><td>US-6</td><td>Konsole: „Canvas is already in use“</td></tr>
+          <tr><td>CMD in Exec-Form mit <code>${PORT}</code></td><td>Docker</td><td>lokal läuft es, bei Render Timeout</td></tr>
+          <tr><td>pandas oder ein ORM eingeschmuggelt</td><td>überall</td><td>Import fehlt in <code>requirements.txt</code>, GitHub Actions rot</td></tr>
+          <tr><td>Ungefragte Zutaten: CORS, Logging, Middleware</td><td>US-3</td><td>niemand kann erklären, wofür</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Vier Übungen: Prompt-Teile erkennen, Prompt-Fehler den Regeln zuordnen, die drei Arbeitsweisen unterscheiden, ein Review an einem Codebeispiel.</p>
+    <div data-uebung="P08-01"></div>
+    <div data-uebung="P08-02"></div>
+    <div data-uebung="P08-03"></div>
+    <div data-uebung="P08-04"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Autonomie des Werkzeugs und Prüfung durch den Menschen sind zwei Achsen. FitTrack wählt wenig Autonomie, volle Prüfung.</li>
+      <li>Rolle, Kontext, Aufgabe, Randbedingungen. Fehlt eines, füllt das Modell die Lücke, plausibel und falsch.</li>
+      <li>Eine Story je Prompt, Fehlermeldungen wörtlich, Erklärung anfordern, nichts Unverstandenes committen.</li>
+      <li>Sechs Fragen an jeden übernommenen Code. Wer eine nicht beantworten kann, hat den Befund.</li>
+      <li>Die typischen Fehler sind bekannt und als Prüfpunkte hinterlegt. Die Tests fangen die meisten, die Prüfung den Rest.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 08 · THWS Business School · Stand 09/2026 · Quellen: Karpathy 2025, Willison 2025, Sarkar und Drosos 2025</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+{
+  "uebungen": [
+    {
+      "id": "P05-01", "typ": "zuordnen",
+      "titel": { "de": "Test und Ebene", "en": "Test and level" },
+      "aufgabe": { "de": "<p>Ordnen Sie jede Prüfung ihrer Ebene in der Pyramide zu.</p>", "en": "<p>Assign each check to its level in the pyramid.</p>" },
+      "ziele": [
+        { "id": "unit", "text": { "de": "Rechenlogik", "en": "Calculation logic" } },
+        { "id": "api", "text": { "de": "API-Integration", "en": "API integration" } },
+        { "id": "geraet", "text": { "de": "Abnahme am Gerät", "en": "Acceptance on the device" } }
+      ],
+      "paare": [
+        { "begriff": { "de": "87,5 / 3 Wochen ergibt 29,2", "en": "87.5 / 3 weeks gives 29.2" }, "ziel": "unit" },
+        { "begriff": { "de": "GET /api/workouts antwortet mit Status 200 und einer Liste", "en": "GET /api/workouts answers 200 with a list" }, "ziel": "api" },
+        { "begriff": { "de": "Kein horizontales Scrollen bei 375 px Breite", "en": "No horizontal scrolling at 375 px" }, "ziel": "geraet" },
+        { "begriff": { "de": "Die Lückenwoche KW 24 erscheint mit Nullwerten", "en": "The gap week appears with zero values" }, "ziel": "unit" },
+        { "begriff": { "de": "Jedes Element hat genau die sechs Felder", "en": "Every element has exactly the six fields" }, "ziel": "api" },
+        { "begriff": { "de": "„Mehr anzeigen“ lässt sich mit dem Daumen treffen", "en": "“Show more” can be hit with a thumb" }, "ziel": "geraet" }
+      ],
+      "rueckmeldung": { "de": "Rechenregeln lassen sich ohne Server prüfen, Antwortstrukturen brauchen die API, Bedienbarkeit braucht das Gerät.", "en": "Rules need no server, structures need the API, usability needs the device." }
+    },
+    {
+      "id": "P05-02", "typ": "quiz",
+      "titel": { "de": "Prüfbar oder nicht", "en": "Checkable or not" },
+      "aufgabe": { "de": "<p>Welche dieser Formulierungen taugen als Akzeptanzkriterium?</p>", "en": "<p>Which of these wordings work as acceptance criteria?</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Welche Kriterien sind prüfbar? Mehrere Antworten sind richtig.", "en": "Which criteria are checkable? Several answers are correct." },
+          "mehrfach": true,
+          "optionen": [
+            { "de": "GET /health liefert {\"status\": \"ok\"}", "en": "GET /health returns {\"status\": \"ok\"}" },
+            { "de": "Die Kennzahlen sollen stimmen", "en": "The metrics should be right" },
+            { "de": "Touch-Targets mindestens 44 px", "en": "Touch targets at least 44 px" },
+            { "de": "Die App soll modern wirken", "en": "The app should feel modern" },
+            { "de": "Wochen ohne Training erscheinen mit distanz_km 0.0", "en": "Weeks without training appear with distanz_km 0.0" }
+          ],
+          "richtig": [0, 2, 4],
+          "erklaerung": { "de": "Prüfbar heißt: Ein Test oder eine Messung kann Ja oder Nein sagen. „Stimmen“ und „modern“ brauchen erst eine Definition. Für die Kennzahlen steht sie im README, für „modern“ gibt es keine.", "en": "Checkable means a test or measurement can say yes or no." }
+        },
+        {
+          "frage": { "de": "Das Modell liefert zu seinem Code gleich passende Tests mit. Alle grün. Was ist damit bewiesen?", "en": "The model delivers matching tests with its code. All green. What does that prove?" },
+          "optionen": [
+            { "de": "Dass Code und Tests aus derselben Quelle konsistent sind. Ob sie die Story erfüllen, bleibt offen, bis ein Mensch die Erwartung geprüft hat.", "en": "That code and tests from the same source are consistent." },
+            { "de": "Dass die Story erfüllt ist.", "en": "That the story is fulfilled." },
+            { "de": "Dass keine Randfälle mehr offen sind.", "en": "That no edge cases remain." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Deshalb stehen die Tests im Kurs vor dem Prompt und stammen von der Rolle Quality. Mitgelieferte Tests des Modells sind ein Vorschlag, den man gegen die Story liest.", "en": "That is why tests come before the prompt and from the quality role." }
+        }
+      ]
+    },
+    {
+      "id": "P05-03", "typ": "zuordnen",
+      "titel": { "de": "Story und Nachweis", "en": "Story and evidence" },
+      "aufgabe": { "de": "<p>Welche Story wird womit nachgewiesen?</p>", "en": "<p>Which story is proven by what?</p>" },
+      "ziele": [
+        { "id": "us1", "text": { "de": "US-1 Daten abrufen", "en": "US-1" } },
+        { "id": "us2", "text": { "de": "US-2 Kennzahlen", "en": "US-2" } },
+        { "id": "us4", "text": { "de": "US-4 Dashboard", "en": "US-4" } },
+        { "id": "us6", "text": { "de": "US-6 Wochenverlauf", "en": "US-6" } }
+      ],
+      "paare": [
+        { "begriff": { "de": "test_stats_leere_liste", "en": "test_stats_leere_liste" }, "ziel": "us2" },
+        { "begriff": { "de": "Messung: scrollWidth gleich innerWidth bei 375 px", "en": "Measurement: scrollWidth equals innerWidth at 375 px" }, "ziel": "us4" },
+        { "begriff": { "de": "test_workouts_sortiert_absteigend", "en": "test_workouts_sortiert_absteigend" }, "ziel": "us1" },
+        { "begriff": { "de": "test_wochen_anzahl_und_luecken", "en": "test_wochen_anzahl_und_luecken" }, "ziel": "us6" },
+        { "begriff": { "de": "Umschalter 8 W / 6 M / 1 J / Alles wechselt das Diagramm", "en": "Period switch changes the chart" }, "ziel": "us6" },
+        { "begriff": { "de": "test_index_liefert_html", "en": "test_index_liefert_html" }, "ziel": "us4" }
+      ],
+      "rueckmeldung": { "de": "Eine Story kann mehrere Nachweise haben, maschinelle und menschliche. Ein Nachweis ohne Story ist ein Befund.", "en": "A story can have several proofs." }
+    },
+    {
+      "id": "P05-04", "typ": "checkliste",
+      "titel": { "de": "Ein Review durchführen", "en": "Run a review" },
+      "aufgabe": { "de": "<p>Nehmen Sie den Code der letzten Story Ihrer Gruppe und gehen Sie die sechs Fragen der Review-Checkliste durch. Haken Sie nur ab, was Sie tatsächlich geprüft haben.</p>", "en": "<p>Take the code of your group's last story and go through the six review questions. Tick only what you actually checked.</p>" },
+      "schritte": [
+        { "text": { "de": "Jede Funktion in einem Satz erklärt, ohne nachzusehen", "en": "Explained every function in one sentence without looking" } },
+        { "text": { "de": "Jeden Import in der Dokumentation oder per <code>pip show</code> gefunden", "en": "Found every import in the documentation or via pip show" } },
+        { "text": { "de": "Leere Liste, fehlenden Wert und ungültige Kennung im Kopf durchgespielt", "en": "Walked through empty list, missing value and invalid id" } },
+        { "text": { "de": "Nach Zahlen und Pfaden gesucht, die in Daten oder Konfiguration gehören", "en": "Searched for numbers and paths that belong in data or configuration" } },
+        { "text": { "de": "Jeden Test seiner Story zugeordnet", "en": "Assigned every test to its story" } },
+        { "text": { "de": "Benennung und Struktur mit dem Rest des Projekts verglichen", "en": "Compared naming and structure with the rest of the project" } }
+      ],
+      "rueckmeldung": { "de": "Übernommener Code wird gelesen wie der Beitrag einer neuen Kollegin: wohlwollend, aber vollständig.", "en": "Adopted code is read like a new colleague's contribution." }
+    }
+  ]
+}

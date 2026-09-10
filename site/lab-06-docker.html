@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 06 · Docker: Image und Container · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-06">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack/tree/docker" target="_blank" rel="noopener">Stand docker</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#warum">Das Problem, das es löst</a>
+  <a class="sidebar-link" href="#begriffe">Image und Container</a>
+  <a class="sidebar-link" href="#dockerfile">Das Dockerfile</a>
+  <a class="sidebar-link" href="#prompt">Der Prompt</a>
+  <a class="sidebar-link" href="#befehle">Drei Befehle</a>
+  <a class="sidebar-link" href="#desktop">Docker Desktop und WebStorm</a>
+  <a class="sidebar-link" href="#compose">Compose und der Port</a>
+  <a class="sidebar-link" href="#spielplatz">Spielplatz</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">06</div>
+  <h1 class="lab-title">Docker: Image und Container</h1>
+  <p class="lab-intro">„Läuft bei mir“ ist der Satz, an dem Softwareprojekte scheitern. Ein Container paketiert die
+    App mit Python, Bibliotheken und Datenbank in ein Paket, das überall gleich startet. Acht Zeilen Dockerfile, drei
+    Befehle, und die App läuft aus dem Container auf dem Smartphone. Genau dasselbe Image geht in Lab 07 zu Render.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Image vs. Container</span>
+    <span class="lernziel-chip">Dockerfile · Schichten</span>
+    <span class="lernziel-chip">build · run · ps</span>
+    <span class="lernziel-chip">PORT-Variable</span>
+    <span class="lernziel-chip">compose</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="warum">
+    <h2>Das Problem, das es löst</h2>
+    <p>Software hängt an Betriebssystem, Python-Version und Bibliotheken. Jede Abweichung erzeugt einen Fehler, den
+      niemand nachstellen kann. Der Container paketiert die Anwendung mit ihrer gesamten Laufzeit. Aus einer Behauptung
+      über die Umgebung wird eine überprüfbare Zusage.</p>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Ohne Container</div>
+        <p>Es läuft, aber nur hier. Python 3.11 statt 3.12, ein Paket fehlt, ein Pfad ist anders. Die Suche verbraucht
+          die Zeit, die für den Sprint fehlt.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Mit Container</div>
+        <p>Es läuft überall gleich. App, Abhängigkeiten und Laufzeit stecken in einem standardisierten Paket. Was
+          lokal läuft, läuft identisch bei Render.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block" id="begriffe">
+    <h2>Image und Container</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Begriff</th><th>Was es ist</th><th>Vergleich</th><th>Anzeigen mit</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Image</strong></td><td>Der Bauplan, aus dem Dockerfile gebaut, unveränderlich</td><td>Der Bauplan eines Hauses</td><td><code>docker images</code></td></tr>
+          <tr><td><strong>Container</strong></td><td>Eine laufende oder gestoppte Instanz eines Images</td><td>Das gebaute Haus</td><td><code>docker ps -a</code></td></tr>
+          <tr><td><strong>Dockerfile</strong></td><td>Die Anleitung, Schicht für Schicht</td><td>Das Rezept</td><td>im Projektordner</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="concept-box">
+      <h3>Die Datenbank reist mit</h3>
+      <p><code>COPY backend/ ./backend/</code> nimmt <code>fittrack.db</code> mit ins Image. Für eine App, die nur liest,
+        ist das richtig. Sobald eine App schreibt, gehört die Datenbank in ein Volume außerhalb des Containers, sonst
+        sind die Daten beim nächsten Neubau weg. Das ist der Unterschied zu Lab 05 im PITM-Lab.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="dockerfile">
+    <h2>Das Dockerfile</h2>
+    <p>Die Reihenfolge ist Technik, nicht Stil: Die Abhängigkeiten stehen vor dem Quellcode, damit ein Codewechsel nicht
+      jedes Mal die vollständige Installation neu anstößt. Docker merkt sich jede Schicht.</p>
+    <pre class="code-block" data-kopieren="Dockerfile"># 1. Basis-Image: schlankes Linux mit Python 3.12
+FROM python:3.12-slim
+
+# 2. Arbeitsverzeichnis im Container
+WORKDIR /app
+
+# 3. Erst die Abhängigkeiten installieren. Diese Schicht wird nur neu gebaut,
+#    wenn sich requirements.txt ändert, was den Build deutlich beschleunigt.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 4. Dann den Code kopieren (was nicht mitkommen soll, steht in .dockerignore)
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
+
+# 5. Port dokumentieren und Server starten.
+#    ${PORT:-8000} bedeutet: nimm die Umgebungsvariable PORT, sonst 8000.
+#    Render.com setzt PORT selbst, lokal gilt 8000.
+EXPOSE 8000
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]</pre>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart TB
+    L1["FROM python:3.12-slim"] --> L2["WORKDIR /app"] --> L3["COPY requirements.txt<br/>RUN pip install"] --> L4["COPY backend/ frontend/"] --> L5["CMD uvicorn … --port ${PORT:-8000}"]
+    C["Codeänderung"] -. "baut nur diese Schichten neu" .-> L4
+      </pre>
+      <div class="unterschrift">Jede Zeile ist eine Schicht. Ändert sich nur der Code, bleibt die teure pip-Schicht im Cache.</div>
+    </div>
+    <div class="warn-box">
+      <h3>Zwei Stolpersteine</h3>
+      <p><code>--host 0.0.0.0</code> muss sein, sonst ist der Container von außen stumm. Und die CMD steht als
+        <code>["sh", "-c", "…"]</code>, weil nur eine Shell <code>${PORT:-8000}</code> auswertet. In der Exec-Form ohne
+        Shell bliebe der Text wörtlich stehen.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="prompt">
+    <h2>Der Prompt</h2>
+    <pre class="prompt" data-kopieren="Prompt für das Dockerfile">Erstelle ein Dockerfile für eine FastAPI-App mit dieser Struktur:
+
+FitTrack/
+├── backend/app/main.py      (FastAPI-App, Objekt heißt app)
+├── backend/app/data/fittrack.db   (SQLite, wird nur gelesen)
+├── frontend/                (statische Dateien, von main.py ausgeliefert)
+└── requirements.txt
+
+Anforderungen:
+- Basis python:3.12-slim, Arbeitsverzeichnis /app
+- requirements.txt zuerst kopieren und installieren, damit die Schicht
+  gecacht wird; dann backend/ und frontend/ kopieren
+- Start: uvicorn backend.app.main:app --host 0.0.0.0
+- Der Port kommt aus der Umgebungsvariable PORT, Standard 8000
+  (Render.com setzt PORT); EXPOSE 8000
+- Dazu eine .dockerignore, die .git, .venv, __pycache__, backend/tests
+  und docs ausschließt
+- Jeder Schritt mit einem kurzen deutschen Kommentar, der erklärt, warum
+
+Erkläre in drei Sätzen, warum requirements.txt vor dem Code kopiert wird.</pre>
+    <ul class="pruefpunkte">
+      <li><strong>CMD in Shell-Form oder als <code>["sh", "-c", "…"]</code>?</strong> Nur dann wird <code>${PORT:-8000}</code> ausgewertet.</li>
+      <li><strong><code>--host 0.0.0.0</code> gesetzt?</strong> Sonst ist der Container nicht erreichbar.</li>
+      <li><strong>Steht die Datenbank in <code>.dockerignore</code>?</strong> Dann fehlt sie im Image, und <code>/api/workouts</code> liefert einen Fehler. Tests und docs dürfen raus, die Datenbank nicht.</li>
+    </ul>
+  </section>
+
+  <section class="section-block" id="befehle">
+    <h2>Drei Befehle</h2>
+    <div data-befehl="B01"></div>
+    <div data-befehl="B02"></div>
+    <div data-befehl="B03"></div>
+    <div class="tip-box">
+      <h3>Port 8000 belegt</h3>
+      <p><code>Bind for 0.0.0.0:8000 failed: port is already allocated</code> heißt: Ein anderes Programm oder ein anderer
+        Container nutzt den Port. Ausweichen mit <code>-p 8001:8000</code>. Links steht der Port auf dem Rechner, rechts
+        der im Container.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="desktop">
+    <h2>Docker Desktop und WebStorm</h2>
+    <p>Die Befehle bleiben Lernziel. Docker Desktop und WebStorm sind die Bequemlichkeit obendrauf.</p>
+    <div class="shot">
+      <img src="assets/img/docker-desktop-images.png" alt="Docker Desktop, Reiter Images, mit dem gebauten Image fittrack" loading="lazy">
+      <div class="unterschrift">Docker Desktop, Images: Das gebaute Image <code>fittrack</code> mit 303 MB, daneben das Basis-Image <code>python:3.12-slim</code>.</div>
+    </div>
+    <div class="shot">
+      <img src="assets/img/docker-desktop-containers.png" alt="Docker Desktop, Reiter Containers, mit dem Container fittrack-fittrack-1 und Port 8001:8000" loading="lazy">
+      <div class="unterschrift">Containers: <code>fittrack-fittrack-1</code> aus Compose mit Port 8001 auf 8000. Start, Stop und Logs per Klick. Ein Image bauen kann Docker Desktop nicht, dafür braucht es Terminal oder WebStorm.</div>
+    </div>
+    <div class="shot">
+      <img src="assets/img/webstorm-compose.png" alt="WebStorm mit geöffneter docker-compose.yml, grünem Startpfeil und Services-Fenster" loading="lazy">
+      <div class="unterschrift">WebStorm: Der grüne Doppelpfeil neben <code>services:</code> baut und startet. Unten im Fenster Services stehen Logs, Stop-Knopf und Port-Link. Voraussetzung ist eine Docker-Verbindung unter Settings → Build, Execution, Deployment → Docker.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="compose">
+    <h2>Compose und der Port</h2>
+    <p>Compose fasst Bauen und Starten in einen Befehl. Für FitTrack ist es ein Dienst, und die Datei macht den Port
+      konfigurierbar, ohne das Dockerfile anzufassen.</p>
+    <pre class="code-block" data-kopieren="docker-compose.yml">services:
+  fittrack:
+    build: .                          # nutzt das Dockerfile in diesem Ordner
+    image: fittrack
+    ports:
+      - "${FITTRACK_PORT:-8000}:8000" # links der Port auf dem Rechner, rechts im Container
+    restart: unless-stopped</pre>
+    <div data-befehl="B04"></div>
+    <div class="info-box">
+      <h3>stop oder down</h3>
+      <p><code>docker compose stop</code> hält den Container an, er bleibt in der Liste und startet per Knopf wieder.
+        <code>docker compose down</code> entfernt Container und Netzwerk. Das Image bleibt in beiden Fällen.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="spielplatz">
+    <h2>Spielplatz</h2>
+    <p>Eine Konsole mit nachgebildetem <code>docker</code>. Im Ordner <code>~/FitTrack</code> liegen Dockerfile und
+      Compose-Datei. Bekannte Abbilder: <code>python</code>, <code>hello-world</code>, <code>nginx</code> und das selbst
+      gebaute <code>fittrack</code>.</p>
+    <div data-terminal="frei"></div>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Vier Übungen: dreimal an der Konsole, einmal zum Dockerfile.</p>
+    <div data-uebung="P06-01"></div>
+    <div data-uebung="P06-02"></div>
+    <div data-uebung="P06-03"></div>
+    <div data-uebung="P06-04"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Image ist der Bauplan, Container die laufende Instanz. <code>docker images</code> und <code>docker ps -a</code> zeigen beide.</li>
+      <li>Abhängigkeiten vor dem Code kopieren, damit der Schichten-Cache greift.</li>
+      <li><code>--host 0.0.0.0</code> und die Shell-Form der CMD sind die zwei Stolpersteine, die den Container stumm machen.</li>
+      <li><code>-p 8001:8000</code> weicht einem belegten Port aus. Links Rechner, rechts Container.</li>
+      <li>Compose macht aus Bauen und Starten einen Befehl. <code>stop</code> hält an, <code>down</code> entfernt.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 06 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 04 · US-4 bis US-6 Das Dashboard · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-04">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://fittrack-k7gg.onrender.com" target="_blank" rel="noopener">Live-App</a>
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack/tree/us-6" target="_blank" rel="noopener">Stand us-6</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#stories">Die drei Stories</a>
+  <a class="sidebar-link" href="#ergebnis">Das Ergebnis</a>
+  <a class="sidebar-link" href="#mobilefirst">Mobile-first in drei Regeln</a>
+  <a class="sidebar-link" href="#architektur">Architektur des Frontends</a>
+  <a class="sidebar-link" href="#us4">US-4: Gerüst</a>
+  <a class="sidebar-link" href="#us5">US-5: Daten per fetch</a>
+  <a class="sidebar-link" href="#us6">US-6: Wochenverlauf</a>
+  <a class="sidebar-link" href="#pruefen">Prüfpunkte</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">04</div>
+  <h1 class="lab-title">US-4 bis US-6: Das Dashboard</h1>
+  <p class="lab-intro">Drei Dateien ohne Build-Schritt: <code>index.html</code>, <code>style.css</code>,
+    <code>app.js</code>. Das Ergebnis sieht aus wie ein Fitness-Dashboard von Garmin oder Apple und holt jede Zahl aus
+    der API. Sprint 2 ist in drei Stories geteilt, damit jede einzeln abnehmbar bleibt: erst das Gerüst, dann die
+    Daten, dann das Diagramm mit einem eigenen Endpunkt, der Test-First wie im Backend entsteht.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Mobile-first</span>
+    <span class="lernziel-chip">StaticFiles</span>
+    <span class="lernziel-chip">fetch · async</span>
+    <span class="lernziel-chip">Chart.js</span>
+    <span class="lernziel-chip">/api/stats/wochen</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="stories">
+    <h2>Die drei Stories</h2>
+    <div class="story"><strong>US-4 · Dashboard.</strong> Als Nutzer möchte ich die App auf dem Smartphone öffnen und ein übersichtliches Dashboard sehen. <em>Akzeptanz:</em> <code>GET /</code> liefert die Seite; bei 375 px Breite kein horizontales Scrollen; Karten stapeln sich; Touch-Targets mindestens 44 px.</div>
+    <div class="story"><strong>US-5 · Kennzahlen und Liste.</strong> Als Nutzer möchte ich meine Kennzahlen und die letzten Trainings sehen. <em>Akzeptanz:</em> Kennzahl-Karten und Liste werden per fetch aus <code>/api/stats</code> und <code>/api/workouts</code> gefüllt, nichts ist hartkodiert.</div>
+    <div class="story"><strong>US-6 · Wochenverlauf.</strong> Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen und den Zeitraum wählen. <em>Akzeptanz:</em> <code>GET /api/stats/wochen</code> liefert je Kalenderwoche distanz_km und anzahl, auch für Wochen ohne Training; das Diagramm zeigt diese Daten; Umschalter 8 W / 6 M / 1 J / Alles.</div>
+  </section>
+
+  <section class="section-block" id="ergebnis">
+    <h2>Das Ergebnis</h2>
+    <div class="karten">
+      <div class="shot schmal">
+        <img src="assets/img/dashboard-mobile.png" alt="FitTrack-Dashboard auf dem Smartphone: Wochenziel-Ring, vier Kennzahl-Kacheln, Balkendiagramm, Aktivitätenliste" loading="lazy">
+        <div class="unterschrift">375 px breit: Ring, Kacheln, Diagramm und Liste stapeln sich.</div>
+      </div>
+      <div class="shot">
+        <img src="assets/img/dashboard-desktop.png" alt="FitTrack-Dashboard auf dem Desktop in zwei Spalten" loading="lazy">
+        <div class="unterschrift">Ab 768 px: dieselben Bausteine in zwei Spalten. Ein Breakpoint, kein zweites Stylesheet.</div>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Bereich</th><th>Zeigt</th><th>Quelle</th></tr></thead>
+        <tbody>
+          <tr><td>Wochenziel-Ring</td><td>Jüngste Woche im Datensatz gegen ein Ziel von 40 km, dazu km, Einheiten, Minuten</td><td>letzter Eintrag von <code>/api/stats/wochen</code></td></tr>
+          <tr><td>Kennzahl-Kacheln</td><td>Gesamt-km, km pro Woche, Lieblingssport, Einheiten</td><td><code>/api/stats</code></td></tr>
+          <tr><td>Diagramm</td><td>km je Kalenderwoche, Umschalter 8 W / 6 M / 1 J / Alles</td><td><code>/api/stats/wochen</code>, Filter im Browser</td></tr>
+          <tr><td>Letzte Aktivitäten</td><td>Zehn jüngste Einheiten, „Mehr anzeigen“ lädt weitere aus der geladenen Liste</td><td><code>/api/workouts</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section-block" id="mobilefirst">
+    <h2>Mobile-first in drei Regeln</h2>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">1 · Schmal zuerst gestalten</div>
+        <p>Basis-CSS für enge Bildschirme, danach <code>@media (min-width: 768px)</code> für Tablet und Desktop. Wer
+          groß beginnt und verkleinert, verteilt Ausnahmen über das ganze Stylesheet.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">2 · Flexible Raster statt fester Breiten</div>
+        <p>Karten nehmen 100 % Breite und stapeln sich von selbst. Grid und Flexbox, keine Pixelbreiten.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">3 · Daumenfreundlich bleiben</div>
+        <p>Touch-Targets mindestens 44 px, Schrift mindestens 16 px, sonst zoomt das Gerät beim Antippen.</p>
+      </div>
+    </div>
+    <div class="info-box">
+      <h3>Prüfpunkt in der Abnahme</h3>
+      <p>Bei einer Breite bis 480 px darf es keinen waagerechten Scrollbalken geben. In den Browser-Entwicklerwerkzeugen
+        prüft das die Gerätesimulation, oder <code>document.documentElement.scrollWidth</code> in der Konsole.
+        Am Ende zählt das Handy im WLAN.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="architektur">
+    <h2>Architektur des Frontends</h2>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart LR
+    subgraph Browser["Smartphone / Browser"]
+        UI["index.html + style.css<br/>Struktur und Gestaltung"]
+        JS["app.js<br/>fetch, Rendern, Chart.js"]
+    end
+    subgraph Server["FastAPI (ein Prozess)"]
+        API["/api/workouts<br/>/api/stats<br/>/api/stats/wochen"]
+        STATIC["StaticFiles → frontend/"]
+    end
+    STATIC -- "GET /" --> UI
+    UI --> JS
+    JS -- "GET /api/…" --> API
+      </pre>
+      <div class="unterschrift">Derselbe Server liefert die drei statischen Dateien und die API. Der Mount für <code>frontend/</code> steht nach den Routen, sonst fängt er <code>/api/…</code> ab.</div>
+    </div>
+    <div class="concept-box">
+      <h3>Warum kein Framework</h3>
+      <p>Kein React, kein Build-Schritt. Drei Dateien, die jede Person in der Gruppe lesen kann, und ein Diagramm aus
+        einer Bibliothek per CDN. Der Preis ist etwas mehr Handarbeit, der Gewinn ist, dass nichts verdeckt, was
+        darunter geschieht. Für ein Kursprojekt ist das der richtige Zuschnitt.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="us4">
+    <h2>US-4: Gerüst und Stylesheet</h2>
+    <p>Test zuerst, auch für das Frontend. Der Test prüft, dass FastAPI die Seite ausliefert.</p>
+    <pre class="code-block" data-kopieren="Test für US-4"># US-4: Frontend wird von FastAPI ausgeliefert
+def test_index_liefert_html():
+    antwort = client.get("/")
+    assert antwort.status_code == 200
+    assert "text/html" in antwort.headers["content-type"]
+    assert "FitTrack" in antwort.text</pre>
+    <pre class="prompt" data-kopieren="Prompt für US-4, Teil 1">Du bist ein erfahrener Frontend-Entwickler. Wir bauen das Dashboard einer
+Fitness-App namens FitTrack: reines HTML, CSS und Vanilla JS ohne Build-Step.
+Vorbild sind die Dashboards von Garmin Connect, Apple Fitness und RingConn:
+dunkler Hintergrund, abgerundete Karten, große Kennzahlen, ruhige Typografie.
+
+Aufgabe, Teil 1 von 3: nur die Struktur und das Stylesheet, noch keine Daten.
+
+frontend/index.html mit folgenden Bereichen von oben nach unten, alle
+Werte vorerst als Platzhalter „…“:
+1. Kopf: Titel „FitTrack“ und ein &lt;p id="zeitraum"&gt;
+2. &lt;section id="woche"&gt;: Wochenziel-Ring. Ein SVG-Kreis (r=52 in einem
+   120er viewBox) mit &lt;circle id="ring-balken"&gt;, daneben eine
+   Definitionsliste mit &lt;dd id="woche-km"&gt;, &lt;dd id="woche-anzahl"&gt;,
+   &lt;dd id="woche-minuten"&gt;. Titel &lt;h2 id="woche-titel"&gt;,
+   Untertitel &lt;p id="woche-untertitel"&gt;.
+3. &lt;section id="kennzahlen"&gt;: vier Kacheln im 2er-Raster mit den ids
+   stat-gesamt, stat-woche, stat-sport, stat-anzahl
+   (Beschriftungen: Gesamt, Pro Woche, Lieblingssport, Einheiten)
+4. &lt;section id="diagramm"&gt;: Titel „Kilometer pro Woche“, vier Buttons
+   „8 W“, „6 M“, „1 J“, „Alles“ mit data-wochen="8|26|52|0", darunter
+   &lt;canvas id="wochen-chart"&gt; in einem Container mit fester Höhe 200 px
+5. &lt;section id="aktivitaeten"&gt;: Titel „Letzte Aktivitäten“,
+   &lt;ol id="aktivitaeten-liste"&gt;, Button &lt;button id="mehr-anzeigen" hidden&gt;
+
+frontend/style.css:
+- CSS Custom Properties in :root für alle Farben: --bg #0f1419,
+  --karte #1a2129, --karte-hell #232c36, --linie #2c3641, --text #f2f5f7,
+  --text-2 #8c98a4, --akzent #f5b841, dazu --laufen #ff6b4a,
+  --radfahren #4cc9f0, --schwimmen #7b8cff, --wandern #8bd450
+- Schrift Manrope (Google Fonts) mit system-ui als Fallback,
+  font-size 16px, font-variant-numeric: tabular-nums
+- Mobile zuerst: eine Spalte, max-width 480px, Karten 100 % breit,
+  border-radius 20px, kein Schatten
+- Alle Buttons mindestens 44px hoch
+- Ein Breakpoint @media (min-width: 768px): zwei Spalten per CSS Grid
+  mit grid-template-areas, Diagramm und Liste nebeneinander
+- Der Ring: stroke-dasharray 327 (Umfang bei r=52), stroke-dashoffset 327,
+  SVG um -90deg gedreht, damit der Balken oben startet
+- Sportart-Farbe über [data-sport="Laufen"] { --sport-farbe: var(--laufen) }
+  usw., damit Listenzeilen später die Farbe per Attribut bekommen
+
+Randbedingungen:
+- &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+- Keine Bilder, keine Emojis, kein Framework, kein Tailwind
+- Kurze deutsche Kommentare, die einem Anfänger erklären, warum
+- Noch kein JavaScript in diesem Schritt
+
+Gib beide Dateien vollständig aus. Erkläre in drei Sätzen, wie das
+Mobile-First-Prinzip im CSS umgesetzt ist.</pre>
+    <p>Dann liefert FastAPI die Seite aus. Ein kurzer zweiter Prompt, oder drei Zeilen von Hand:</p>
+    <pre class="code-block" data-kopieren="Ergänzung in main.py">from fastapi.staticfiles import StaticFiles
+
+FRONTEND_ORDNER = Path(__file__).parent.parent.parent / "frontend"
+
+# Das Frontend liegt als statische Dateien im Ordner frontend/. Der Mount muss
+# NACH den API-Routen stehen, sonst fängt er alle Anfragen ab.
+app.mount("/", StaticFiles(directory=FRONTEND_ORDNER, html=True), name="frontend")</pre>
+  </section>
+
+  <section class="section-block" id="us5">
+    <h2>US-5: Daten per fetch</h2>
+    <p>Kein pytest-Test für JavaScript im Kurs, die Abnahme läuft am Gerät. Frage an die Gruppe: Wie würde man das
+      automatisieren? Stichwort Playwright, als Ausblick.</p>
+    <pre class="prompt" data-kopieren="Prompt für US-5">Du bist ein erfahrener Frontend-Entwickler. FitTrack-Dashboard, Teil 2 von 3.
+Es gibt eine index.html mit diesen Elementen (Auszug der ids):
+- #zeitraum (p im Kopf)
+- #stat-gesamt, #stat-woche, #stat-sport, #stat-anzahl (Kennzahl-Kacheln)
+- #aktivitaeten-liste (ol), #mehr-anzeigen (button, anfangs hidden)
+Listenzeilen bekommen die Farbe per Attribut data-sport="Laufen" usw.
+
+Die API liefert:
+GET /api/stats -&gt;
+  {"gesamt_km": 3963.0, "durchschnitt_km_pro_woche": 37.7,
+   "lieblingssportart": "Radfahren", "anzahl": 311}
+  (lieblingssportart kann null sein)
+GET /api/workouts -&gt; Liste, jüngstes Datum zuerst:
+  {"id": 311, "datum": "2026-09-05", "sportart": "Schwimmen",
+   "dauer_min": 43, "distanz_km": 2.0, "kalorien": 614}
+
+Aufgabe: Erstelle frontend/app.js mit
+- ladeJson(url): fetch, wirft bei Status != 200 einen Fehler
+- formatDatum("2026-09-05") -&gt; "05.09.2026"
+- formatZahl(wert, nachkommastellen): deutsche Schreibweise per toLocaleString
+- zeigeKennzahlen(stats): füllt die vier Kacheln
+- zeigeAktivitaeten(workouts): zeigt die ersten 10 Einheiten als &lt;li&gt;
+  mit data-sport, einem Kürzel im Kreis (La, Ra, Sc, Wa), Sportart,
+  Datum, Distanz, Dauer und Kalorien. Der Button „Mehr anzeigen“ hängt
+  jeweils 10 weitere an und verschwindet, wenn alle sichtbar sind.
+- zeigeZeitraum(workouts): schreibt „&lt;ältestes&gt; bis &lt;jüngstes&gt;“ in #zeitraum
+- start(): ruft alles auf; wenn ein fetch fehlschlägt, steht im
+  betroffenen Bereich ein kurzer Hinweis „… konnten nicht geladen
+  werden. Läuft der Server?“ und der Rest lädt trotzdem.
+- Am Ende: start();
+
+Randbedingungen:
+- Vanilla JS, keine Bibliothek, kein Modul-Bundler, async/await
+- Kleine Funktionen mit deutschen Namen, je ein Kommentar auf Deutsch
+- Keine Werte hartkodieren, alles kommt aus der API
+- In index.html vor &lt;/body&gt; ergänzen: &lt;script src="app.js"&gt;&lt;/script&gt;
+
+Gib app.js vollständig aus und erkläre in drei Sätzen, wie „Mehr anzeigen“
+funktioniert, ohne die API erneut zu fragen.</pre>
+  </section>
+
+  <section class="section-block" id="us6">
+    <h2>US-6: Wochenverlauf</h2>
+    <p>Zwei Teile: erst der Endpunkt mit Test, dann Ring und Diagramm. Die Erwartungswerte wieder von Hand: KW 23
+      hat 34,5 km in 4 Einheiten und 175 Minuten, KW 24 ist leer, KW 25 hat 53,0 km in 4 Einheiten und 285 Minuten.</p>
+    <pre class="code-block" data-kopieren="Tests für US-6"># US-6: Wochenverlauf
+def test_wochen_anzahl_und_luecken():
+    wochen = client.get("/api/stats/wochen").json()
+    assert len(wochen) == 3
+    assert [w["kw"] for w in wochen] == ["2026-W23", "2026-W24", "2026-W25"]
+    assert wochen[1] == {"kw": "2026-W24", "wochenstart": "2026-06-08",
+                         "distanz_km": 0.0, "anzahl": 0, "dauer_min": 0}
+
+
+def test_wochen_summen():
+    wochen = client.get("/api/stats/wochen").json()
+    assert wochen[0]["wochenstart"] == "2026-06-01"
+    assert wochen[0]["distanz_km"] == 34.5
+    assert wochen[0]["anzahl"] == 4
+    assert wochen[0]["dauer_min"] == 175
+    assert wochen[2]["distanz_km"] == 53.0
+    assert wochen[2]["anzahl"] == 4
+    assert wochen[2]["dauer_min"] == 285
+
+
+def test_wochen_leer(monkeypatch):
+    from app import main
+    monkeypatch.setattr(main, "lade_workouts", lambda: [])
+    assert client.get("/api/stats/wochen").json() == []</pre>
+    <pre class="prompt" data-kopieren="Prompt für US-6, Teil A (Backend)">Du bist ein erfahrener Python-Entwickler. FitTrack, FastAPI. In
+backend/app/statistik.py gibt es bereits:
+
+from collections import defaultdict
+from datetime import date, timedelta
+
+def montag_der_woche(datum_text: str) -&gt; date:
+    tag = date.fromisoformat(datum_text)
+    return tag - timedelta(days=tag.weekday())
+
+Workouts sind Dictionaries mit id, datum (ISO), sportart, dauer_min,
+distanz_km, kalorien.
+
+Aufgabe: Ergänze berechne_wochen(workouts: list[dict]) -&gt; list[dict].
+Rückgabe: eine Liste aufsteigend nach Woche, ein Eintrag pro Kalenderwoche
+von der ersten bis zur letzten Trainingswoche. Wochen ohne Training
+erscheinen mit Nullwerten. Jeder Eintrag:
+{"kw": "2026-W23", "wochenstart": "2026-06-01",
+ "distanz_km": 34.5, "anzahl": 4, "dauer_min": 175}
+kw ist Jahr und ISO-Woche zweistellig, wochenstart der Montag als ISO-Datum,
+distanz_km auf 1 Nachkommastelle gerundet. Leere Liste ergibt [].
+
+Dazu ein Pydantic-Modell WochenEintrag in models.py und in main.py die Route
+GET /api/stats/wochen mit response_model=list[WochenEintrag], die
+berechne_wochen(lade_workouts()) zurückgibt.
+
+Randbedingungen: nur Standardbibliothek und Pydantic, deutsche Namen,
+je ein Docstring. Diese Tests müssen bestehen:
+
+[die drei Tests von oben einfügen]
+
+Erkläre in drei Sätzen, wie du die Lücken erzeugst.</pre>
+    <pre class="prompt" data-kopieren="Prompt für US-6, Teil B (Frontend)">Du bist ein erfahrener Frontend-Entwickler. FitTrack-Dashboard, Teil 3 von 3.
+In frontend/app.js gibt es bereits ladeJson(url), formatDatum(iso),
+formatZahl(wert, nachkommastellen), zeigeFehler(bereichId, text) und eine
+Funktion start(), die /api/stats und /api/workouts lädt.
+
+Neu ist GET /api/stats/wochen -&gt; Liste aufsteigend, ein Eintrag je Woche:
+{"kw": "2026-W36", "wochenstart": "2026-08-31",
+ "distanz_km": 64.4, "anzahl": 3, "dauer_min": 295}
+
+In index.html gibt es:
+- #woche-titel (h2), #woche-untertitel (p), #ring-prozent (span),
+  #ring-balken (SVG-circle, r=52, stroke-dasharray und stroke-dashoffset 327),
+  #woche-km, #woche-anzahl, #woche-minuten (dd)
+- #wochen-chart (canvas) und vier Buttons .zeitraum-wahl button mit
+  data-wochen="8", "26", "52", "0" (0 = alle); der aktive hat class="aktiv"
+- Chart.js 4 ist per &lt;script&gt; vor app.js eingebunden:
+  https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js
+
+Aufgabe, ergänze app.js:
+1. Konstanten WOCHENZIEL_KM = 40 und RING_UMFANG = 327.
+2. zeigeWoche(wochen): nimmt den letzten Eintrag (jüngste Woche im
+   Datensatz). Titel „Kalenderwoche 36“, Untertitel „ab 31.08.2026,
+   Wochenziel 40 km“. Prozent = distanz_km / Ziel, Text zeigt den echten
+   Wert (auch über 100 %), der Ring ist bei 100 % voll:
+   strokeDashoffset = RING_UMFANG * (1 - min(anteil, 1)). km, Anzahl,
+   Minuten in die dd-Felder.
+3. zeigeDiagramm(wochen, anzahlWochen): Balkendiagramm mit Chart.js.
+   anzahlWochen &gt; 0 -&gt; die letzten n Wochen, 0 -&gt; alle. Beim ersten Aufruf
+   das Chart erzeugen und in einer Variablen merken, bei weiteren Aufrufen
+   nur Daten tauschen und update() aufrufen. Ohne Legende, x-Achse ohne
+   Beschriftung, y-Achse ab 0 mit höchstens 5 Ticks, Balkenfarbe aus der
+   CSS-Variablen --akzent (per getComputedStyle lesen), Tooltip
+   „Kalenderwoche 36“ und „64,4 km“. maintainAspectRatio: false.
+4. verbindeZeitraumWahl(wochen): Klick setzt die Klasse aktiv um und
+   ruft zeigeDiagramm mit Number(button.dataset.wochen) auf.
+5. In start(): zuerst /api/stats/wochen laden, dann zeigeWoche,
+   zeigeDiagramm(wochen, 8), verbindeZeitraumWahl; Fehler wie bisher
+   mit zeigeFehler("woche", ...).
+
+Randbedingungen: Vanilla JS, deutsche Namen und Kommentare, keine Werte
+hartkodieren außer den zwei Konstanten. Gib nur die neuen und geänderten
+Funktionen aus. Erkläre in drei Sätzen, warum das Chart beim Umschalten
+nicht neu erzeugt wird.</pre>
+  </section>
+
+  <section class="section-block" id="pruefen">
+    <h2>Prüfpunkte für die Antworten</h2>
+    <ul class="pruefpunkte">
+      <li><strong>Viewport-Meta vorhanden?</strong> Ohne sie zeigt das Handy eine geschrumpfte Desktop-Seite.</li>
+      <li><strong>Feste Breiten in Pixeln?</strong> <code>width: 400px</code> ist ein Verstoß gegen Regel 2.</li>
+      <li><strong>Mount nach den Routen?</strong> Steht <code>app.mount("/")</code> vor <code>/api/…</code>, werden alle Tests außer <code>/</code> rot. Das lässt sich live zeigen.</li>
+      <li><strong>Steht eine Zahl im JavaScript, die aus der API kommen müsste?</strong> Dann ist US-5 verfehlt.</li>
+      <li><strong>Server aus, Seite neu laden:</strong> Erscheint der Hinweistext, oder bleibt alles bei „…“?</li>
+      <li><strong>Wird bei jedem Klick ein neues Chart erzeugt?</strong> Dann meldet die Konsole „Canvas is already in use“.</li>
+      <li><strong>Sind die Balken echte Daten?</strong> Eine Distanz in <code>fittrack.db</code> ändern, neu laden, das Diagramm ändert sich. Danach <code>git checkout backend/app/data/fittrack.db</code>.</li>
+    </ul>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Vier Übungen: Mobile-first, Bereiche und Endpunkte, Mount und Chart, dann die Abnahme am Smartphone.</p>
+    <div data-uebung="P04-01"></div>
+    <div data-uebung="P04-02"></div>
+    <div data-uebung="P04-03"></div>
+    <div data-uebung="P04-04"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Drei Dateien, kein Build-Schritt, Chart.js per CDN. Jede Zahl kommt aus einem der drei Endpunkte.</li>
+      <li>Mobile zuerst, ein Breakpoint bei 768 px, Touch-Targets 44 px, Schrift 16 px.</li>
+      <li>FastAPI liefert das Frontend als statische Dateien aus. Der Mount steht nach den Routen.</li>
+      <li>Der Wochenverlauf hat einen eigenen Endpunkt mit Test. Lückenwochen kommen mit Nullwerten, der Zeitraumfilter läuft im Browser.</li>
+      <li>Das Chart wird einmal erzeugt und danach aktualisiert.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 04 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{
+  "uebungen": [
+    {
+      "id": "P04-01", "typ": "quiz",
+      "titel": { "de": "Mobile-first", "en": "Mobile first" },
+      "aufgabe": { "de": "<p>Drei Fragen zu den drei Regeln.</p>", "en": "<p>Three questions on the three rules.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Das Dashboard sieht auf dem Handy aus wie eine winzige Desktop-Seite, alles ist klein und man muss zoomen. Was fehlt am wahrscheinlichsten?", "en": "The dashboard looks like a tiny desktop page on the phone. What is most likely missing?" },
+          "optionen": [
+            { "de": "Das Viewport-Meta-Tag im head", "en": "The viewport meta tag" },
+            { "de": "Ein zweites Stylesheet für Handys", "en": "A second stylesheet for phones" },
+            { "de": "Chart.js", "en": "Chart.js" }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Ohne <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"> nimmt das Handy eine virtuelle Breite von rund 980 px an und schrumpft alles. Eine Zeile, und der häufigste Anfängerfehler.", "en": "Without the viewport meta tag the phone assumes about 980 px and shrinks everything." }
+        },
+        {
+          "frage": { "de": "Warum kommt das Basis-CSS für schmale Bildschirme zuerst und der Breakpoint mit min-width danach?", "en": "Why does the base CSS for narrow screens come first and the min-width breakpoint after?" },
+          "optionen": [
+            { "de": "Weil die breite Ansicht dann eine Erweiterung einer funktionierenden schmalen ist. Umgekehrt verteilt man Ausnahmen über das ganze Stylesheet.", "en": "Because the wide view then extends a working narrow one." },
+            { "de": "Weil Browser CSS von unten nach oben lesen.", "en": "Because browsers read CSS bottom-up." },
+            { "de": "Weil min-width nur am Dateiende erlaubt ist.", "en": "Because min-width is only allowed at the end of a file." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Mobile-first ist eine Reihenfolge: Die Basis gilt überall, der Breakpoint fügt ab 768 px zwei Spalten hinzu. Nichts muss zurückgenommen werden.", "en": "Mobile first is an order: base everywhere, breakpoint adds." }
+        },
+        {
+          "frage": { "de": "Die Zeitraum-Buttons sind 36 px hoch. Ist US-4 erfüllt?", "en": "The period buttons are 36 px high. Is US-4 fulfilled?" },
+          "optionen": [
+            { "de": "Nein. Das Kriterium verlangt Touch-Targets von mindestens 44 px. Das ist genau die Art Punkt, an dem der PO zurückgibt.", "en": "No, the criterion requires at least 44 px." },
+            { "de": "Ja, solange es auf dem Desktop gut aussieht.", "en": "Yes, as long as it looks good on desktop." },
+            { "de": "Ja, 36 px ist der Standard von Chart.js.", "en": "Yes, 36 px is the Chart.js default." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "In der Referenzlösung ist genau das passiert: Die segmentierten Buttons waren 36 px hoch, die Prüfung mit getBoundingClientRect hat es gezeigt, min-height wurde auf 44 px gesetzt. Ein Kriterium, das man messen kann, ist ein gutes Kriterium.", "en": "That is exactly what happened in the reference solution." }
+        }
+      ]
+    },
+    {
+      "id": "P04-02", "typ": "zuordnen",
+      "titel": { "de": "Bereich und Endpunkt", "en": "Area and endpoint" },
+      "aufgabe": { "de": "<p>Welcher Bereich des Dashboards holt seine Daten woher?</p>", "en": "<p>Which dashboard area fetches its data from where?</p>" },
+      "ziele": [
+        { "id": "stats", "text": { "de": "GET /api/stats", "en": "GET /api/stats" } },
+        { "id": "wochen", "text": { "de": "GET /api/stats/wochen", "en": "GET /api/stats/wochen" } },
+        { "id": "workouts", "text": { "de": "GET /api/workouts", "en": "GET /api/workouts" } },
+        { "id": "keiner", "text": { "de": "Kein Endpunkt, steht im Frontend", "en": "No endpoint, lives in the frontend" } }
+      ],
+      "paare": [
+        { "begriff": { "de": "Vier Kennzahl-Kacheln: Gesamt, Pro Woche, Lieblingssport, Einheiten", "en": "Four metric tiles" }, "ziel": "stats" },
+        { "begriff": { "de": "Wochenziel-Ring mit km, Einheiten, Minuten der jüngsten Woche", "en": "Weekly goal ring" }, "ziel": "wochen" },
+        { "begriff": { "de": "Balkendiagramm mit Zeitraumwahl", "en": "Bar chart with period selection" }, "ziel": "wochen" },
+        { "begriff": { "de": "Liste der letzten Aktivitäten mit „Mehr anzeigen“", "en": "List of recent activities" }, "ziel": "workouts" },
+        { "begriff": { "de": "Das Wochenziel von 40 km", "en": "The weekly goal of 40 km" }, "ziel": "keiner" },
+        { "begriff": { "de": "Zeitraum „03.09.2024 bis 05.09.2026“ im Kopf", "en": "Date range in the header" }, "ziel": "workouts" }
+      ],
+      "rueckmeldung": { "de": "Das Wochenziel ist die einzige Zahl im Frontend, und sie ist als Konstante mit Namen markiert. Alles andere kommt aus drei Endpunkten.", "en": "The weekly goal is the only number in the frontend." }
+    },
+    {
+      "id": "P04-03", "typ": "quiz",
+      "titel": { "de": "Mount und Chart", "en": "Mount and chart" },
+      "aufgabe": { "de": "<p>Zwei Fehler, die in fast jeder Gruppe einmal passieren.</p>", "en": "<p>Two mistakes that happen in almost every group once.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Nach dem Einbau von StaticFiles sind plötzlich alle API-Tests rot, nur test_index_liefert_html ist grün. Ursache?", "en": "After adding StaticFiles all API tests are red, only test_index_liefert_html is green. Cause?" },
+          "optionen": [
+            { "de": "Der Mount auf \"/\" steht vor den API-Routen und fängt jede Anfrage ab. Er muss ans Ende von main.py.", "en": "The mount on \"/\" sits before the API routes and catches every request." },
+            { "de": "Der Ordner frontend/ ist leer.", "en": "The frontend folder is empty." },
+            { "de": "uvicorn läuft nicht.", "en": "uvicorn is not running." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "FastAPI prüft Routen in der Reihenfolge der Registrierung. Ein Mount auf \"/\" passt auf alles. Deshalb steht er als Letztes, mit einem Kommentar, der das erklärt.", "en": "FastAPI matches routes in registration order." }
+        },
+        {
+          "frage": { "de": "Beim Umschalten des Zeitraums meldet die Konsole „Canvas is already in use“. Was ist falsch?", "en": "Switching the period logs “Canvas is already in use”. What is wrong?" },
+          "optionen": [
+            { "de": "Bei jedem Klick wird new Chart() aufgerufen. Das Chart gehört einmal erzeugt und dann per data-Tausch und update() aktualisiert.", "en": "new Chart() is called on every click." },
+            { "de": "Chart.js unterstützt keine Balkendiagramme.", "en": "Chart.js does not support bar charts." },
+            { "de": "Der Endpunkt liefert zu viele Wochen.", "en": "The endpoint returns too many weeks." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Eine Variable außerhalb der Funktion merkt sich das Chart. Ist sie gesetzt, werden nur labels und data getauscht. Das steht so im Prompt, und genau danach fragt die Erklärung in drei Sätzen.", "en": "A variable outside the function keeps the chart." }
+        }
+      ]
+    },
+    {
+      "id": "P04-04", "typ": "checkliste",
+      "titel": { "de": "Abnahme am Smartphone", "en": "Acceptance on the phone" },
+      "aufgabe": { "de": "<p>Server mit <code>--host 0.0.0.0</code> starten, IP des Rechners notieren, Handy im selben WLAN. Dann diese Punkte am Gerät prüfen.</p>", "en": "<p>Start the server with --host 0.0.0.0, note the machine's IP, phone in the same WLAN. Then check these points on the device.</p>" },
+      "schritte": [
+        { "text": { "de": "Die Seite lädt unter <code>http://&lt;IP&gt;:8000</code> und zeigt den Ring mit echten Zahlen", "en": "The page loads and shows the ring with real numbers" } },
+        { "text": { "de": "Kein horizontales Scrollen, alle Karten stapeln sich untereinander", "en": "No horizontal scrolling, all cards stack" } },
+        { "text": { "de": "Die vier Zeitraum-Buttons lassen sich mit dem Daumen sicher treffen und das Diagramm wechselt", "en": "The four period buttons are easy to hit and the chart switches" } },
+        { "text": { "de": "„Mehr anzeigen“ hängt zehn weitere Einheiten an und verschwindet am Ende der Liste", "en": "“Show more” appends ten more and disappears at the end" } },
+        { "text": { "de": "Server stoppen, Seite neu laden: In jedem Bereich steht ein Hinweistext statt „…“", "en": "Stop the server, reload: every area shows a hint instead of “…”" } }
+      ],
+      "rueckmeldung": { "de": "Das ist die Abnahme nach Definition of Done: Der Mensch prüft am Gerät, was kein Testlauf beurteilt.", "en": "That is the acceptance per definition of done." }
+    }
+  ]
+}

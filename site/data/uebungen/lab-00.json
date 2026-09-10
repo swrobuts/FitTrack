@@ -1,0 +1,435 @@
+{
+  "befehle": {
+    "B01": {
+      "titel": {
+        "de": "Starter klonen und Umgebung anlegen",
+        "en": "Clone the starter and create the environment"
+      },
+      "varianten": {
+        "mac": {
+          "befehl": "git clone -b starter https://github.com/swrobuts/FitTrack.git\ncd FitTrack\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -r requirements.txt",
+          "teile": [
+            {
+              "was": "git clone -b starter …",
+              "bedeutet": {
+                "de": "Holt das Repository und stellt gleich den Branch starter ein. Ohne -b landet man auf main, der fertigen Referenz.",
+                "en": "Fetches the repository and checks out the starter branch right away. Without -b you land on main, the finished reference."
+              }
+            },
+            {
+              "was": "python3 -m venv .venv",
+              "bedeutet": {
+                "de": "Legt eine eigene Python-Umgebung im Projektordner an. Pakete landen dort und nicht im System.",
+                "en": "Creates a project-local Python environment. Packages go there, not into the system."
+              }
+            },
+            {
+              "was": "source .venv/bin/activate",
+              "bedeutet": {
+                "de": "Schaltet die Umgebung im aktuellen Terminal ein. Der Prompt zeigt danach (.venv). Unter Windows: .venv\\Scripts\\activate.",
+                "en": "Activates the environment in the current terminal. The prompt shows (.venv) afterwards. On Windows: .venv\\Scripts\\activate."
+              }
+            },
+            {
+              "was": "pip install -r requirements.txt",
+              "bedeutet": {
+                "de": "Installiert genau die vier Pakete aus der Datei: fastapi, uvicorn, pytest, httpx2. Mehr braucht die App nicht.",
+                "en": "Installs exactly the four packages from the file: fastapi, uvicorn, pytest, httpx2. The app needs nothing else."
+              }
+            }
+          ]
+        },
+        "win": {
+          "befehl": "git clone -b starter https://github.com/swrobuts/FitTrack.git\ncd FitTrack\npython -m venv .venv\n.venv\\Scripts\\activate\npip install -r requirements.txt",
+          "teile": [
+            {
+              "was": "git clone -b starter …",
+              "bedeutet": {
+                "de": "Holt das Repository und stellt gleich den Branch starter ein. Ohne -b landet man auf main, der fertigen Referenz.",
+                "en": "Fetches the repository and checks out the starter branch right away. Without -b you land on main, the finished reference."
+              }
+            },
+            {
+              "was": "python3 -m venv .venv",
+              "bedeutet": {
+                "de": "Legt eine eigene Python-Umgebung im Projektordner an. Pakete landen dort und nicht im System.",
+                "en": "Creates a project-local Python environment. Packages go there, not into the system."
+              }
+            },
+            {
+              "was": "source .venv/bin/activate",
+              "bedeutet": {
+                "de": "Schaltet die Umgebung im aktuellen Terminal ein. Der Prompt zeigt danach (.venv). Unter Windows: .venv\\Scripts\\activate.",
+                "en": "Activates the environment in the current terminal. The prompt shows (.venv) afterwards. On Windows: .venv\\Scripts\\activate."
+              }
+            },
+            {
+              "was": "pip install -r requirements.txt",
+              "bedeutet": {
+                "de": "Installiert genau die vier Pakete aus der Datei: fastapi, uvicorn, pytest, httpx2. Mehr braucht die App nicht.",
+                "en": "Installs exactly the four packages from the file: fastapi, uvicorn, pytest, httpx2. The app needs nothing else."
+              }
+            }
+          ]
+        },
+        "cmd": {
+          "befehl": "git clone -b starter https://github.com/swrobuts/FitTrack.git\ncd FitTrack\npython -m venv .venv\n.venv\\Scripts\\activate\npip install -r requirements.txt",
+          "teile": [
+            {
+              "was": "git clone -b starter …",
+              "bedeutet": {
+                "de": "Holt das Repository und stellt gleich den Branch starter ein. Ohne -b landet man auf main, der fertigen Referenz.",
+                "en": "Fetches the repository and checks out the starter branch right away. Without -b you land on main, the finished reference."
+              }
+            },
+            {
+              "was": "python3 -m venv .venv",
+              "bedeutet": {
+                "de": "Legt eine eigene Python-Umgebung im Projektordner an. Pakete landen dort und nicht im System.",
+                "en": "Creates a project-local Python environment. Packages go there, not into the system."
+              }
+            },
+            {
+              "was": "source .venv/bin/activate",
+              "bedeutet": {
+                "de": "Schaltet die Umgebung im aktuellen Terminal ein. Der Prompt zeigt danach (.venv). Unter Windows: .venv\\Scripts\\activate.",
+                "en": "Activates the environment in the current terminal. The prompt shows (.venv) afterwards. On Windows: .venv\\Scripts\\activate."
+              }
+            },
+            {
+              "was": "pip install -r requirements.txt",
+              "bedeutet": {
+                "de": "Installiert genau die vier Pakete aus der Datei: fastapi, uvicorn, pytest, httpx2. Mehr braucht die App nicht.",
+                "en": "Installs exactly the four packages from the file: fastapi, uvicorn, pytest, httpx2. The app needs nothing else."
+              }
+            }
+          ]
+        }
+      }
+    },
+    "B02": {
+      "titel": {
+        "de": "Den ersten Test laufen lassen",
+        "en": "Run the first test"
+      },
+      "befehl": "pytest",
+      "teile": [
+        {
+          "was": "pytest",
+          "bedeutet": {
+            "de": "Findet über pytest.ini den Ordner backend/tests und führt alle Tests aus. Jetzt: 1 error, weil app.main noch nicht existiert. Genau so soll es sein.",
+            "en": "Finds backend/tests via pytest.ini and runs all tests. Now: 1 error, because app.main does not exist yet. That is exactly the point."
+          }
+        }
+      ]
+    }
+  },
+  "uebungen": [
+    {
+      "id": "P00-01",
+      "typ": "checkliste",
+      "titel": {
+        "de": "Der eigene Rechner ist bereit",
+        "en": "Your machine is ready"
+      },
+      "aufgabe": {
+        "de": "<p>Fünf Punkte, jeder mit einem Befehl oder einem Blick prüfbar. Haken Sie ab, was auf Ihrem Rechner funktioniert.</p>",
+        "en": "<p>Five points, each checkable with one command or one look.</p>"
+      },
+      "schritte": [
+        {
+          "text": {
+            "de": "<code>docker run hello-world</code> gibt „Hello from Docker!“ aus",
+            "en": "<code>docker run hello-world</code> prints “Hello from Docker!”"
+          }
+        },
+        {
+          "text": {
+            "de": "<code>python3 --version</code> meldet 3.12 oder neuer",
+            "en": "<code>python3 --version</code> reports 3.12 or newer"
+          }
+        },
+        {
+          "text": {
+            "de": "WebStorm zeigt unter Settings → Plugins das Plugin „Python“ als installiert",
+            "en": "WebStorm lists the “Python” plugin as installed under Settings → Plugins"
+          }
+        },
+        {
+          "text": {
+            "de": "<code>git config --global user.name</code> und <code>user.email</code> sind gesetzt",
+            "en": "<code>git config --global user.name</code> and <code>user.email</code> are set"
+          }
+        },
+        {
+          "text": {
+            "de": "Ein Konto bei claude.ai besteht, oder LM Studio ist installiert und ein Modell geladen",
+            "en": "A claude.ai account exists, or LM Studio is installed with a model loaded"
+          }
+        }
+      ],
+      "rueckmeldung": {
+        "de": "Damit ist der Setup-Check aus dem Kurs erledigt. Alles Weitere passiert im Projektordner.",
+        "en": "That completes the setup check. Everything else happens in the project folder."
+      }
+    },
+    {
+      "id": "P00-02",
+      "typ": "terminal",
+      "titel": {
+        "de": "Im Projektordner umsehen",
+        "en": "Look around the project folder"
+      },
+      "aufgabe": {
+        "de": "<p>In dieser Konsole liegt das Projekt bereits unter <code>~/FitTrack</code>. Wechseln Sie hinein, listen Sie den Inhalt auf und sehen Sie sich an, welche Pakete die App braucht.</p>",
+        "en": "<p>In this console the project already sits under <code>~/FitTrack</code>. Change into it, list its contents and look at which packages the app needs.</p>"
+      },
+      "begruessung": [
+        {
+          "de": "Auftrag 1 von 1. Das Projekt liegt unter ~/FitTrack.",
+          "en": "Assignment 1 of 1. The project sits under ~/FitTrack."
+        }
+      ],
+      "schritte": [
+        {
+          "text": {
+            "de": "In den Ordner FitTrack wechseln",
+            "en": "Change into the FitTrack folder"
+          },
+          "zustand": {
+            "pfad": "FitTrack"
+          }
+        },
+        {
+          "text": {
+            "de": "Den Inhalt auflisten",
+            "en": "List the contents"
+          },
+          "muster": "^(ls|dir|Get-ChildItem)\\b"
+        },
+        {
+          "text": {
+            "de": "requirements.txt anzeigen",
+            "en": "Show requirements.txt"
+          },
+          "muster": "^(cat|type|Get-Content)\\s+requirements\\.txt"
+        }
+      ],
+      "rueckmeldung": {
+        "de": "Vier Pakete, keine Datenbankbibliothek: sqlite3 bringt Python mit.",
+        "en": "Four packages, no database library: sqlite3 ships with Python."
+      }
+    },
+    {
+      "id": "P00-03",
+      "typ": "quiz",
+      "titel": {
+        "de": "Rollen und Definition of Done",
+        "en": "Roles and definition of done"
+      },
+      "aufgabe": {
+        "de": "<p>Drei Fragen zum Vorgehensmodell.</p>",
+        "en": "<p>Three questions about the process model.</p>"
+      },
+      "fragen": [
+        {
+          "frage": {
+            "de": "Warum soll nicht dieselbe Person die Erwartungswerte festlegen und den Code prompten?",
+            "en": "Why should the same person not set the expected values and prompt for the code?"
+          },
+          "optionen": [
+            {
+              "de": "Weil sonst gegen die eigene Lösung getestet wird statt gegen die Anforderung. Getrennte Köpfe, getrennte Fehlerquellen.",
+              "en": "Because otherwise you test against your own solution rather than the requirement."
+            },
+            {
+              "de": "Weil der Chat nur eine Person pro Gruppe zulässt.",
+              "en": "Because the chat allows only one person per group."
+            },
+            {
+              "de": "Weil Erwartungswerte nur der Product Owner kennt.",
+              "en": "Because only the product owner knows expected values."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "Die Rollentrennung ist der Kern des Testkonzepts: Die Rolle Quality legt fest, was rauskommen muss, die Rolle Developer lässt Code erzeugen. So wird ein Zufallstreffer zu einem nachvollziehbaren Ergebnis.",
+            "en": "Separating roles is the core of the test concept."
+          }
+        },
+        {
+          "frage": {
+            "de": "Der Health-Endpunkt liefert nur {\"status\": \"ok\"}. Warum ist er trotzdem eine eigene Story?",
+            "en": "The health endpoint only returns {\"status\": \"ok\"}. Why is it still a story of its own?"
+          },
+          "optionen": [
+            {
+              "de": "Weil Docker und Render ihn brauchen: Der Container und der Health-Check im Betrieb fragen genau diesen Pfad, um zu wissen, ob die App läuft.",
+              "en": "Because Docker and Render need it as a liveness check."
+            },
+            {
+              "de": "Weil FastAPI ohne ihn nicht startet.",
+              "en": "Because FastAPI does not start without it."
+            },
+            {
+              "de": "Weil das Frontend ihn für die Kennzahlen aufruft.",
+              "en": "Because the frontend calls it for the metrics."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "In render.yaml steht healthCheckPath: /health. Render leitet erst Verkehr weiter, wenn dieser Pfad antwortet. Außerdem ist er der kleinste Endpunkt, an dem sich die ganze Schleife üben lässt.",
+            "en": "render.yaml sets healthCheckPath: /health."
+          }
+        },
+        {
+          "frage": {
+            "de": "Welche Punkte gehören zur Definition of Done? Mehrere Antworten sind richtig.",
+            "en": "Which points belong to the definition of done? Several answers are correct."
+          },
+          "mehrfach": true,
+          "optionen": [
+            {
+              "de": "Tests vorhanden und grün",
+              "en": "Tests present and green"
+            },
+            {
+              "de": "Akzeptanzkriterium am Gerät vorgeführt",
+              "en": "Acceptance criterion demonstrated on the device"
+            },
+            {
+              "de": "Der Chat hat den Code als korrekt bezeichnet",
+              "en": "The chat called the code correct"
+            },
+            {
+              "de": "Eine zweite Person hat den Code nach der Review-Checkliste geprüft",
+              "en": "A second person reviewed the code with the checklist"
+            },
+            {
+              "de": "Commit mit Story-Bezug",
+              "en": "Commit referencing the story"
+            }
+          ],
+          "richtig": [
+            0,
+            1,
+            3,
+            4
+          ],
+          "erklaerung": {
+            "de": "Die Aussage des Modells über seinen eigenen Code ist kein Nachweis. Nachweise liefern die Maschine (Tests) und der Mensch (Demo, Review).",
+            "en": "The model's opinion about its own code is not evidence."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P00-04",
+      "typ": "zuordnen",
+      "titel": {
+        "de": "Sechs Bausteine der Iteration",
+        "en": "Six building blocks of the iteration"
+      },
+      "aufgabe": {
+        "de": "<p>Ordnen Sie jeder Beschreibung den Baustein zu.</p>",
+        "en": "<p>Assign each description to its building block.</p>"
+      },
+      "ziele": [
+        {
+          "id": "vision",
+          "text": {
+            "de": "Vision",
+            "en": "Vision"
+          }
+        },
+        {
+          "id": "backlog",
+          "text": {
+            "de": "Product Backlog",
+            "en": "Product backlog"
+          }
+        },
+        {
+          "id": "sprint",
+          "text": {
+            "de": "Sprint Backlog",
+            "en": "Sprint backlog"
+          }
+        },
+        {
+          "id": "dod",
+          "text": {
+            "de": "Definition of Done",
+            "en": "Definition of done"
+          }
+        },
+        {
+          "id": "review",
+          "text": {
+            "de": "Sprint Review",
+            "en": "Sprint review"
+          }
+        },
+        {
+          "id": "retro",
+          "text": {
+            "de": "Retrospektive",
+            "en": "Retrospective"
+          }
+        }
+      ],
+      "paare": [
+        {
+          "begriff": {
+            "de": "Ein Satz, an dem sich jede Diskussion über Umfang messen lässt",
+            "en": "One sentence every scope discussion is measured against"
+          },
+          "ziel": "vision"
+        },
+        {
+          "begriff": {
+            "de": "Priorisierte User Stories mit Akzeptanzkriterien",
+            "en": "Prioritised user stories with acceptance criteria"
+          },
+          "ziel": "backlog"
+        },
+        {
+          "begriff": {
+            "de": "Was in dieser Timebox realistisch abgeschlossen wird",
+            "en": "What will realistically be finished in this timebox"
+          },
+          "ziel": "sprint"
+        },
+        {
+          "begriff": {
+            "de": "Gilt für jede Story gleich und wird nicht je Fall verhandelt",
+            "en": "Applies to every story alike and is not negotiated case by case"
+          },
+          "ziel": "dod"
+        },
+        {
+          "begriff": {
+            "de": "Demo gegen die Kriterien, der PO nimmt ab oder gibt zurück",
+            "en": "Demo against the criteria, the PO accepts or returns"
+          },
+          "ziel": "review"
+        },
+        {
+          "begriff": {
+            "de": "Was hat der KI-Workflow gebracht, wo war die Prüfung unverzichtbar?",
+            "en": "What did the AI workflow bring, where was the review indispensable?"
+          },
+          "ziel": "retro"
+        }
+      ],
+      "rueckmeldung": {
+        "de": "Jeder Baustein hat einen sichtbaren Urheber und einen Adressaten. Fällt einer aus, fällt es beim nächsten sofort auf.",
+        "en": "Every building block has a visible author and addressee."
+      }
+    }
+  ]
+}

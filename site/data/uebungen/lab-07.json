@@ -1,0 +1,75 @@
+{
+  "uebungen": [
+    {
+      "id": "P07-01", "typ": "quiz",
+      "titel": { "de": "Was wo läuft", "en": "What runs where" },
+      "aufgabe": { "de": "<p>Drei Fragen zu Hosting, Blueprint und Health-Check.</p>", "en": "<p>Three questions on hosting, blueprint and health check.</p>" },
+      "fragen": [
+        {
+          "frage": { "de": "Warum kann diese Lernumgebung auf GitHub Pages liegen, die FitTrack-App aber nicht?", "en": "Why can this learning environment live on GitHub Pages while the FitTrack app cannot?" },
+          "optionen": [
+            { "de": "Die Lernumgebung besteht aus Dateien, die der Browser ausführt, sogar SQLite läuft dort als WebAssembly. FitTrack braucht einen Python-Prozess auf einem Server, der aus der Datenbank liest und Kennzahlen rechnet.", "en": "The learning environment is files the browser runs; FitTrack needs a Python process on a server." },
+            { "de": "GitHub Pages erlaubt keine Python-Dateien im Repository.", "en": "GitHub Pages forbids Python files in the repository." },
+            { "de": "Render ist billiger als GitHub Pages.", "en": "Render is cheaper than GitHub Pages." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Auslieferung gegen Ausführung. Alles, was im Browser rechnen kann, darf statisch liegen. Alles, was einen Server braucht, gehört auf einen Web Service.", "en": "Delivery versus execution." }
+        },
+        {
+          "frage": { "de": "Der Dienst bei Render zeigt „Live“, aber jede Anfrage endet mit einem Timeout. Lokal läuft der Container. Was prüfen Sie zuerst?", "en": "The Render service shows “Live” but every request times out. Locally the container runs. What do you check first?" },
+          "optionen": [
+            { "de": "Ob die App auf dem Port lauscht, den Render in PORT setzt. Eine CMD ohne ${PORT:-8000} oder ohne Shell-Form lauscht auf 8000, Render leitet aber woandershin.", "en": "Whether the app listens on the port Render sets in PORT." },
+            { "de": "Ob das Repository öffentlich ist.", "en": "Whether the repository is public." },
+            { "de": "Ob genug Build-Minuten übrig sind.", "en": "Whether build minutes remain." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Das ist der eine Stolperstein beim Deploy. Lokal fällt er nie auf, weil ohne PORT der Standard 8000 gilt.", "en": "That is the one stumbling block at deployment." }
+        },
+        {
+          "frage": { "de": "Was bewirkt healthCheckPath: /health in render.yaml?", "en": "What does healthCheckPath: /health do?" },
+          "optionen": [
+            { "de": "Render fragt den Pfad nach dem Start und leitet erst Verkehr weiter, wenn er mit 200 antwortet. Ein Deploy mit kaputter App bleibt so unsichtbar, die alte Version läuft weiter.", "en": "Render polls the path and routes traffic only once it answers 200." },
+            { "de": "Render zeigt den Pfad als Startseite an.", "en": "Render shows the path as the start page." },
+            { "de": "Render führt dort pytest aus.", "en": "Render runs pytest there." }
+          ],
+          "richtig": [0],
+          "erklaerung": { "de": "Deshalb war US-3 die erste Story: Der kleinste Endpunkt ist im Betrieb der wichtigste.", "en": "That is why US-3 was the first story." }
+        }
+      ]
+    },
+    {
+      "id": "P07-02", "typ": "zuordnen",
+      "titel": { "de": "Station und Werkzeug", "en": "Station and tool" },
+      "aufgabe": { "de": "<p>Ordnen Sie jede Aufgabe der Station in der Pipeline zu, die sie erledigt.</p>", "en": "<p>Assign each task to the pipeline station that performs it.</p>" },
+      "ziele": [
+        { "id": "ws", "text": { "de": "WebStorm, lokal", "en": "WebStorm, local" } },
+        { "id": "gh", "text": { "de": "GitHub", "en": "GitHub" } },
+        { "id": "ci", "text": { "de": "GitHub Actions", "en": "GitHub Actions" } },
+        { "id": "render", "text": { "de": "Render", "en": "Render" } },
+        { "id": "pages", "text": { "de": "GitHub Pages", "en": "GitHub Pages" } }
+      ],
+      "paare": [
+        { "begriff": { "de": "Commit mit Story-Bezug und Push", "en": "Commit with story reference and push" }, "ziel": "ws" },
+        { "begriff": { "de": "Repository, Branches, Tags je Lehrschritt", "en": "Repository, branches, tags per step" }, "ziel": "gh" },
+        { "begriff": { "de": "pytest auf einem frischen Ubuntu-Runner", "en": "pytest on a fresh Ubuntu runner" }, "ziel": "ci" },
+        { "begriff": { "de": "docker build aus dem Dockerfile und Container mit PORT", "en": "docker build and container with PORT" }, "ziel": "render" },
+        { "begriff": { "de": "Diese Lernumgebung, statisch ausgeliefert", "en": "This learning environment, served statically" }, "ziel": "pages" },
+        { "begriff": { "de": "Health-Check auf /health vor dem Weiterleiten", "en": "Health check on /health before routing" }, "ziel": "render" }
+      ],
+      "rueckmeldung": { "de": "Ein Push, drei Empfänger. Jeder tut genau eine Sache, und jede ist an ihrem Ergebnis prüfbar: Haken, URL, Seite.", "en": "One push, three receivers." }
+    },
+    {
+      "id": "P07-03", "typ": "terminal",
+      "titel": { "de": "Committen und pushen", "en": "Commit and push" },
+      "aufgabe": { "de": "<p>Im Projektordner liegt <code>render.yaml</code>. Legen Sie ein Repository an, committen Sie mit Bezug auf den Deploy, verbinden Sie ein Remote mit dem Namen <code>origin</code> und pushen Sie. Auf dem eigenen Rechner löst genau dieser Push den Build bei Render aus.</p>", "en": "<p>Create a repository, commit the render.yaml, add a remote named origin and push.</p>" },
+      "begruessung": [ { "de": "Auftrag 1 von 1. Vorher cd FitTrack.", "en": "Assignment 1 of 1. cd FitTrack first." } ],
+      "schritte": [
+        { "text": { "de": "In den Ordner FitTrack wechseln", "en": "Change into FitTrack" }, "zustand": { "pfad": "FitTrack" } },
+        { "text": { "de": "git init, git add ., git commit -m \"deploy: Render-Blueprint\"", "en": "git init, git add ., git commit" }, "muster": "^git\\s+commit\\b", "zustand": { "gitCommits": 1 } },
+        { "text": { "de": "Remote anlegen: git remote add origin https://github.com/<konto>/FitTrack.git", "en": "Add remote origin" }, "muster": "^git\\s+remote\\s+add\\s+origin\\b" },
+        { "text": { "de": "Pushen: git push -u origin main", "en": "Push: git push -u origin main" }, "muster": "^git\\s+push\\b", "zustand": { "gitVeroeffentlicht": true } }
+      ],
+      "rueckmeldung": { "de": "Im echten Repository ist origin schon gesetzt, weil Sie geklont haben. Nach dem Push: Actions-Reiter auf GitHub und Deploy-Liste bei Render beobachten.", "en": "In the real repository origin is already set." }
+    }
+  ]
+}

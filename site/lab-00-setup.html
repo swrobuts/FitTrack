@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 00 · Setup und Micro-Scrum · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-00">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://github.com/swrobuts/FitTrack" target="_blank" rel="noopener">Repository</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#ziel">Worum es geht</a>
+  <a class="sidebar-link" href="#werkzeuge">Die Werkzeugkette</a>
+  <a class="sidebar-link" href="#starter">Den Starter holen</a>
+  <a class="sidebar-link" href="#struktur">Was im Starter liegt</a>
+  <a class="sidebar-link" href="#scrum">Micro-Scrum</a>
+  <a class="sidebar-link" href="#dod">Definition of Done</a>
+  <a class="sidebar-link" href="#backlog">Das Product Backlog</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">00</div>
+  <h1 class="lab-title">Setup und Micro-Scrum</h1>
+  <p class="lab-intro">Bevor die erste Zeile Code entsteht, muss die Werkzeugkette laufen und die Gruppe wissen, wer was
+    tut. Dieses Lab bringt beides in Betrieb: Docker, WebStorm, Git und den Chat auf der einen Seite, Vision, User
+    Stories, drei Rollen und die Definition of Done auf der anderen. Am Ende sehen Sie den ersten Test rot. Das ist kein
+    Fehler, sondern der Ausgangspunkt der ganzen Methode.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Docker · WebStorm · Git</span>
+    <span class="lernziel-chip">Branch starter</span>
+    <span class="lernziel-chip">PO · Dev · QA</span>
+    <span class="lernziel-chip">Definition of Done</span>
+    <span class="lernziel-chip">Test rot</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="ziel">
+    <h2>Worum es geht</h2>
+    <p>FitTrack ist eine mobile-first Web-App, die Trainingsdaten auf dem Smartphone anzeigt. Sie ist bewusst klein: vier
+      Funktionen, drei Dateien Frontend, ein Container. Was nicht klein ist, ist das Vorgehen. Die Gruppe durchläuft
+      eine vollständige Iteration: Vision, Stories, Test zuerst, Prompt im Chat, Review, Abnahme am Gerät, Container,
+      Deployment. Die Werkzeuge darin sind austauschbar, die Abfolge ist es nicht.</p>
+    <div class="concept-box">
+      <h3>Produktvision in einem Satz</h3>
+      <p>„FitTrack zeigt mir meine Trainingsdaten auf dem Smartphone, verständlich, aktuell, ansprechend.“ An diesem
+        Satz misst sich jede spätere Diskussion über Umfang. Was ihn nicht stützt, kommt nicht in den Sprint.</p>
+    </div>
+    <div class="diagramm">
+      <pre class="mermaid">
+flowchart LR
+    V["Vision"] --> B["Product Backlog<br/>6 User Stories"] --> S1["Sprint 1<br/>Daten und API"] --> S2["Sprint 2<br/>Frontend"] --> S3["Sprint 3<br/>Docker und Abnahme"] --> R["Review und<br/>Retrospektive"]
+      </pre>
+      <div class="unterschrift">Die Iteration in Miniatur. Jeder Sprint endet mit einer Abnahme gegen Test und Akzeptanzkriterium.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="werkzeuge">
+    <h2>Die Werkzeugkette</h2>
+    <p>Sechs Werkzeuge, jedes mit einer Aufgabe. Die Installation gehört vor den ersten Termin, im Raum bleibt nur ein
+      kurzer Check.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Werkzeug</th><th>Wofür</th><th>Prüfen mit</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Python 3.12</strong></td><td>Backend mit FastAPI, Tests mit pytest, Datenzugriff mit sqlite3</td><td><code>python3 --version</code></td></tr>
+          <tr><td><strong>WebStorm</strong> mit Python-Plugin</td><td>Editor für Backend und Frontend, Terminal, Git, Docker-Anbindung, Datenbankansicht</td><td>Plugin „Python“ unter Settings → Plugins</td></tr>
+          <tr><td><strong>Git und GitHub</strong></td><td>Stände festhalten, Commit je Story, Push löst später den Deploy aus</td><td><code>git config --global user.name</code></td></tr>
+          <tr><td><strong>Docker Desktop</strong></td><td>Die App als Image bauen und als Container starten</td><td><code>docker run hello-world</code></td></tr>
+          <tr><td><strong>Claude</strong> im Chat</td><td>Code vorschlagen lassen, nie ungeprüft übernehmen</td><td>Konto bei claude.ai, kostenloses Kontingent reicht</td></tr>
+          <tr><td><strong>LM Studio</strong> (optional)</td><td>Derselbe Workflow mit einem lokalen Modell</td><td>Modell vorab herunterladen</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="shot">
+      <img src="assets/img/webstorm-projekt.png" alt="WebStorm mit dem geöffneten FitTrack-Projekt: Projektbaum links, Editor rechts, Services-Fenster mit Docker unten" loading="lazy">
+      <div class="unterschrift">WebStorm mit dem FitTrack-Projekt. Links der Projektbaum mit backend, frontend und tests, unten das Services-Fenster mit der Docker-Anbindung.</div>
+    </div>
+    <div class="tip-box">
+      <h3>PyCharm geht genauso</h3>
+      <p>Wer PyCharm hat, macht alle Schritte identisch. Der Unterschied zu WebStorm ist nur, welches Plugin von Haus aus
+        dabei ist. In WebStorm kommt Python als Plugin dazu, in PyCharm JavaScript.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="starter">
+    <h2>Den Starter holen</h2>
+    <p>Der Branch <code>starter</code> im Repository enthält den Ausgangsstand: Ordnerstruktur, Datenbank, Testdaten,
+      README und genau einen Test, der noch rot ist. Die vier Befehle unten sind der gesamte Setup-Aufwand.</p>
+    <div data-befehl="B01"></div>
+    <div data-befehl="B02"></div>
+    <div class="warn-box">
+      <h3>Rot ist richtig</h3>
+      <p>Nach <code>pytest</code> erscheint <code>ModuleNotFoundError: No module named 'app.main'</code>. Der Test in
+        <code>backend/tests/test_api.py</code> beschreibt, was die App können soll, bevor es den Code gibt. Er wird in
+        Lab 01 grün.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="struktur">
+    <h2>Was im Starter liegt</h2>
+    <p>Die Struktur ist vorgegeben, damit in der knappen Zeit niemand über Pfade verhandelt. Backend, Frontend und Tests
+      liegen getrennt. Die Datenbank liegt im Backend, ihr Schema daneben.</p>
+    <pre class="code-block">FitTrack/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   └── data/
+│   │       ├── fittrack.db        # SQLite-Datenbank, 311 Trainingseinheiten
+│   │       └── schema.sql         # Tabellen sportart und workout, Sicht v_workout
+│   └── tests/
+│       ├── conftest.py            # baut die Testdatenbank aus schema.sql und dem Fixture
+│       ├── fixtures/workouts_klein.sql   # 8 Einheiten, von Hand nachrechenbar
+│       └── test_api.py            # ein Test: test_health, noch rot
+├── frontend/                      # entsteht in Sprint 2
+├── scripts/generate_workouts.py   # erzeugt fittrack.db reproduzierbar
+├── docs/                          # Setup-Anleitung, Checklisten
+├── pytest.ini
+├── requirements.txt
+└── README.md                      # Backlog, Datenmodell, Setup</pre>
+    <div class="info-box">
+      <h3>Zwei Datenbanken, ein Schema</h3>
+      <p><code>fittrack.db</code> sind die Echtdaten der App. Die Tests bauen bei jedem Lauf aus <code>schema.sql</code>
+        und <code>workouts_klein.sql</code> eine eigene, temporäre Datenbank mit acht Einheiten. Testdaten sind nicht
+        Produktionsdaten. Warum das für die Erwartungswerte wichtig ist, zeigt Lab 03.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="scrum">
+    <h2>Micro-Scrum</h2>
+    <p>Scrum wird hier nicht zitiert, sondern auf das eingedampft, was in vier Stunden tatsächlich entsteht. Drei Rollen
+      trennen Perspektiven, und das ist der Kern: Wer die Erwartung formuliert, promptet nicht selbst.</p>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Product Owner</div>
+        <p>Formuliert die User Stories mit Akzeptanzkriterien, entscheidet, was in den Sprint kommt, nimmt ab oder gibt
+          zurück.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Developer</div>
+        <p>Promptet, liest den Vorschlag, übernimmt ihn in WebStorm und passt ihn an. Verantwortet, dass jede Zeile
+          erklärbar ist.</p>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Quality und Review</div>
+        <p>Legt die Erwartungswerte fest, pflegt die Tests, führt die Review-Checkliste. Sagt Nein, wenn etwas offen
+          ist.</p>
+      </div>
+    </div>
+    <p>Die Rollen rotieren über die drei Sprints. Jede Person trägt einmal jede Rolle, damit niemand die Prüfung an
+      eine einzige Person delegiert.</p>
+    <div class="diagramm">
+      <pre class="mermaid">
+stateDiagram-v2
+    direction LR
+    Backlog --> SprintBacklog : in den Sprint gezogen
+    SprintBacklog --> TestRot : Test aus dem Kriterium
+    TestRot --> TestGruen : Code geprüft und übernommen
+    TestGruen --> Review : Demo am Gerät
+    Review --> Done : PO nimmt ab
+    Review --> SprintBacklog : PO gibt zurück
+      </pre>
+      <div class="unterschrift">Eine Story durchläuft sechs Zustände. Es gibt genau einen Rückweg: Der Product Owner kann im Review zurückgeben.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="dod">
+    <h2>Definition of Done</h2>
+    <p>Fertig ist eine Liste, die für jede Story gleich lautet. Sie mischt bewusst zwei Nachweisarten: Die Maschine
+      prüft die Tests, der Mensch prüft das Verhalten am Gerät.</p>
+    <div class="karten">
+      <div class="karte">
+        <div class="kopfzeile">Nachweis durch die Maschine</div>
+        <ul>
+          <li>Code läuft lokal ohne Fehler</li>
+          <li>Zugehörige Tests vorhanden und grün (<code>pytest</code>)</li>
+          <li>Commit und Push mit Story-Bezug, etwa <code>feat(US-2): Kennzahlen-Endpunkt</code></li>
+        </ul>
+      </div>
+      <div class="karte">
+        <div class="kopfzeile">Nachweis durch den Menschen</div>
+        <ul>
+          <li>Akzeptanzkriterium am Gerät vorgeführt</li>
+          <li>Mindestens eine weitere Person hat den Code nach der Review-Checkliste geprüft</li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-box">
+      <h3>Warum beides</h3>
+      <p>Eine grüne Testreihe belegt, dass der Code tut, was die Tests beschreiben. Ob die Tests die Story beschreiben,
+        kann nur ein Mensch beurteilen. Deshalb steht die Demo gleichberechtigt daneben.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="backlog">
+    <h2>Das Product Backlog</h2>
+    <p>Sechs User Stories in derselben Form: Nutzen und Akzeptanzkriterium. Damit sind sie prompt- und prüfbar
+      zugleich. Bei Zeitnot sind US-1 und US-3 Pflicht, US-2 ist verhandelbar. Diese Entscheidung fällt beim Planen,
+      nicht unter Druck kurz vor dem Review.</p>
+    <div class="story"><strong>US-1 · Daten abrufen.</strong> Als Nutzer möchte ich alle meine Trainingseinheiten als JSON abrufen, damit die App sie anzeigen kann. <em>Akzeptanz:</em> <code>GET /api/workouts</code> liefert Status 200 und eine Liste; jedes Element enthält id, datum, sportart, dauer_min, distanz_km, kalorien.</div>
+    <div class="story"><strong>US-2 · Kennzahlen.</strong> Als Nutzer möchte ich meine Kennzahlen abrufen, damit ich meinen Fortschritt sehe. <em>Akzeptanz:</em> <code>GET /api/stats</code> liefert gesamt_km, durchschnitt_km_pro_woche, lieblingssportart, anzahl, korrekt berechnet für die Testdaten.</div>
+    <div class="story"><strong>US-3 · Health.</strong> Als Entwickler möchte ich einen Health-Endpunkt, damit ich später im Container prüfen kann, ob die App läuft. <em>Akzeptanz:</em> <code>GET /health</code> liefert <code>{"status": "ok"}</code>.</div>
+    <div class="story"><strong>US-4 · Dashboard.</strong> Als Nutzer möchte ich die App auf dem Smartphone öffnen und ein übersichtliches Dashboard sehen. <em>Akzeptanz:</em> <code>GET /</code> liefert die Seite; bei 375 px Breite kein horizontales Scrollen; Karten stapeln sich; Touch-Targets mindestens 44 px.</div>
+    <div class="story"><strong>US-5 · Kennzahlen und Liste.</strong> Als Nutzer möchte ich meine Kennzahlen und die letzten Trainings sehen. <em>Akzeptanz:</em> Kennzahl-Karten und Liste werden per fetch aus <code>/api/stats</code> und <code>/api/workouts</code> gefüllt, nichts ist hartkodiert.</div>
+    <div class="story"><strong>US-6 · Wochenverlauf.</strong> Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen und den Zeitraum wählen. <em>Akzeptanz:</em> <code>GET /api/stats/wochen</code> liefert je Kalenderwoche distanz_km und anzahl, auch für Wochen ohne Training; das Diagramm zeigt diese Daten; Umschalter 8 W / 6 M / 1 J / Alles.</div>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Vier Übungen: eine Checkliste für den eigenen Rechner, eine an der Konsole, zwei zum Vorgehensmodell.</p>
+    <div data-uebung="P00-01"></div>
+    <div data-uebung="P00-02"></div>
+    <div data-uebung="P00-03"></div>
+    <div data-uebung="P00-04"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Der Starter liegt auf dem Branch <code>starter</code>. Nach venv und <code>pip install</code> ist der erste Test rot, und das ist der Plan.</li>
+      <li>Drei Rollen trennen Perspektiven: Wer die Erwartung festlegt, promptet nicht selbst. Die Rollen rotieren je Sprint.</li>
+      <li>Die Definition of Done verlangt beides: grüne Tests und eine Demo am Gerät, dazu ein Review durch eine zweite Person.</li>
+      <li>Sechs Stories mit Akzeptanzkriterien bilden das Backlog. US-1 und US-3 sind Pflicht.</li>
+      <li>Zwei Datenbanken, ein Schema: Echtdaten in <code>fittrack.db</code>, Testdaten als SQL-Datei, die die Tests selbst einspielen.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 00 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs'
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', themeVariables: { primaryColor: '#F7ECEE', primaryBorderColor: '#7A1E32', primaryTextColor: '#1F171A', lineColor: '#7A1E32', secondaryColor: '#F9F0DC', tertiaryColor: '#FAF6F6', fontFamily: 'Manrope, sans-serif' } })
+</script>
+</body>
+</html>

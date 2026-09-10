@@ -1,0 +1,331 @@
+{
+  "befehle": {
+    "B01": {
+      "titel": {
+        "de": "Tests laufen lassen",
+        "en": "Run the tests"
+      },
+      "befehl": "pytest",
+      "ausgabe": ".                                                                        [100%]\n1 passed in 0.15s",
+      "teile": [
+        {
+          "was": "pytest",
+          "bedeutet": {
+            "de": "Ein Punkt je bestandenem Test. Ist etwas rot, steht darunter der Traceback: Datei, Zeile, Erwartung, tatsächlicher Wert. Genau diesen Block kopieren Sie in den Chat, nicht eine Umschreibung.",
+            "en": "One dot per passed test. If something is red, the traceback follows: file, line, expectation, actual value. Copy exactly that block into the chat, not a paraphrase."
+          }
+        }
+      ]
+    },
+    "B02": {
+      "titel": {
+        "de": "Server starten",
+        "en": "Start the server"
+      },
+      "befehl": "uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
+      "teile": [
+        {
+          "was": "backend.app.main:app",
+          "bedeutet": {
+            "de": "Modulpfad und Objektname, getrennt durch Doppelpunkt: Datei backend/app/main.py, darin die Variable app.",
+            "en": "Module path and object name separated by a colon: file backend/app/main.py, variable app inside it."
+          }
+        },
+        {
+          "was": "--reload",
+          "bedeutet": {
+            "de": "Startet den Server bei jeder gespeicherten Änderung neu. Nur für die Entwicklung, im Container fehlt der Schalter.",
+            "en": "Restarts the server on every saved change. Development only; the container omits the flag."
+          }
+        },
+        {
+          "was": "--host 0.0.0.0",
+          "bedeutet": {
+            "de": "Bindet an alle Netzwerkadressen. Ohne das antwortet der Server nur auf localhost, und das Handy im WLAN sieht nichts.",
+            "en": "Binds to all network addresses. Without it the server answers only on localhost and the phone sees nothing."
+          }
+        }
+      ]
+    },
+    "B03": {
+      "titel": {
+        "de": "Commit mit Story-Bezug",
+        "en": "Commit referencing the story"
+      },
+      "befehl": "git add backend/app/main.py\ngit commit -m \"feat(US-3): Health-Endpunkt\"\ngit push",
+      "teile": [
+        {
+          "was": "git add …",
+          "bedeutet": {
+            "de": "Merkt die Datei für den Commit vor. Was nicht vorgemerkt ist, wandert nicht in den Commit.",
+            "en": "Stages the file for the commit. What is not staged does not go into the commit."
+          }
+        },
+        {
+          "was": "feat(US-3): …",
+          "bedeutet": {
+            "de": "Typ, Story, Kurzbeschreibung. Die Historie zeigt so, welcher Commit welche Anforderung erfüllt. Das ist ein Punkt der Endabnahme.",
+            "en": "Type, story, short description. The history then shows which commit fulfils which requirement."
+          }
+        },
+        {
+          "was": "git push",
+          "bedeutet": {
+            "de": "Schiebt den Commit nach GitHub. Ab Lab 07 löst das den Deploy bei Render und die Tests in GitHub Actions aus.",
+            "en": "Pushes the commit to GitHub. From lab 07 on this triggers the Render deploy and the tests in GitHub Actions."
+          }
+        }
+      ]
+    }
+  },
+  "uebungen": [
+    {
+      "id": "P01-01",
+      "typ": "quiz",
+      "titel": {
+        "de": "Die Reihenfolge",
+        "en": "The order"
+      },
+      "aufgabe": {
+        "de": "<p>Drei Fragen dazu, warum die Schleife so herum läuft und nicht anders.</p>",
+        "en": "<p>Three questions on why the loop runs this way round.</p>"
+      },
+      "fragen": [
+        {
+          "frage": {
+            "de": "Der Test ist nach dem Übernehmen des Codes immer noch rot. Was ist der nächste Schritt?",
+            "en": "The test is still red after taking over the code. What is the next step?"
+          },
+          "optionen": [
+            {
+              "de": "Den Traceback wörtlich kopieren und in den Chat zurückgeben.",
+              "en": "Copy the traceback verbatim and hand it back to the chat."
+            },
+            {
+              "de": "Den Test so ändern, dass er zum Code passt.",
+              "en": "Change the test so it matches the code."
+            },
+            {
+              "de": "Dem Chat schreiben, dass es „irgendwie nicht geht“.",
+              "en": "Tell the chat that it “somehow does not work”."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "Der Test ist die Spezifikation und bleibt stehen. Die Fehlermeldung enthält Datei, Zeile und den tatsächlichen Wert, alles, was das Modell für eine Korrektur braucht. Paraphrasen verlieren genau diese Information.",
+            "en": "The test is the specification and stays. The error message carries everything the model needs."
+          }
+        },
+        {
+          "frage": {
+            "de": "Warum steht im Prompt der komplette Test, obwohl er im Repository liegt?",
+            "en": "Why does the prompt contain the full test although it sits in the repository?"
+          },
+          "optionen": [
+            {
+              "de": "Weil der Chat das Repository nicht sieht. Alles, was das Modell wissen muss, steht im Prompt.",
+              "en": "Because the chat does not see the repository."
+            },
+            {
+              "de": "Weil FastAPI den Test zum Starten braucht.",
+              "en": "Because FastAPI needs the test to start."
+            },
+            {
+              "de": "Damit das Modell den Test umschreiben kann.",
+              "en": "So the model can rewrite the test."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "Im Chat-Workflow gibt es keinen Werkzeugzugriff. Der Prompt muss in sich geschlossen sein: Struktur, Datenmodell, bestehender Code als Ausschnitt, Tests.",
+            "en": "In the chat workflow there is no tool access; the prompt has to be self-contained."
+          }
+        },
+        {
+          "frage": {
+            "de": "Das Modell liefert main.py mit CORS-Middleware und einer Logging-Konfiguration. Was tun?",
+            "en": "The model returns main.py with CORS middleware and a logging configuration. What do you do?"
+          },
+          "optionen": [
+            {
+              "de": "Weglassen. Ungefragte Zutaten gehören nicht in den Commit, auch wenn sie funktionieren.",
+              "en": "Leave them out. Uninvited additions do not belong in the commit, even if they work."
+            },
+            {
+              "de": "Übernehmen, das Modell wird schon wissen, warum.",
+              "en": "Take them over, the model will know why."
+            },
+            {
+              "de": "Übernehmen und die Tests dafür vom Modell schreiben lassen.",
+              "en": "Take them over and let the model write tests for them."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "Jede Zeile muss jemand in der Gruppe erklären können. Was niemand angefordert hat und niemand erklären kann, wird gestrichen. Kleiner Code ist prüfbarer Code.",
+            "en": "Every line must be explainable by someone in the group."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P01-02",
+      "typ": "zuordnen",
+      "titel": {
+        "de": "Wer macht was in der Schleife",
+        "en": "Who does what in the loop"
+      },
+      "aufgabe": {
+        "de": "<p>Ordnen Sie jeden Schritt der Rolle zu, die ihn im Kurs trägt.</p>",
+        "en": "<p>Assign each step to the role that carries it.</p>"
+      },
+      "ziele": [
+        {
+          "id": "po",
+          "text": {
+            "de": "Product Owner",
+            "en": "Product owner"
+          }
+        },
+        {
+          "id": "dev",
+          "text": {
+            "de": "Developer",
+            "en": "Developer"
+          }
+        },
+        {
+          "id": "qa",
+          "text": {
+            "de": "Quality und Review",
+            "en": "Quality and review"
+          }
+        }
+      ],
+      "paare": [
+        {
+          "begriff": {
+            "de": "Formuliert Story und Akzeptanzkriterium",
+            "en": "Formulates story and acceptance criterion"
+          },
+          "ziel": "po"
+        },
+        {
+          "begriff": {
+            "de": "Schreibt den Test und legt die Erwartungswerte fest",
+            "en": "Writes the test and sets the expected values"
+          },
+          "ziel": "qa"
+        },
+        {
+          "begriff": {
+            "de": "Promptet und übernimmt den Code in WebStorm",
+            "en": "Prompts and takes the code into WebStorm"
+          },
+          "ziel": "dev"
+        },
+        {
+          "begriff": {
+            "de": "Führt die Review-Checkliste am übernommenen Code",
+            "en": "Runs the review checklist on the adopted code"
+          },
+          "ziel": "qa"
+        },
+        {
+          "begriff": {
+            "de": "Nimmt die Story nach der Demo ab oder gibt sie zurück",
+            "en": "Accepts the story after the demo or returns it"
+          },
+          "ziel": "po"
+        },
+        {
+          "begriff": {
+            "de": "Committet mit Story-Bezug",
+            "en": "Commits with a story reference"
+          },
+          "ziel": "dev"
+        }
+      ],
+      "rueckmeldung": {
+        "de": "Die Trennung ist der Wirkstoff: Wer die Erwartung festlegt, promptet nicht, und wer promptet, nimmt nicht ab.",
+        "en": "The separation is the active ingredient."
+      }
+    },
+    {
+      "id": "P01-03",
+      "typ": "terminal",
+      "titel": {
+        "de": "Den ersten Commit setzen",
+        "en": "Make the first commit"
+      },
+      "aufgabe": {
+        "de": "<p>Im Projektordner liegt <code>backend/app/main.py</code>. Merken Sie die Änderungen mit <code>git add .</code> vor und committen Sie mit einer Nachricht, die die Story nennt, zum Beispiel <code>feat(US-3): Health-Endpunkt</code>. Danach: <code>git log</code>.</p><p>Diese Konsole hat noch kein Repository. Legen Sie zuerst eines an.</p>",
+        "en": "<p>The project folder contains <code>backend/app/main.py</code>. Stage the file and commit with a message naming the story. Then run <code>git log</code>. This console has no repository yet, so create one first.</p>"
+      },
+      "begruessung": [
+        {
+          "de": "Auftrag 1 von 1. Beginnen Sie mit cd FitTrack.",
+          "en": "Assignment 1 of 1. Start with cd FitTrack."
+        }
+      ],
+      "schritte": [
+        {
+          "text": {
+            "de": "In den Ordner FitTrack wechseln",
+            "en": "Change into FitTrack"
+          },
+          "zustand": {
+            "pfad": "FitTrack"
+          }
+        },
+        {
+          "text": {
+            "de": "Ein Repository anlegen",
+            "en": "Create a repository"
+          },
+          "muster": "^git\\s+init\\b",
+          "zustand": {
+            "gitRepo": true
+          }
+        },
+        {
+          "text": {
+            "de": "Änderungen vormerken: git add .",
+            "en": "Stage changes: git add ."
+          },
+          "muster": "^git\\s+add\\b",
+          "zustand": {
+            "gitIndexGefuellt": true
+          }
+        },
+        {
+          "text": {
+            "de": "Commit mit Story-Bezug, etwa feat(US-3): …",
+            "en": "Commit referencing the story"
+          },
+          "muster": "^git\\s+commit\\b.*US-3",
+          "zustand": {
+            "gitCommits": 1
+          }
+        },
+        {
+          "text": {
+            "de": "Historie ansehen",
+            "en": "Show the history"
+          },
+          "muster": "^git\\s+log\\b"
+        }
+      ],
+      "rueckmeldung": {
+        "de": "Auf dem eigenen Rechner ist das Repository schon da, weil Sie es geklont haben. Dort fällt git init weg, git push kommt dazu.",
+        "en": "On your own machine the repository already exists because you cloned it."
+      }
+    }
+  ]
+}
