@@ -75,7 +75,7 @@ Branches und Tags:
 
 Jeder Schritt im Prompt-Skript hat dieselbe Struktur:
 
-1. Rolle im Micro-Scrum, Sprint, Story
+1. Rolle im Scrum, Sprint, Story
 2. Ziel und Akzeptanzkriterium
 3. Test zuerst: Code, den die Studierenden selbst in `test_api.py` schreiben, plus `pytest`-Aufruf mit erwartetem roten Ergebnis
 4. Prompt zum Kopieren, in sich geschlossen (Kontext, Datenmodell, bestehender Code als Ausschnitt, Randbedingungen, Tests, Bitte um Erklärung)

@@ -1,7 +1,7 @@
 # FitTrack
 
 Eine mobile-first Web-App, die persönliche Trainingsdaten auf dem Smartphone anzeigt.
-Entwickelt im Kurs „Datenbasierte Fallstudien“ als Micro-Scrum-Projekt mit KI-Unterstützung im Chat.
+Entwickelt im Kurs „Datenbasierte Fallstudien“ als agiles Projekt (Scrum im Kleinen) mit KI-Unterstützung im Chat.
 
 **Product Vision:** FitTrack zeigt mir meine Trainingsdaten auf dem Smartphone – verständlich, aktuell, ansprechend.
 

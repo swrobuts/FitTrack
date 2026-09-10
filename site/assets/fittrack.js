@@ -196,7 +196,7 @@ const TERMINAL_HINWEISE = {
  */
 const LABS = [
   { id: 'lab-00', nr: '00', datei: 'lab-00-setup.html', uebungen: 4,
-    titel: { de: 'Setup und Micro-Scrum', en: 'Setup and micro scrum' }, voraussetzung: null,
+    titel: { de: 'Setup und Scrum im Kleinen', en: 'Setup and Scrum in miniature' }, voraussetzung: null,
     zeit: { de: '45 Minuten', en: '45 minutes' },
     ziel: { de: 'Die Werkzeugkette in Betrieb nehmen, die Rollen kennen und den ersten Test rot sehen.', en: 'Get the toolchain running, know the roles and see the first test fail.' } },
   { id: 'lab-01', nr: '01', datei: 'lab-01-health.html', uebungen: 3,

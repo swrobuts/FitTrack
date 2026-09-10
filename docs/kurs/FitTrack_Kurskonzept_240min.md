@@ -2,7 +2,7 @@
 
 **Lehrformat:** 2 Termine à 120 Minuten (Vorführung + Mitmachen)
 **Zielgruppe:** Bachelor Business Analytics (Projekt- und IT-Management)
-**Methodik:** Micro-Scrum (agil), KI-unterstützt, nicht agentisch
+**Methodik:** Scrum im Kleinen (agil), KI-unterstützt, nicht agentisch
 **Philosophie:** Kein reines Vibe Coding – sondern ein echtes Softwareprojekt mit Konzeption, Tests, Abnahme und Deployment
 
 > **Stand 10.09.2026, auf die Referenzlösung fortgeschrieben.** Die ursprüngliche Fassung sah eine JSON-Datei, VS Code und rund 30 Datensätze vor. Die Referenzlösung nutzt SQLite mit versioniertem Schema, WebStorm, 311 Einheiten über zwei Jahre, einen Deploy auf Render und eine siebte Story aus dem Semantik-Review des Dashboards. Materialien: Foliendeck `Winf_FitTrack.pptx`, Lernumgebung <https://swrobuts.github.io/FitTrack/>, Prompt-Skript `docs/dozent/prompt-skript.md`, Live-App <https://fittrack-k7gg.onrender.com>.
@@ -117,7 +117,7 @@ docker ps / docker stop <id>        # laufende Container sehen/stoppen
 
 ---
 
-## 4. Vorgehensmodell: Micro-Scrum
+## 4. Vorgehensmodell: Scrum im Kleinen
 
 ### Rollen (in 3er-Gruppen rotierend)
 
