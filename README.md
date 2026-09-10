@@ -5,6 +5,12 @@ Entwickelt im Kurs „Datenbasierte Fallstudien“ als Micro-Scrum-Projekt mit K
 
 **Product Vision:** FitTrack zeigt mir meine Trainingsdaten auf dem Smartphone – verständlich, aktuell, ansprechend.
 
+| | |
+|---|---|
+| **Lernumgebung** | <https://swrobuts.github.io/FitTrack/> – zehn Labs mit Prompts, Diagrammen, Konsole und SQLite im Browser |
+| **Live-App** | <https://fittrack-k7gg.onrender.com> – die fertige Referenz auf Render |
+| **Starter für Studierende** | Branch [`starter`](https://github.com/swrobuts/FitTrack/tree/starter) |
+
 ## Ordnerstruktur
 
 ```text
