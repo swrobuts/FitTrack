@@ -78,7 +78,33 @@
     <button type="button" class="kachel tippbar" data-kennzahl="anzahl" role="listitem"><span class="kachel-label">Einheiten gesamt</span><span class="kachel-wert"><span id="stat-anzahl">…</span></span></button>
   </div>
 
-  <!-- 3. Verlauf: ein Balken je Woche, Ziel als Linie. Tippen auf einen Balken öffnet die Woche. -->
+  <!-- 3. Sportarten: eine Kachel je Sportart. Tippen öffnet die Sportart mit Filter für die Liste. -->
+  <section id="sportarten" class="karte" aria-labelledby="sportarten-titel">
+    <div class="karte-kopf">
+      <div>
+        <h2 id="sportarten-titel" class="karte-titel">Sportarten</h2>
+        <p class="karte-untertitel">Anteil an allen Kilometern.</p>
+      </div>
+    </div>
+    <div id="sport-kacheln" class="sport-kacheln"></div>
+  </section>
+
+  <!-- 4. Die letzten Trainingseinheiten. Tippen öffnet die Einheit. -->
+  <section id="aktivitaeten" class="karte" aria-labelledby="aktivitaeten-titel">
+    <div class="karte-kopf">
+      <h2 id="aktivitaeten-titel" class="karte-titel">Letzte Aktivitäten</h2>
+      <button id="filter-aufheben" type="button" class="knopf knopf-klein" hidden>Filter aufheben</button>
+    </div>
+    <ol id="aktivitaeten-liste" class="aktivitaeten-liste">
+      <li class="hinweis">…</li>
+    </ol>
+    <div class="liste-aktionen">
+      <button id="mehr-anzeigen" type="button" class="knopf" hidden>20 weitere anzeigen</button>
+      <button id="alle-anzeigen" type="button" class="knopf knopf-leise" hidden>Alle anzeigen</button>
+    </div>
+  </section>
+
+  <!-- 5. Verlauf: ein Balken je Woche, Ziel als Linie. Tippen auf einen Balken öffnet die Woche. -->
   <section id="verlauf" class="karte" aria-labelledby="verlauf-titel">
     <div class="karte-kopf">
       <div>
@@ -107,7 +133,7 @@
     </table>
   </section>
 
-  <!-- 4. Trainingskalender: ein Feld je Tag, Farbe nach Kilometern. Tippen öffnet den Tag. -->
+  <!-- 6. Trainingskalender: ein Feld je Tag, Farbe nach Kilometern. Tippen öffnet den Tag. -->
   <section id="kalender" class="karte" aria-labelledby="kalender-titel">
     <div class="karte-kopf">
       <div>
@@ -119,32 +145,6 @@
       <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
     </div>
     <div id="kalender-raster" class="kalender-raster" role="grid" aria-label="Tage mit Training"></div>
-  </section>
-
-  <!-- 5. Sportarten: eine Kachel je Sportart. Tippen öffnet die Sportart mit Filter für die Liste. -->
-  <section id="sportarten" class="karte" aria-labelledby="sportarten-titel">
-    <div class="karte-kopf">
-      <div>
-        <h2 id="sportarten-titel" class="karte-titel">Sportarten</h2>
-        <p class="karte-untertitel">Anteil an allen Kilometern.</p>
-      </div>
-    </div>
-    <div id="sport-kacheln" class="sport-kacheln"></div>
-  </section>
-
-  <!-- 6. Die letzten Trainingseinheiten. Tippen öffnet die Einheit. -->
-  <section id="aktivitaeten" class="karte" aria-labelledby="aktivitaeten-titel">
-    <div class="karte-kopf">
-      <h2 id="aktivitaeten-titel" class="karte-titel">Letzte Aktivitäten</h2>
-      <button id="filter-aufheben" type="button" class="knopf knopf-klein" hidden>Filter aufheben</button>
-    </div>
-    <ol id="aktivitaeten-liste" class="aktivitaeten-liste">
-      <li class="hinweis">…</li>
-    </ol>
-    <div class="liste-aktionen">
-      <button id="mehr-anzeigen" type="button" class="knopf" hidden>20 weitere anzeigen</button>
-      <button id="alle-anzeigen" type="button" class="knopf knopf-leise" hidden>Alle anzeigen</button>
-    </div>
   </section>
 
 </main>

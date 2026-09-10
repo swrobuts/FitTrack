@@ -170,7 +170,7 @@ svg { display: block; }
 /* Kennzahlen: 2 Spalten auf dem Handy, jede Kachel ein Knopf */
 .kennzahlen { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .kachel {
-  border: 1px solid var(--linie); border-radius: var(--radius); background: transparent;
+  border: 0; border-radius: var(--radius); background: var(--karte);
   padding: 14px 16px; min-height: 92px; text-align: left;
   display: flex; flex-direction: column; justify-content: center; gap: 10px;
 }
@@ -311,8 +311,8 @@ svg { display: block; }
     grid-template-areas:
       "kopf kopf"
       "woche kennzahlen"
-      "verlauf kalender"
-      "sportarten aktivitaeten";
+      "sportarten aktivitaeten"
+      "verlauf kalender";
     gap: 20px;
   }
   .kopf { grid-area: kopf; }
@@ -321,7 +321,7 @@ svg { display: block; }
   #verlauf { grid-area: verlauf; display: flex; flex-direction: column; }
   #verlauf .diagramm-flaeche { flex: 1; min-height: 240px; }
   #kalender { grid-area: kalender; }
-  #sportarten { grid-area: sportarten; align-self: start; }
+  #sportarten { grid-area: sportarten; }
   #aktivitaeten { grid-area: aktivitaeten; }
   .karte-kopf { flex-direction: row; align-items: flex-start; justify-content: space-between; }
   .karte-kopf .karte-titel { white-space: nowrap; }
