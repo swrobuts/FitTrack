@@ -67,7 +67,7 @@
         { "begriff": { "de": "Umschalter 8 W / 6 M / 1 J / Alles wechselt das Diagramm", "en": "Period switch changes the chart" }, "ziel": "us6" },
         { "begriff": { "de": "test_index_liefert_html", "en": "test_index_liefert_html" }, "ziel": "us4" }
       ],
-      "rueckmeldung": { "de": "Eine Story kann mehrere Nachweise haben, maschinelle und menschliche. Ein Nachweis ohne Story ist ein Befund.", "en": "A story can have several proofs." }
+      "rueckmeldung": { "de": "Eine Story kann mehrere Nachweise haben, maschinelle und menschliche. Ein Nachweis, der zu keiner Story gehört, deutet auf eine Lücke in der Planung hin.", "en": "A story can have several proofs." }
     },
     {
       "id": "P05-04", "typ": "checkliste",

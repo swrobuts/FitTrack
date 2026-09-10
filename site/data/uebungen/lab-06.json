@@ -27,7 +27,7 @@
       "teile": [
         { "was": "docker ps", "bedeutet": { "de": "Zeigt laufende Container mit Ports. Mit -a auch die gestoppten.", "en": "Shows running containers with ports; -a includes stopped ones." } },
         { "was": "curl …/health", "bedeutet": { "de": "Die Antwort {\"status\": \"ok\"} kommt aus dem Container. Das ist die Demo für den PO, danach das Handy im WLAN.", "en": "The answer comes from the container." } },
-        { "was": "docker logs fittrack", "bedeutet": { "de": "Zeigt die Ausgabe von uvicorn, also jede Anfrage. Erster Griff bei Fehlern.", "en": "Shows uvicorn's output, every request." } },
+        { "was": "docker logs fittrack", "bedeutet": { "de": "Zeigt die Ausgabe von uvicorn, also jede Anfrage. Erste Anlaufstelle bei Fehlern.", "en": "Shows uvicorn's output, every request." } },
         { "was": "docker stop fittrack", "bedeutet": { "de": "Hält den Container an. Er bleibt mit docker ps -a sichtbar und lässt sich mit docker start fittrack wieder starten.", "en": "Stops the container; it stays visible with ps -a." } }
       ]
     },

@@ -86,7 +86,7 @@
       </table>
     </div>
     <div class="concept-box">
-      <h3>Die Datenbank reist mit</h3>
+      <h3>Die Datenbank ist Teil des Images</h3>
       <p><code>COPY backend/ ./backend/</code> nimmt <code>fittrack.db</code> mit ins Image. Für eine App, die nur liest,
         ist das richtig. Sobald eine App schreibt, gehört die Datenbank in ein Volume außerhalb des Containers, sonst
         sind die Daten beim nächsten Neubau weg. Für FitTrack, das nur liest, ist das nicht nötig.</p>
@@ -127,7 +127,7 @@ flowchart TB
     </div>
     <div class="warn-box">
       <h3>Zwei Stolpersteine</h3>
-      <p><code>--host 0.0.0.0</code> muss sein, sonst ist der Container von außen stumm. Und die CMD steht als
+      <p><code>--host 0.0.0.0</code> muss sein, sonst ist der Container von außen nicht erreichbar. Und die CMD steht als
         <code>["sh", "-c", "…"]</code>, weil nur eine Shell <code>${PORT:-8000}</code> auswertet. In der Exec-Form ohne
         Shell bliebe der Text wörtlich stehen.</p>
     </div>
@@ -177,7 +177,7 @@ Erkläre in drei Sätzen, warum requirements.txt vor dem Code kopiert wird.</pre
 
   <section class="section-block" id="desktop">
     <h2>Docker Desktop und WebStorm</h2>
-    <p>Die Befehle bleiben Lernziel. Docker Desktop und WebStorm sind die Bequemlichkeit obendrauf.</p>
+    <p>Die Befehle bleiben Lernziel. Docker Desktop und WebStorm sind eine Erleichterung, kein Ersatz.</p>
     <div class="shot">
       <img src="assets/img/docker-desktop-images.png" alt="Docker Desktop, Reiter Images, mit dem gebauten Image fittrack" loading="lazy">
       <div class="unterschrift">Docker Desktop, Images: Das gebaute Image <code>fittrack</code> mit 303 MB, daneben das Basis-Image <code>python:3.12-slim</code>.</div>
@@ -234,7 +234,7 @@ Erkläre in drei Sätzen, warum requirements.txt vor dem Code kopiert wird.</pre
     <ul>
       <li>Image ist der Bauplan, Container die laufende Instanz. <code>docker images</code> und <code>docker ps -a</code> zeigen beide.</li>
       <li>Abhängigkeiten vor dem Code kopieren, damit der Schichten-Cache greift.</li>
-      <li><code>--host 0.0.0.0</code> und die Shell-Form der CMD sind die zwei Stolpersteine, die den Container stumm machen.</li>
+      <li><code>--host 0.0.0.0</code> und die Shell-Form der CMD sind die zwei Stolpersteine, die den Container von außen unerreichbar machen.</li>
       <li><code>-p 8001:8000</code> weicht einem belegten Port aus. Links Rechner, rechts Container.</li>
       <li>Compose macht aus Bauen und Starten einen Befehl. <code>stop</code> hält an, <code>down</code> entfernt.</li>
     </ul>

@@ -152,7 +152,7 @@
           },
           "optionen": [
             {
-              "de": "Weglassen. Ungefragte Zutaten gehören nicht in den Commit, auch wenn sie funktionieren.",
+              "de": "Weglassen. Nicht angeforderte Ergänzungen gehören nicht in den Commit, auch wenn sie funktionieren.",
               "en": "Leave them out. Uninvited additions do not belong in the commit, even if they work."
             },
             {

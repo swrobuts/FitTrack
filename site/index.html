@@ -79,7 +79,7 @@
       </thead>
       <tbody>
         <tr><td>0</td><td><code>sprint-0</code></td><td>Starter</td><td>Struktur, <code>schema.sql</code>, <code>fittrack.db</code>, SQL-Testdaten, ein erster Test, der noch fehlschlägt</td><td><a href="lab-00-setup.html" data-lab-link>Lab 00</a></td></tr>
-        <tr><td>1</td><td><code>us-3</code></td><td>US-3</td><td><code>GET /health</code>, die Schleife einmal ganz</td><td><a href="lab-01-health.html" data-lab-link>Lab 01</a></td></tr>
+        <tr><td>1</td><td><code>us-3</code></td><td>US-3</td><td><code>GET /health</code>, die Schleife einmal vollständig durchlaufen</td><td><a href="lab-01-health.html" data-lab-link>Lab 01</a></td></tr>
         <tr><td>2</td><td><code>us-1</code></td><td>US-1</td><td><code>daten.py</code> liest die Sicht <code>v_workout</code>, <code>GET /api/workouts</code></td><td><a href="lab-02-daten.html" data-lab-link>Lab 02</a></td></tr>
         <tr><td>3</td><td><code>us-2</code></td><td>US-2</td><td><code>statistik.py</code>, <code>GET /api/stats</code>, Erwartungswerte von Hand</td><td><a href="lab-03-kennzahlen.html" data-lab-link>Lab 03</a></td></tr>
         <tr><td>4</td><td><code>us-4</code></td><td>US-4</td><td>Mobile-first Gerüst, FastAPI liefert <code>frontend/</code> aus</td><td rowspan="3"><a href="lab-04-frontend.html" data-lab-link>Lab 04</a></td></tr>
@@ -134,7 +134,7 @@
       <h3>US-3: Der Health-Endpunkt</h3>
       <div class="sub">Test schlägt fehl, Prompt, Prüfen, Test besteht, Commit</div>
       <div class="desc">Der kleinste Endpunkt der App, gewählt, weil er die ganze Schleife in zehn Minuten zeigt. Und
-        weil der Container und Render ihn später als Lebenszeichen brauchen.</div>
+        weil Docker und Render später über ihn prüfen, ob die App läuft.</div>
       <div class="meta">3 Übungen · 30 Min</div>
     </a>
 
@@ -178,7 +178,7 @@
       <div class="lab-num">06</div>
       <h3>Docker: Image und Container</h3>
       <div class="sub">Dockerfile, build, run, compose</div>
-      <div class="desc">Acht Zeilen Dockerfile, drei Befehle, ein Handy im WLAN. Warum die Abhängigkeiten vor dem Code
+      <div class="desc">Acht Zeilen Dockerfile, drei Befehle, dann der Test auf dem Handy im WLAN. Warum die Abhängigkeiten vor dem Code
         kopiert werden und wieso der Port aus einer Variablen kommt. Mit Konsole zum Üben.</div>
       <div class="meta">4 Übungen · 45 Min</div>
     </a>

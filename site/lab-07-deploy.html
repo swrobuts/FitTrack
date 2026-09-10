@@ -110,7 +110,7 @@ flowchart LR
       <div class="unterschrift">Der Dienst <code>fittrack</code> bei Render: Docker, Free, Blueprint managed, Live. Jede Zeile in der Deploy-Liste ist ein Push mit seiner Commit-Nachricht.</div>
     </div>
     <div class="info-box">
-      <h3>Dafür war US-3</h3>
+      <h3>Der Grund für US-3</h3>
       <p><code>healthCheckPath: /health</code> ist der Grund, warum der Health-Endpunkt eine eigene Story war. Render
         leitet erst Verkehr weiter, wenn dieser Pfad mit 200 antwortet. Und der Port: Render setzt <code>PORT</code>,
         das Dockerfile liest ihn. Ohne diese Zeile startet der Dienst, antwortet aber nie.</p>

@@ -66,7 +66,7 @@
   <section class="section-block" id="schleife">
     <h2>Die Schleife</h2>
     <p>Der Ablauf ist bewusst nicht agentisch: Das Modell schlägt vor, übernommen wird von Hand. Die Prüfstelle zwischen
-      Vorschlag und Editor ist der Ort, an dem aus Textproduktion Entwicklung wird.</p>
+      Vorschlag und Editor ist der Schritt, der aus einem Textvorschlag geprüften Code macht.</p>
     <div class="diagramm">
       <pre class="mermaid">
 flowchart TD
@@ -221,7 +221,7 @@ Gib nur die Datei main.py aus und erkläre in drei Sätzen deine Entscheidungen.
   <section class="section-block" id="pruefen">
     <h2>Prüfpunkte für die Antwort</h2>
     <ul class="pruefpunkte">
-      <li><strong>Genau eine Datei?</strong> Hat das Modell etwas Ungefragtes ergänzt, etwa Middleware, CORS oder Logging? Weglassen.</li>
+      <li><strong>Genau eine Datei?</strong> Hat das Modell etwas ergänzt, das nicht angefordert war, etwa Middleware, CORS oder Logging? Weglassen.</li>
       <li><strong>Steht <code>app = FastAPI(...)</code> auf Modulebene?</strong> Der Test importiert <code>app</code> aus <code>app.main</code>.</li>
       <li><strong>Existiert jeder Import?</strong> Halluzinierte Pakete sind der häufigste Fehler generierten Codes.</li>
       <li><strong>Können Sie jede Zeile erklären?</strong> Wenn nicht, nachfragen, bevor Sie übernehmen.</li>
