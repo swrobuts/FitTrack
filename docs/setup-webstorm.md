@@ -77,3 +77,34 @@ uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
 3. Auf dem Smartphone im selben WLAN `http://<IP>:8000` öffnen.
 
 Wenn das Handy nicht zugreifen kann: Firewall des Rechners prüfen, oder Hotspot vom Handy nutzen und den Rechner damit verbinden.
+
+## 9. Docker aus WebStorm heraus (statt Terminal)
+
+Das Docker-Plugin ist in WebStorm enthalten. Damit lassen sich Image bauen und Container starten per Klick. Docker Desktop muss dafür laufen.
+
+### Einmalig: Docker-Verbindung anlegen
+
+Ohne diesen Schritt erscheint beim Klick auf den grünen Pfeil die Meldung `Error running 'docker-compose.yml': Server is not specified`.
+
+1. `Settings → Build, Execution, Deployment → Docker`.
+2. Auf `+` klicken, `Docker for Mac` (Windows: `Docker for Windows`) wählen.
+3. Unten muss `Connection successful` erscheinen. `OK`.
+
+Falls die Verbindung fehlschlägt: In Docker Desktop unter `Settings → Advanced` den Punkt `Allow the default Docker socket to be used` aktivieren und Docker Desktop neu starten.
+
+### Container starten
+
+- In `docker-compose.yml` steht links neben `services:` ein grüner Doppelpfeil. Ein Klick baut das Image und startet den Container. Beim ersten Mal fragt WebStorm nach dem Docker-Server: die eben angelegte Verbindung wählen.
+- Alternativ in der `Dockerfile` neben `FROM` auf den Pfeil klicken → `Run on Docker`. Das baut das Image und startet einen Container ohne Port-Zuordnung. Diese ergänzt man in der Run-Konfiguration unter `Bind ports`: `8000` auf dem Rechner → `8000` im Container.
+
+Unten öffnet sich das Fenster `Services`. Dort stehen Logs, ein Stop-Knopf und unter `Ports` ein Link, der die App im Browser öffnet.
+
+### Port 8000 belegt
+
+In der Run-Konfiguration der `docker-compose.yml` (Bearbeiten über das Dropdown oben rechts → `Edit Configurations…`) unter `Environment variables` den Eintrag `FITTRACK_PORT=8001` setzen. Dann ist die App unter <http://localhost:8001> erreichbar.
+
+### Was Docker Desktop selbst kann
+
+Docker Desktop zeigt unter `Containers` und `Images` alles an, was WebStorm oder das Terminal gebaut haben: starten, stoppen, Logs lesen, Port-Link öffnen. Ein Image aus einem Dockerfile bauen kann Docker Desktop nicht. Dafür braucht es WebStorm oder das Terminal.
+
+Für den Kurs gilt: Die drei Befehle `docker build`, `docker run` und `docker ps` im Terminal sind Lernziel. WebStorm und Docker Desktop sind die Bequemlichkeit obendrauf.
