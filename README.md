@@ -1,0 +1,148 @@
+# FitTrack
+
+Eine mobile-first Web-App, die persönliche Trainingsdaten auf dem Smartphone anzeigt.
+Entwickelt im Kurs „Datenbasierte Fallstudien“ als Micro-Scrum-Projekt mit KI-Unterstützung im Chat.
+
+**Product Vision:** FitTrack zeigt mir meine Trainingsdaten auf dem Smartphone – verständlich, aktuell, ansprechend.
+
+## Ordnerstruktur
+
+```text
+FitTrack/
+├── backend/
+│   ├── app/
+│   │   ├── main.py            # FastAPI-Routen (entsteht in Sprint 1)
+│   │   ├── models.py          # Pydantic-Datenmodell (Sprint 1)
+│   │   ├── daten.py           # liest aus der SQLite-Datenbank (Sprint 1)
+│   │   ├── statistik.py       # Kennzahlen berechnen (Sprint 1)
+│   │   └── data/
+│   │       ├── fittrack.db    # SQLite-Datenbank, 311 Trainingseinheiten, Sep 2024 – Sep 2026
+│   │       └── schema.sql     # Tabellen sportart und workout, Sicht v_workout
+│   └── tests/
+│       ├── conftest.py        # baut die Testdatenbank aus schema.sql und dem Fixture
+│       ├── fixtures/workouts_klein.sql    # 8 Einheiten, von Hand nachrechenbar
+│       └── test_api.py        # Tests ZUERST schreiben
+├── frontend/                  # index.html, style.css, app.js (Sprint 2)
+├── scripts/generate_workouts.py   # erzeugt fittrack.db reproduzierbar
+├── docs/
+│   ├── setup-webstorm.md      # IDE einrichten
+│   └── checklisten.md         # Definition of Done, Review, End-Abnahme
+├── requirements.txt
+└── README.md
+```
+
+## Setup (einmalig)
+
+Voraussetzungen: Python 3.12, Git, Docker Desktop, WebStorm mit Python-Plugin (oder PyCharm). Details in [docs/setup-webstorm.md](docs/setup-webstorm.md).
+
+```bash
+git clone <URL dieses Repos>
+cd FitTrack
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+## Tests ausführen
+
+```bash
+pytest
+```
+
+Zu Beginn ist der Test rot: `ModuleNotFoundError: No module named 'app.main'`. Das ist Absicht. Der Test beschreibt, was die App können soll, bevor es den Code gibt.
+
+## App starten
+
+```bash
+uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Dann im Browser: <http://localhost:8000/docs> zeigt die automatische API-Dokumentation.
+Auf dem Smartphone im selben WLAN: `http://<IP-des-Rechners>:8000`.
+
+## Datenmodell
+
+Die Daten liegen in der SQLite-Datenbank `backend/app/data/fittrack.db`. SQLite braucht keinen Server: Die Datenbank ist eine Datei, und Python bringt das Modul `sqlite3` mit. Das Schema steht in `schema.sql`, die Datenbank wird daraus mit `python scripts/generate_workouts.py` erzeugt.
+
+```mermaid
+erDiagram
+    SPORTART ||--o{ WORKOUT : "wird ausgeübt in"
+    SPORTART {
+        int  id PK
+        text name "Laufen, Radfahren, Schwimmen, Wandern"
+        text einheit "km"
+    }
+    WORKOUT {
+        int  id PK
+        text datum "JJJJ-MM-TT"
+        int  sportart_id FK
+        int  dauer_min
+        real distanz_km
+        int  kalorien
+    }
+```
+
+Die Sportart ist eine eigene Tabelle, damit ihr Name genau einmal gespeichert ist. Die Sicht `v_workout` verbindet beide Tabellen und liefert je Einheit den Namen der Sportart. Die API arbeitet nur mit dieser Sicht, deren Zeilen so aussehen:
+
+| Feld | Typ | Beispiel |
+|---|---|---|
+| `id` | Zahl | 42 |
+| `datum` | Text, `JJJJ-MM-TT` | `2026-05-14` |
+| `sportart` | Text | `Laufen`, `Radfahren`, `Schwimmen`, `Wandern` |
+| `dauer_min` | Zahl | 47 |
+| `distanz_km` | Kommazahl | 8.3 |
+| `kalorien` | Zahl | 512 |
+
+## Product Backlog
+
+### Sprint 1 – Daten und API
+
+```text
+US-1: Als Nutzer möchte ich alle meine Trainingseinheiten als JSON abrufen,
+      damit die App sie anzeigen kann.
+      Akzeptanz: GET /api/workouts liefert Status 200 und eine Liste;
+      jedes Element enthält id, datum, sportart, dauer_min, distanz_km, kalorien.
+
+US-2: Als Nutzer möchte ich meine Kennzahlen abrufen,
+      damit ich meinen Fortschritt sehe.
+      Akzeptanz: GET /api/stats liefert gesamt_km, durchschnitt_km_pro_woche,
+      lieblingssportart, anzahl – korrekt berechnet für das Fixture.
+
+US-3: Als Entwickler möchte ich einen Health-Endpunkt,
+      damit ich später im Container prüfen kann, ob die App läuft.
+      Akzeptanz: GET /health liefert {"status": "ok"}.
+```
+
+### Sprint 2 – Frontend
+
+```text
+US-4: Als Nutzer möchte ich die App auf dem Smartphone öffnen und ein
+      übersichtliches Dashboard sehen, damit ich sie unterwegs nutzen kann.
+      Akzeptanz: GET / liefert die Seite; bei 375 px Breite kein horizontales
+      Scrollen; Karten stapeln sich; Touch-Targets mindestens 44 px.
+
+US-5: Als Nutzer möchte ich meine Kennzahlen und die letzten Trainings sehen,
+      damit ich meinen Stand auf einen Blick erfasse.
+      Akzeptanz: Kennzahl-Karten und Liste werden per fetch aus /api/stats
+      und /api/workouts gefüllt, nichts ist hartkodiert.
+
+US-6: Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen
+      und den Zeitraum wählen, damit ich Trends erkenne.
+      Akzeptanz: GET /api/stats/wochen liefert pro Kalenderwoche distanz_km
+      und anzahl, auch für Wochen ohne Training; das Diagramm zeigt diese
+      Daten; Umschalter 8 W / 6 M / 1 J / Alles.
+```
+
+### Sprint 3 – Docker und Abnahme
+
+Dockerfile schreiben, Image bauen, Container starten, App auf dem Smartphone aus dem Container testen.
+
+## Wie die Kennzahlen definiert sind
+
+- `gesamt_km`: Summe aller `distanz_km`, gerundet auf 1 Nachkommastelle.
+- `durchschnitt_km_pro_woche`: `gesamt_km` geteilt durch die Anzahl der Kalenderwochen von der Woche des ersten bis zur Woche des letzten Trainings (beide inklusive), gerundet auf 1 Nachkommastelle.
+- `lieblingssportart`: Sportart mit der größten Summe `distanz_km`. Bei Gleichstand die alphabetisch erste.
+- `anzahl`: Anzahl der Einheiten.
+- Leere Datenliste: 0.0, 0.0, `null`, 0.
+
+Rechnet die Erwartungswerte für das Fixture selbst aus, bevor ihr die KI nach Code fragt. Sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt.

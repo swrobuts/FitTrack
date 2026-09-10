@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+
+# System
+.DS_Store
