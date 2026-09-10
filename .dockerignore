@@ -1,0 +1,11 @@
+# Diese Dateien kommen nicht ins Image
+.git
+.venv
+.idea
+__pycache__
+*.pyc
+.pytest_cache
+backend/tests
+docs
+scripts
+*.md

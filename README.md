@@ -137,6 +137,21 @@ US-6: Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen
 
 Dockerfile schreiben, Image bauen, Container starten, App auf dem Smartphone aus dem Container testen.
 
+## Docker
+
+Ein Container enthält App, Python und alle Bibliotheken. Was hier läuft, läuft identisch auf jedem Server.
+
+```bash
+docker build -t fittrack .              # Image bauen (Bauplan: Dockerfile)
+docker run -p 8000:8000 fittrack        # Container starten -> http://localhost:8000
+docker ps                               # laufende Container anzeigen
+docker stop <CONTAINER ID>              # Container stoppen
+```
+
+Prüfen: <http://localhost:8000/health> antwortet mit `{"status": "ok"}`. Auf dem Smartphone im WLAN: `http://<IP-des-Rechners>:8000`.
+
+Falls Port 8000 auf dem Rechner belegt ist: `docker run -p 8001:8000 fittrack` und dann Port 8001 im Browser nutzen.
+
 ## Wie die Kennzahlen definiert sind
 
 - `gesamt_km`: Summe aller `distanz_km`, gerundet auf 1 Nachkommastelle.
