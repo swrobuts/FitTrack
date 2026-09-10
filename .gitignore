@@ -13,3 +13,6 @@ __pycache__/
 
 # Claude Code
 .claude/
+
+# lokale Einstellungen, z. B. FITTRACK_PORT für docker compose
+.env

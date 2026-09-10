@@ -101,7 +101,12 @@ Unten öffnet sich das Fenster `Services`. Dort stehen Logs, ein Stop-Knopf und 
 
 ### Port 8000 belegt
 
-In der Run-Konfiguration der `docker-compose.yml` (Bearbeiten über das Dropdown oben rechts → `Edit Configurations…`) unter `Environment variables` den Eintrag `FITTRACK_PORT=8001` setzen. Dann ist die App unter <http://localhost:8001> erreichbar.
+Meldung: `Bind for 0.0.0.0:8000 failed: port is already allocated`. Dann belegt ein anderes Programm oder ein anderer Container den Port. Zwei Wege:
+
+- Eine Datei `.env` im Projektordner anlegen mit dem Inhalt `FITTRACK_PORT=8001`. Docker Compose liest sie automatisch, auch beim Klick in WebStorm. Die Datei ist per `.gitignore` ausgeschlossen und bleibt auf dem eigenen Rechner.
+- Oder in der Run-Konfiguration der `docker-compose.yml` (Dropdown oben rechts → `Edit Configurations…`) unter `Environment variables` den Eintrag `FITTRACK_PORT=8001` setzen.
+
+Danach ist die App unter <http://localhost:8001> erreichbar.
 
 ### Was Docker Desktop selbst kann
 
