@@ -7,7 +7,8 @@ Start lokal (aus dem Projektordner FitTrack/):
 from fastapi import FastAPI
 
 from .daten import lade_workouts
-from .models import Workout
+from .models import Stats, Workout
+from .statistik import berechne_stats
 
 app = FastAPI(title="FitTrack", version="0.1.0")
 
@@ -22,3 +23,9 @@ def health() -> dict:
 def workouts() -> list[dict]:
     """Alle Trainingseinheiten, jüngste zuerst."""
     return lade_workouts()
+
+
+@app.get("/api/stats", response_model=Stats)
+def stats() -> dict:
+    """Kennzahlen über alle Trainingseinheiten."""
+    return berechne_stats(lade_workouts())

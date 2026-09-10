@@ -46,3 +46,41 @@ def test_echtdaten_sind_lesbar():
     echt = lade_workouts(STANDARD_DATEI)
     assert len(echt) > 250
     assert {"Laufen", "Radfahren", "Schwimmen", "Wandern"} == {w["sportart"] for w in echt}
+
+
+# US-2: Kennzahlen
+# Erwartungswerte von Hand aus dem Fixture berechnet (siehe README, Abschnitt Kennzahlen):
+#   Distanzen: 5 + 20 + 8 + 1.5 + 30 + 9 + 10 + 4 = 87.5 km
+#   Kalenderwochen: KW 23, 24, 25 = 3 Wochen  ->  87.5 / 3 = 29.17 -> 29.2
+#   Je Sportart: Radfahren 50.0, Laufen 26.0, Wandern 10.0, Schwimmen 1.5
+def test_stats_gesamt_km():
+    stats = client.get("/api/stats").json()
+    assert stats["gesamt_km"] == 87.5
+
+
+def test_stats_durchschnitt():
+    stats = client.get("/api/stats").json()
+    assert stats["durchschnitt_km_pro_woche"] == 29.2
+
+
+def test_stats_lieblingssportart():
+    stats = client.get("/api/stats").json()
+    assert stats["lieblingssportart"] == "Radfahren"
+
+
+def test_stats_anzahl():
+    stats = client.get("/api/stats").json()
+    assert stats["anzahl"] == 8
+
+
+def test_stats_leere_liste(monkeypatch):
+    # Randfall: keine Daten. Wir tauschen die Ladefunktion vorübergehend aus.
+    from app import main
+    monkeypatch.setattr(main, "lade_workouts", lambda: [])
+    stats = client.get("/api/stats").json()
+    assert stats == {
+        "gesamt_km": 0.0,
+        "durchschnitt_km_pro_woche": 0.0,
+        "lieblingssportart": None,
+        "anzahl": 0,
+    }

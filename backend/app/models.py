@@ -16,3 +16,12 @@ class Workout(BaseModel):
     dauer_min: int
     distanz_km: float
     kalorien: int
+
+
+class Stats(BaseModel):
+    """Kennzahlen für /api/stats."""
+
+    gesamt_km: float
+    durchschnitt_km_pro_woche: float
+    lieblingssportart: str | None   # None, wenn es keine Daten gibt
+    anzahl: int
