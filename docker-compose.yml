@@ -1,0 +1,13 @@
+# Lokaler Start mit einem Befehl:
+#   docker compose up --build        # Image bauen und Container starten
+#   docker compose down              # Container stoppen und entfernen
+#
+# Port 8000 ist auf manchen Rechnern belegt. Dann so starten:
+#   FITTRACK_PORT=8001 docker compose up --build
+services:
+  fittrack:
+    build: .                          # nutzt das Dockerfile in diesem Ordner
+    image: fittrack
+    ports:
+      - "${FITTRACK_PORT:-8000}:8000" # links der Port auf dem Rechner, rechts im Container
+    restart: unless-stopped

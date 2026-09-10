@@ -152,6 +152,15 @@ Prüfen: <http://localhost:8000/health> antwortet mit `{"status": "ok"}`. Auf de
 
 Falls Port 8000 auf dem Rechner belegt ist: `docker run -p 8001:8000 fittrack` und dann Port 8001 im Browser nutzen.
 
+Kürzer mit Docker Compose (Bauen und Starten in einem Befehl):
+
+```bash
+docker compose up --build            # http://localhost:8000
+docker compose down                  # stoppen und aufräumen
+```
+
+Bei belegtem Port 8000: `FITTRACK_PORT=8001 docker compose up --build`.
+
 ## Deploy auf Render.com
 
 Die Referenzlösung läuft unter <https://fittrack-k7gg.onrender.com>. Der Free-Plan schläft nach 15 Minuten ohne Zugriff ein, der erste Aufruf dauert dann bis zu einer Minute.
