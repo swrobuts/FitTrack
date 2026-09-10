@@ -16,7 +16,7 @@ git checkout main        # zurück zum fertigen Stand
 | 4 | `us-4` | 2 | 0:05 | Frontend-Gerüst, mobile-first |
 | 5 | `us-5` | 2 | 0:25 | Kennzahlen und Liste per fetch |
 | 6 | `us-6` | 2 | 0:40 | Wochenverlauf, Ring, Diagramm |
-| 6b | `us-7` | 2 | 1:00 | Semantik-Review: schön, aber falsch |
+| 6b | `us-7` | 2 | 1:00 | Semantik-Review: Bullet-Graph, Kalender, Kacheln |
 | 7 | `docker` | 2 | 1:10 | Dockerfile, Build, Handy-Test |
 | 8 | `render` | 2 | 1:25 | Deploy auf Render.com |
 | 9 | `ci` | optional | | GitHub Actions |
@@ -636,20 +636,27 @@ nicht neu erzeugt wird.
 
 ## Schritt 6b: US-7 Schön, aber falsch (Termin 2, ab 1:00)
 
-**Warum dieser Schritt:** Nach Schritt 6 sind alle Tests grün, das Dashboard sieht aus wie eine Sport-App, und die Gruppe ist zufrieden. Genau jetzt die Ansicht auf den Beamer legen und fragen: „Was bedeutet 161 %?“ Die Antwort im ersten Entwurf: Der Ring war geschlossen, zeigte „161 % vom Ziel“ und stand über einer Woche, die längst vorbei war. Nichts davon prüfte ein Test, weil die Tests die API prüfen und nicht die Aussage der Oberfläche. Das ist die Lerneinheit: **Der Eindruck ist kein Prüfkriterium.** Vorher-Nachher-Bilder liegen in `site/assets/img/vergleich-mobile.png` und `vergleich-desktop.png`.
+**Warum dieser Schritt:** Nach Schritt 6 sind alle Tests grün, das Dashboard sieht aus wie eine Sport-App, und die Gruppe ist zufrieden. Genau jetzt die Ansicht auf den Beamer legen und fragen: „Was bedeutet 161 %?“ Der Erstentwurf der KI: Ring geschlossen, „161 % vom Ziel“, über einer Woche, die längst vorbei war, darunter gestapelte Säulen ohne Achse. Nichts davon prüfte ein Test, weil die Tests die API prüfen und nicht die Aussage der Oberfläche. Die Lerneinheit hat zwei Sätze: **Der Eindruck ist kein Prüfkriterium.** Und: **KI allein liefert einen brauchbaren Erstentwurf, KI mit menschlicher Kritik ein gutes Ergebnis.** Der Zweitentwurf ist nicht die KI-Korrektur der KI, sondern das Ergebnis konkreter Vorschläge aus dem Review: Bullet-Graph statt Ring, ein Balken je Woche statt Stapel, Kalender, Kacheln, Status-Badge, alles antippbar. Vorher-Nachher-Bilder liegen in `site/assets/img/vergleich-mobile.png` und `vergleich-desktop.png`.
 
-**Was der erste Entwurf falsch machte** (die Liste an die Wand, die Gruppe soll die Punkte selbst finden, bevor sie eingeblendet wird):
+**Was der Erstentwurf falsch machte** (die Liste an die Wand, die Gruppe soll die Punkte selbst finden, bevor sie eingeblendet wird):
 
-| Befund im ersten Entwurf | Warum das täuscht | Korrektur |
+| Befund im Erstentwurf | Warum das täuscht | Zweitentwurf |
 |---|---|---|
-| Ring geschlossen, „161 % vom Ziel“ | Ein voller Ring sagt „erreicht“, die Zahl sagt „übererfüllt“, beides ohne Kilometer. Was zeigt der Ring bei 161 %? Nichts anderes als bei 100 %. | Ring bei 100 % gedeckelt, im Ring die Kilometer, daneben „Ziel erreicht, 24,4 km darüber“ |
-| „Kalenderwoche 36“ als Fortschritt, obwohl die Woche vorbei ist | Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis. | Titel „Letzte Trainingswoche“ mit Datumsspanne; nur bei Daten in der laufenden Woche „Diese Woche, Stand Mi“ |
-| Wochenziel 40 km ohne Bezug | 2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, muss aber dastehen. | „Ziel 40 km über alle Sportarten“ plus Kilometer je Sportart |
-| Balken ohne x-Achse | Welcher Balken ist welche Woche? Raten. | Achse „Kalenderwoche“, Legende, Ziellinie, Klick auf Balken beschreibt ihn |
-| „Alles“ zeigt 105 dünne Balken | Unlesbar, obwohl es „funktioniert“. | Monatssummen mit Achse „Monat“ |
+| Ring geschlossen, „161 % vom Ziel“ | Ein Kreis zeigt einen Anteil an einem Ganzen. Eine Woche ist kein Ganzes, sie hat ein Ziel, das man verfehlt oder übertrifft. Ab 100 % ist der Ring voll und stumm, die Zahl hat keine Einheit. | Bullet-Graph: Balken für 64,4 km, Marke bei 40 km, Skala bis 80 km. Die Übererfüllung liegt sichtbar rechts der Marke. Daneben „24,4 km über dem Ziel“, Badge „Ziel erreicht“, „3 Wochen in Folge“ |
+| „Kalenderwoche 36“ als Fortschritt, obwohl die Woche vorbei ist | Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis. | Titel „Letzte Trainingswoche“ mit Datumsspanne; nur bei Daten in der laufenden Woche „Diese Woche, Stand Do“ mit Badge „Auf Kurs“ oder „Im Rückstand“ gegen das anteilige Ziel |
+| Wochenziel 40 km ohne Bezug | 2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, muss aber dastehen. | „Ziel 40 km über alle Sportarten“, der Balken im Bullet-Graph ist nach Sportart gefärbt, darunter die Kilometer je Sportart |
+| Balken ohne x-Achse, Tooltip nur mit Maus | Welcher Balken ist welche Woche? Raten. Auf dem Handy gibt es keinen Hover. | Achse „Kalenderwoche“, Ziellinie, Farbe sagt „Ziel erreicht“ oder „unter dem Ziel“, Tippen irgendwo in der Spalte zeigt die Woche mit einem Balken je Sportart unter dem Diagramm |
+| Gestapelte Säulen, „Alles“ mit 105 Balken | Stapel sind auf 375 px nicht ablesbar: Teilbalken haben keine gemeinsame Nulllinie. 105 Balken sind unlesbar. | Ein Balken je Woche, die Sportarten im Detail darunter; ab einem Jahr Monatssummen |
 | Kürzel „8 W / 6 M / 1 J“, „Sc / Wa / Ra“ | Versteht niemand ohne Einweisung. | Ausgeschrieben, Symbole je Sportart |
-| „Einheiten“ zweimal, einmal je Woche, einmal gesamt | Gleiches Wort, andere Bedeutung. | „Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Meiste km“ |
-| Schrift 12 px, keine `aria-pressed`, Ring ohne sprechendes Label, nur dunkel | Auf dem Handy in der Sonne unlesbar, für Screenreader stumm. | Mindestens 13 px, `aria-pressed`, dynamisches `aria-label`, Tabelle für Screenreader, helles Thema |
+| „Einheiten“ zweimal, einmal je Woche, einmal gesamt | Gleiches Wort, andere Bedeutung. | „Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Beste Woche, KW 37/2025“ |
+| Schrift 12 px, keine `aria-pressed`, nur dunkel | Auf dem Handy in der Sonne unlesbar, für Screenreader stumm. | Mindestens 13 px, `aria-pressed`, sprechende `aria-label`, Tabelle für Screenreader, helles Thema |
+
+**Was der Zweitentwurf zusätzlich bringt,** weil das Review danach gefragt hat, nicht die KI:
+
+- **Trainingskalender:** ein Feld je Tag der letzten acht Wochen, Farbe nach Kilometern, Zahl im Feld, Tippen zeigt die Einheit. Zeigt Regelmäßigkeit, die ein Wochenbalken verbirgt.
+- **Sportarten-Kacheln:** Kilometer, Anteil als Balken, Einheiten je Sportart; Tippen filtert die Aktivitätenliste.
+- **Status-Badge:** ein Wort für den Stand, dazu die Serie erreichter Wochen.
+- **Ø je Einheit** in der Wochenkarte, **Beste Woche** in den Kennzahlen.
 
 **Story:** Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard genau das aussagt, was die Daten hergeben. Akzeptanz siehe README (US-7).
 
@@ -671,18 +678,24 @@ Der bestehende Test `test_wochen_anzahl_und_luecken` vergleicht KW 24 als ganzes
 Wir bauen das Dashboard von FitTrack (Vanilla JS, Chart.js 4, API-Antworten
 siehe unten). Bevor du Code schreibst, lege die Bedeutung jedes Elements
 fest. Gib eine Tabelle mit den Spalten
-Element | zeigt | Einheit | Zeitbezug | Zustände (0 %, 100 %, über 100 %,
-keine Daten) | Beschriftung im Bild.
+Element | zeigt | Einheit | Zeitbezug | Form | Zustände (0 %, 100 %,
+über 100 %, keine Daten) | Beschriftung im Bild.
 Regeln, die die Tabelle erfüllen muss:
 1. Jede Zahl trägt Einheit und Bezug, z. B. "64,4 km, KW 36, 31.08. bis 06.09.".
-2. Ein Fortschrittselement zeigt nur laufende Zeiträume. Abgeschlossene
-   Zeiträume heißen Ergebnis. Werte über 100 % werden gedeckelt und als
-   "Ziel erreicht, +x km" beschriftet.
-3. Jede Achse hat Titel und Einheit, jede Farbe steht in einer Legende.
-4. Kein Begriff bedeutet an zwei Stellen etwas Verschiedenes.
-5. Keine Abkürzungen, die nicht im Bild erklärt sind.
-6. Beschreibe, wie die Ansicht bei 0, 1 und 105 Datenpunkten aussieht.
-7. Schrift mindestens 13 px, Bedienelemente 44 px, aria-pressed an
+2. Die Form passt zur Aussage: Ein Kreis nur für Anteile an einem Ganzen.
+   Ein Ziel als Bullet-Graph: Balken für den Ist-Wert, Marke für das Ziel,
+   Skala über das Ziel hinaus, damit Übererfüllung sichtbar bleibt.
+3. Fortschritt nur für laufende Zeiträume. Abgeschlossene Zeiträume
+   heißen Ergebnis.
+4. Jede Achse hat Titel und Einheit, jede Farbe steht in einer Legende.
+   Keine gestapelten Balken auf 375 px; Aufteilungen stehen als eigene
+   Balken im Detail.
+5. Kein Begriff bedeutet an zwei Stellen etwas Verschiedenes, keine
+   Abkürzungen, die nicht im Bild erklärt sind.
+6. Touch zuerst: Jede Grafik ist antippbar und nennt dann ihre Zahl im
+   Klartext. Nichts, was nur mit der Maus erscheint.
+7. Beschreibe, wie die Ansicht bei 0, 1 und 105 Datenpunkten aussieht.
+8. Schrift mindestens 13 px, Bedienelemente 44 px, aria-pressed an
    Umschaltern, sprechende aria-label, helles und dunkles Thema.
 Erst wenn ich die Tabelle bestätigt habe, schreibst du den Code.
 API-Antworten: [Beispiel von /api/stats und /api/stats/wochen einfügen]
@@ -693,17 +706,18 @@ API-Antworten: [Beispiel von /api/stats und /api/stats/wochen einfügen]
 ```text
 Prüfe deinen Vorschlag wie ein kritischer Designer, der ihn zum ersten
 Mal sieht. Gehe jedes sichtbare Element durch und beantworte: Was
-bedeutet es? Woher kommt der Wert? Was zeigt es bei 0, bei mehr als
-100 %, bei 105 Datenpunkten? Nenne jede Stelle, an der die Darstellung
-mehr behauptet als die Daten hergeben, und schlage die Korrektur vor.
-Lobe nichts. Wenn du nichts findest, sage das und begründe es je Element.
+bedeutet es? Woher kommt der Wert? Passt die Form zur Aussage? Was zeigt
+es bei 0, bei mehr als 100 %, bei 105 Datenpunkten, auf 375 px Breite
+ohne Maus? Nenne jede Stelle, an der die Darstellung mehr behauptet als
+die Daten hergeben, und schlage die Korrektur vor. Lobe nichts. Wenn du
+nichts findest, sage das und begründe es je Element.
 ```
 
-**Prüfpunkte:** Die Gruppe geht die Liste „Semantik-Review: Schön, aber falsch“ aus `docs/checklisten.md` am Beamer durch. Eine Zahl wird nachgerechnet: `SELECT sportart, ROUND(SUM(distanz_km),1) FROM v_workout WHERE datum BETWEEN '2026-08-31' AND '2026-09-06' GROUP BY sportart;` muss die Chips der Wochenkarte ergeben. „Alles“ anklicken. Tab-Taste drücken: Fokusring sichtbar? Systemeinstellung auf hell stellen: lesbar?
+**Prüfpunkte:** Die Gruppe geht die Liste „Semantik-Review: Schön, aber falsch“ aus `docs/checklisten.md` am Beamer durch. Eine Zahl wird nachgerechnet: `SELECT sportart, ROUND(SUM(distanz_km),1) FROM v_workout WHERE datum BETWEEN '2026-08-31' AND '2026-09-06' GROUP BY sportart;` muss die Aufteilung der Wochenkarte ergeben. Am Handy: einen Balken antippen, ein Kalenderfeld antippen, eine Sportart-Kachel antippen. „Alles“ anklicken. Tab-Taste drücken: Fokusring sichtbar? Systemeinstellung auf hell stellen: lesbar?
 
-**Botschaft für die Gruppe:** Tests sichern die Daten, nicht die Aussage. Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen. Deshalb legt der Prompt die Bedeutung vor dem Code fest, und deshalb prüft die QA-Rolle die Oberfläche mit derselben Strenge wie den Code.
+**Botschaft für die Gruppe:** Tests sichern die Daten, nicht die Aussage. Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen. Der Erstentwurf der KI war ein brauchbarer Schritt; gut wurde er erst durch die Kritik eines Menschen, der wusste, was ein Kreis bedeutet und was ein Ziel braucht. Deshalb legt der Prompt Bedeutung und Form vor dem Code fest, und deshalb prüft die QA-Rolle die Oberfläche mit derselben Strenge wie den Code.
 
-**Commit:** `feat(US-7): Dashboard nach Semantik-Review, je_sportart im Wochenverlauf`
+**Commit:** `feat(US-7): Zweitentwurf nach Semantik-Review: Bullet-Graph, Kalender, Kacheln`
 
 ---
 

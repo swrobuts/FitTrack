@@ -19,17 +19,19 @@
 
 ## Semantik-Review: Schön, aber falsch (vor jeder Abnahme einer Oberfläche)
 
-Ein Vorschlag, der gut aussieht, ist noch nicht richtig. Das erste FitTrack-Dashboard bestand alle Tests und zeigte trotzdem einen geschlossenen Ring mit „161 %“ für eine Woche, die längst vorbei war. Die Tests prüfen die API, nicht die Aussage der Oberfläche. Deshalb geht diese Liste vor jeder Abnahme einmal über jedes sichtbare Element.
+Ein Vorschlag, der gut aussieht, ist noch nicht richtig. Der Erstentwurf des FitTrack-Dashboards bestand alle Tests und zeigte trotzdem einen geschlossenen Ring mit „161 %“ für eine Woche, die längst vorbei war. Erst die Kritik eines Menschen machte aus dem Erstentwurf den Zweitentwurf: KI allein liefert einen brauchbaren Schritt, KI mit Kritik ein gutes Ergebnis. Die Tests prüfen die API, nicht die Aussage der Oberfläche. Deshalb geht diese Liste vor jeder Abnahme einmal über jedes sichtbare Element.
 
 - [ ] **Bedeutung:** Kann ich zu jeder Zahl sagen, was sie zeigt, in welcher Einheit und für welchen Zeitraum? Steht das auch dran?
 - [ ] **Nachrechnen:** Kann ich die Zahl aus den Rohdaten (Datenbank, API-Antwort) selbst herleiten? Stichprobe machen.
 - [ ] **Zustände:** Was bedeutet das Element bei 0 %, bei 100 %, bei mehr als 100 %? Was zeigt es, wenn es „voll“ ist? Ist die Aussage dann noch wahr?
+- [ ] **Form passt zur Aussage:** Ein Kreis zeigt Anteile an einem Ganzen. Ein Ziel braucht eine Marke am Balken (Bullet-Graph), damit Verfehlen und Übertreffen sichtbar bleiben. Verläufe als ein Balken je Zeitabschnitt; keine Stapel auf 375 px.
 - [ ] **Zeitbezug:** Ist der Zeitraum abgeschlossen oder laufend? Ein Fortschrittsbalken für eine vergangene Woche ist ein Ergebnis, kein Fortschritt.
 - [ ] **Achsen und Legende:** Hat jede Achse Titel und Einheit? Ist jede Farbe erklärt? Weiß ich, welcher Balken welche Woche ist?
 - [ ] **Gleiche Wörter, gleiche Bedeutung:** Kommt ein Begriff zweimal vor („Einheiten“), meint er beide Male dasselbe? Sonst Bezug ergänzen.
 - [ ] **Abkürzungen:** Versteht jemand ohne Einweisung „8 W“, „Sc“, „Ø“? Ausschreiben oder erklären.
 - [ ] **Extremfälle:** Sieht die Ansicht mit 0, 1 und 105 Datenpunkten noch sinnvoll aus? „Alles“ ausprobieren.
 - [ ] **Bedienbarkeit:** Schrift mindestens 13 px, Bedienelemente 44 px, Tastatur (Tab, Fokusring), Screenreader (`aria-pressed`, sprechende `aria-label`), Kontrast, helles und dunkles Thema.
+- [ ] **Touch:** Jede Grafik ist antippbar und nennt dann ihre Zahl im Klartext (Balken, Kalenderfeld, Kachel). Kein Tooltip, der nur mit der Maus erscheint.
 - [ ] **Zehn-Sekunden-Test:** Die Ansicht jemandem zehn Sekunden zeigen und erklären lassen. Was falsch erklärt wird, ist falsch dargestellt.
 
 Eine Story gilt erst als abgenommen, wenn jeder Punkt entweder erfüllt ist oder bewusst zurückgestellt wurde.
@@ -42,7 +44,7 @@ Eine Story gilt erst als abgenommen, wenn jeder Punkt entweder erfüllt ist oder
 4. Erklärung anfordern: „Erkläre in drei Sätzen deine wichtigsten Entscheidungen.“
 5. Fehlermeldungen wörtlich zurückspielen: Traceback kopieren, nicht paraphrasieren.
 6. Niemals Unverstandenes committen: Jede Zeile muss jemand in der Gruppe erklären können.
-7. Bei Oberflächen zuerst die Bedeutung festlegen, dann Code anfordern: Für jedes Element Aussage, Einheit, Zeitbezug und Zustände in einer Tabelle bestätigen lassen (Vorlage im Prompt-Skript, Schritt 6b).
+7. Bei Oberflächen zuerst die Bedeutung festlegen, dann Code anfordern: Für jedes Element Aussage, Einheit, Zeitbezug, Zustände und die passende Form in einer Tabelle bestätigen lassen (Vorlage im Prompt-Skript, Schritt 6b).
 8. Jeden Vorschlag vom Modell selbst prüfen lassen: „Nenne jede Stelle, an der die Darstellung mehr behauptet als die Daten hergeben.“ Das ersetzt die eigene Prüfung nicht, findet aber die offensichtlichen Fälle.
 
 ## End-Abnahme (Termin 2, wird abgezeichnet)

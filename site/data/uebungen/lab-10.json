@@ -19,8 +19,8 @@
           },
           "optionen": [
             {
-              "de": "Ein voller Ring sieht bei 100 % und bei 161 % gleich aus. Die Grafik trägt keine Information mehr, die Zahl hat keine Einheit.",
-              "en": "A full ring looks the same at 100 % and 161 %."
+              "de": "Ein Kreis zeigt Anteile an einem Ganzen. Eine Woche hat ein Ziel, das man verfehlt oder übertrifft. Ab 100 % ist der Ring voll und sagt nichts mehr, die Zahl hat keine Einheit.",
+              "en": "A circle shows shares of a whole; a goal can be exceeded, and above 100 % the ring says nothing."
             },
             {
               "de": "161 % ist eine korrekte Angabe, also ist die Darstellung in Ordnung.",
@@ -35,8 +35,8 @@
             0
           ],
           "erklaerung": {
-            "de": "Die Zahl stimmt rechnerisch, die Darstellung sagt trotzdem nichts: Ab 100 % ist der Ring voll, egal ob 100 oder 300 %. Deshalb wird er gedeckelt, zeigt die Kilometer und daneben steht „Ziel erreicht, 24,4 km darüber“.",
-            "en": "The number is arithmetically right, the display still says nothing above 100 %."
+            "de": "Die Zahl stimmt rechnerisch, die Form ist falsch: Ein Kreis kodiert einen Anteil, ein Ziel braucht eine Marke, über die der Balken hinauswachsen kann. Der Zweitentwurf zeigt deshalb einen Bullet-Graph: Balken für 64,4 km, Marke bei 40 km, Skala bis 80 km, daneben „24,4 km über dem Ziel“ und das Badge „Ziel erreicht“.",
+            "en": "The number is right, the form is wrong: a circle encodes a share, a goal needs a marker the bar can pass. Hence the bullet graph."
           }
         },
         {
@@ -89,7 +89,7 @@
             0
           ],
           "erklaerung": {
-            "de": "Tests sichern die Daten, nicht die Aussage. Deshalb gehört zu jeder Abnahme einer Oberfläche der Semantik-Review, und deshalb legt der Prompt die Bedeutung fest, bevor Code entsteht.",
+            "de": "Tests sichern die Daten, nicht die Aussage. Deshalb gehört zu jeder Abnahme einer Oberfläche der Semantik-Review, und deshalb legt der Prompt Bedeutung und Form fest, bevor Code entsteht. Der Erstentwurf der KI war ein brauchbarer Schritt; gut wurde er erst durch die Kritik eines Menschen.",
             "en": "Tests secure the data, not the message."
           }
         }
@@ -112,6 +112,13 @@
           "text": {
             "de": "Zustände: 0 %, 100 %, darüber",
             "en": "States"
+          }
+        },
+        {
+          "id": "form",
+          "text": {
+            "de": "Form passt zur Aussage",
+            "en": "Form fits the message"
           }
         },
         {
@@ -139,8 +146,15 @@
       "paare": [
         {
           "begriff": {
-            "de": "Ring geschlossen bei 161 %",
-            "en": "Ring closed at 161 %"
+            "de": "Ein Kreis für ein Ziel, das man übertreffen kann",
+            "en": "A circle for a goal that can be exceeded"
+          },
+          "ziel": "form"
+        },
+        {
+          "begriff": {
+            "de": "Ring bleibt bei 161 % genauso voll wie bei 100 %",
+            "en": "Ring equally full at 161 % and 100 %"
           },
           "ziel": "zustand"
         },
@@ -185,6 +199,20 @@
             "en": "Abbreviations 8 W, Sc, Ra"
           },
           "ziel": "beschriftung"
+        },
+        {
+          "begriff": {
+            "de": "Gestapelte Säulen auf 375 px Breite",
+            "en": "Stacked bars at 375 px"
+          },
+          "ziel": "form"
+        },
+        {
+          "begriff": {
+            "de": "Tooltip erscheint nur mit der Maus",
+            "en": "Tooltip appears only with a mouse"
+          },
+          "ziel": "bedienung"
         }
       ],
       "rueckmeldung": {
@@ -218,8 +246,8 @@
         },
         {
           "text": {
-            "de": "Der Ring bei 0 %, 100 % und über 100 % angeschaut: Sagt er jedes Mal etwas Wahres?",
-            "en": "Ring checked at 0, 100 and above 100 %"
+            "de": "Das Wochenziel bei 0, 100 und 161 % angeschaut: Bleibt die Übererfüllung sichtbar? Passt die Form (Marke am Balken, kein Kreis)?",
+            "en": "Weekly goal checked at 0, 100 and 161 %: does the excess stay visible, does the form fit?"
           }
         },
         {
@@ -244,6 +272,12 @@
           "text": {
             "de": "„Alles“ angeklickt: lesbar?",
             "en": "Clicked All: readable?"
+          }
+        },
+        {
+          "text": {
+            "de": "Am Handy einen Balken, ein Kalenderfeld und eine Sportart-Kachel angetippt: Jede Grafik nennt ihre Zahl im Klartext",
+            "en": "On the phone tapped a bar, a calendar cell and a sport tile: every chart states its number"
           }
         },
         {

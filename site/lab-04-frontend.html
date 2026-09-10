@@ -67,19 +67,25 @@
     <h2>Das Ergebnis</h2>
     <div class="karten">
       <div class="shot schmal">
-        <img src="assets/img/dashboard-mobile.png" alt="FitTrack-Dashboard auf dem Smartphone nach dem Semantik-Review: Wochenkarte mit gedeckeltem Ring, vier Kennzahl-Kacheln, gestapeltes Balkendiagramm mit Achsen und Ziellinie, Aktivitätenliste mit Sportsymbolen" loading="lazy">
-        <div class="unterschrift">375 px breit: Ring, Kacheln, Diagramm und Liste stapeln sich.</div>
+        <img src="assets/img/dashboard-mobile.png" alt="FitTrack-Dashboard auf dem Smartphone im Zweitentwurf: Wochenkarte mit Bullet-Graph und Status-Badge, vier Kennzahl-Kacheln, Wochenverlauf mit Ziellinie, Trainingskalender, Sportarten-Kacheln, Aktivitätenliste mit Sportsymbolen" loading="lazy">
+        <div class="unterschrift">375 px breit, Stand nach Lab 10: Wochenkarte, Kacheln, Verlauf, Kalender, Sportarten und Liste stapeln sich.</div>
       </div>
       <div class="shot">
         <img src="assets/img/dashboard-desktop.png" alt="FitTrack-Dashboard auf dem Desktop in zwei Spalten" loading="lazy">
         <div class="unterschrift">Ab 768 px: dieselben Bausteine in zwei Spalten. Ein Breakpoint, kein zweites Stylesheet.</div>
       </div>
     </div>
+    <div class="warn-box">
+      <h3>Die Bilder zeigen den Zweitentwurf</h3>
+      <p>Die Prompts in diesem Lab erzeugen den Erstentwurf mit Wochenziel-Ring und gestapeltem Diagramm. Genau so
+        sah das Dashboard nach US-6 aus, und genau so bestand es alle Tests. Was daran trotzdem falsch war und wie der
+        Zweitentwurf entstand, ist <a href="lab-10-semantik.html" data-lab-link>Lab 10</a>.</p>
+    </div>
     <div class="table-scroll">
       <table>
         <thead><tr><th>Bereich</th><th>Zeigt</th><th>Quelle</th></tr></thead>
         <tbody>
-          <tr><td>Wochenziel-Ring</td><td>Jüngste Woche im Datensatz gegen ein Ziel von 40 km, dazu km, Einheiten, Minuten</td><td>letzter Eintrag von <code>/api/stats/wochen</code></td></tr>
+          <tr><td>Wochenkarte</td><td>Jüngste Woche im Datensatz gegen ein Ziel von 40 km, dazu km, Einheiten, Minuten. Im Erstentwurf ein Ring, seit Lab 10 ein Bullet-Graph</td><td>letzter Eintrag von <code>/api/stats/wochen</code></td></tr>
           <tr><td>Kennzahl-Kacheln</td><td>Gesamt-km, km pro Woche, Lieblingssport, Einheiten</td><td><code>/api/stats</code></td></tr>
           <tr><td>Diagramm</td><td>km je Kalenderwoche, Umschalter 8 W / 6 M / 1 J / Alles</td><td><code>/api/stats/wochen</code>, Filter im Browser</td></tr>
           <tr><td>Letzte Aktivitäten</td><td>Zehn jüngste Einheiten, „Mehr anzeigen“ lädt weitere aus der geladenen Liste</td><td><code>/api/workouts</code></td></tr>

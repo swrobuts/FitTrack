@@ -39,12 +39,14 @@
   <div class="lab-num-big">10</div>
   <h1 class="lab-title">US-7: Schön, aber falsch</h1>
   <p class="lab-intro">Nach Lab 04 sind alle Tests grün und das Dashboard sieht aus wie eine Sport-App. Genau dann zeigte
-    der erste Entwurf einen geschlossenen Ring mit „161 % vom Ziel“ über einer Woche, die längst vorbei war. Kein Test
-    hat das bemerkt. Dieses Lab zeigt, warum generierte Oberflächen besonders viel Misstrauen verdienen, wenn sie gut
-    aussehen, und wie man solche Fehler findet und mit dem richtigen Prompt verhindert.</p>
+    der Erstentwurf der KI einen geschlossenen Ring mit „161 % vom Ziel“ über einer Woche, die längst vorbei war. Kein
+    Test hat das bemerkt. Dieses Lab zeigt, warum generierte Oberflächen besonders viel Misstrauen verdienen, wenn sie
+    gut aussehen, wie ein Mensch mit konkreter Kritik aus dem brauchbaren Erstentwurf den guten Zweitentwurf macht, und
+    welcher Prompt solche Fehler von vornherein verhindert.</p>
   <div class="lernziele">
     <span class="lernziel-chip">Semantik-Review</span>
-    <span class="lernziel-chip">Vorher-Nachher</span>
+    <span class="lernziel-chip">Bullet-Graph statt Ring</span>
+    <span class="lernziel-chip">Erstentwurf, Zweitentwurf</span>
     <span class="lernziel-chip">Bedeutung vor Code</span>
     <span class="lernziel-chip">Selbstprüfungs-Prompt</span>
   </div>
@@ -56,12 +58,14 @@
   <section class="section-block" id="botschaft">
     <h2>Die Botschaft</h2>
     <div class="concept-box">
-      <h3>Tests sichern die Daten, nicht die Aussage.</h3>
+      <h3>Tests sichern die Daten, nicht die Aussage. KI allein liefert einen Schritt, KI mit Kritik ein Ergebnis.</h3>
       <p>Die 14 Tests aus Lab 01 bis 04 prüfen Status, Felder, Summen und Lückenwochen. Alles davon war richtig. Was
         die Oberfläche aus diesen richtigen Zahlen macht, prüft kein Test. Das prüft nur ein Mensch mit einer Frage an
         jedes sichtbare Element: <strong>Was bedeutet das, und stimmt es?</strong> Ein Modell kennt die Form eines
         Fitness-Dashboards und füllt sie. Ob ein voller Ring, ein fehlendes Achsenlabel oder ein doppelt verwendetes
-        Wort etwas Wahres behauptet, fragt es nicht, solange niemand es dazu zwingt.</p>
+        Wort etwas Wahres behauptet, fragt es nicht, solange niemand es dazu zwingt. Der Erstentwurf ist deshalb ein
+        brauchbarer Schritt, nicht mehr. Gut wird er, wenn ein Mensch mit Fachwissen konkrete Vorschläge macht: ein
+        Bullet-Graph statt eines Kreises, ein Balken je Woche statt eines Stapels, ein Kalender, Kacheln, Touch.</p>
     </div>
   </section>
 
@@ -76,6 +80,11 @@
         des Ziels keine Information mehr. Die Zahl hat keine Einheit. Und die Karte heißt „Kalenderwoche 36“, obwohl
         heute Donnerstag in KW 37 ist: Eine abgeschlossene Woche ist ein Ergebnis, kein Fortschritt. Drei falsche
         Aussagen in einem Element, das alle Tests bestanden hat.</p>
+      <p>Die tiefere Frage: <strong>Warum überhaupt ein Kreis?</strong> Ein Kreis kodiert einen Anteil an einem Ganzen.
+        Eine Trainingswoche ist kein Ganzes, sie hat ein Ziel, und ein Ziel kann man verfehlen oder übertreffen. Die
+        passende Form ist ein Bullet-Graph: ein Balken für den Ist-Wert, eine Marke für das Ziel, eine Skala, die über
+        das Ziel hinausreicht. Die KI hat den Ring gewählt, weil Garmin und Apple ihn zeigen, nicht weil er die
+        Aussage trägt.</p>
     </div>
     <p>Die Gruppe soll die weiteren Befunde selbst finden, bevor die Tabelle unten eingeblendet wird. Fünf Minuten,
       jede Person eine Zahl oder Grafik, dieselbe Frage.</p>
@@ -85,16 +94,16 @@
     <h2>Acht Befunde, keiner ein Rechenfehler</h2>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Befund im ersten Entwurf</th><th>Warum es täuscht</th><th>Korrektur</th></tr></thead>
+        <thead><tr><th>Befund im Erstentwurf</th><th>Warum es täuscht</th><th>Zweitentwurf</th></tr></thead>
         <tbody>
-          <tr><td><strong>Ring geschlossen, „161 % vom Ziel“</strong></td><td>Ein voller Ring sagt „erreicht“, die Zahl sagt „übererfüllt“, beides ohne Kilometer. Ab 100 % sieht der Ring immer gleich aus.</td><td>Ring bei 100 % gedeckelt und grün, im Ring die Kilometer, daneben „Ziel erreicht, 24,4 km darüber“.</td></tr>
-          <tr><td><strong>„Kalenderwoche 36“ als Fortschritt, obwohl vorbei</strong></td><td>Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis.</td><td>Titel „Letzte Trainingswoche“ mit Datumsspanne. Nur bei Daten in der laufenden Woche „Diese Woche“ mit „Stand Do“.</td></tr>
-          <tr><td><strong>Wochenziel 40 km ohne Bezug</strong></td><td>2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, aber es muss dastehen.</td><td>„Ziel 40 km über alle Sportarten“, darunter die Kilometer je Sportart.</td></tr>
-          <tr><td><strong>Balken ohne x-Achse</strong></td><td>Welcher Balken ist welche Woche? Raten.</td><td>Achse „Kalenderwoche“, Legende, Ziellinie bei 40 km, Klick auf einen Balken beschreibt ihn unter dem Diagramm.</td></tr>
-          <tr><td><strong>„Alles“ zeigt 105 dünne Balken</strong></td><td>Funktioniert und ist unlesbar.</td><td>Monatssummen mit Achse „Monat“, Titel „Kilometer pro Monat“.</td></tr>
+          <tr><td><strong>Ring geschlossen, „161 % vom Ziel“</strong></td><td>Ein Kreis zeigt einen Anteil an einem Ganzen. Eine Woche hat ein Ziel, das man verfehlt oder übertrifft. Ab 100 % ist der Ring voll und stumm, die Zahl hat keine Einheit.</td><td>Bullet-Graph: Balken für 64,4 km, nach Sportart gefärbt, Marke bei 40 km, Skala bis 80 km. Die Übererfüllung liegt sichtbar rechts der Marke. Daneben „24,4 km über dem Ziel“, Badge „Ziel erreicht“ und „3 Wochen in Folge“.</td></tr>
+          <tr><td><strong>„Kalenderwoche 36“ als Fortschritt, obwohl vorbei</strong></td><td>Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis.</td><td>Titel „Letzte Trainingswoche“ mit Datumsspanne. Nur bei Daten in der laufenden Woche „Diese Woche, Stand Do“ mit Badge „Auf Kurs“ oder „Im Rückstand“ gegen das anteilige Ziel.</td></tr>
+          <tr><td><strong>Wochenziel 40 km ohne Bezug</strong></td><td>2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, aber es muss dastehen.</td><td>„Ziel 40 km über alle Sportarten“, der Balken ist nach Sportart gefärbt, darunter die Kilometer je Sportart.</td></tr>
+          <tr><td><strong>Balken ohne x-Achse, Tooltip nur mit Maus</strong></td><td>Welcher Balken ist welche Woche? Raten. Auf dem Handy gibt es keinen Hover.</td><td>Achse „Kalenderwoche“, Ziellinie, Farbe sagt „Ziel erreicht“ oder „unter dem Ziel“. Tippen irgendwo in der Spalte zeigt die Woche unter dem Diagramm mit einem Balken je Sportart.</td></tr>
+          <tr><td><strong>Gestapelte Säulen, „Alles“ mit 105 Balken</strong></td><td>Stapel sind auf 375 px nicht ablesbar: Die Teilbalken haben keine gemeinsame Nulllinie. 105 Balken sind unlesbar.</td><td>Ein Balken je Woche, die Sportarten als eigene Balken im Detail; ab einem Jahr Monatssummen mit Achse „Monat“.</td></tr>
           <tr><td><strong>Kürzel „8 W / 6 M / 1 J“, „Sc / Wa / Ra“</strong></td><td>Versteht niemand ohne Einweisung.</td><td>„8 Wochen“, „6 Monate“, „1 Jahr“; Symbole je Sportart in der Liste.</td></tr>
-          <tr><td><strong>„Einheiten“ zweimal, einmal je Woche, einmal gesamt</strong></td><td>Gleiches Wort, andere Bedeutung. „Gesamt“ und „Pro Woche“ ohne Zeitraum.</td><td>„Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Meiste km“ statt „Lieblingssport“.</td></tr>
-          <tr><td><strong>Schrift 12 px, kein <code>aria-pressed</code>, nur dunkel</strong></td><td>Auf dem Handy in der Sonne unlesbar, für Screenreader stumm.</td><td>Mindestens 13 px, <code>aria-pressed</code>, sprechendes <code>aria-label</code> am Ring, Tabelle für Screenreader, helles Thema per <code>prefers-color-scheme</code>.</td></tr>
+          <tr><td><strong>„Einheiten“ zweimal, einmal je Woche, einmal gesamt</strong></td><td>Gleiches Wort, andere Bedeutung. „Gesamt“ und „Pro Woche“ ohne Zeitraum.</td><td>„Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Beste Woche, KW 37/2025“.</td></tr>
+          <tr><td><strong>Schrift 12 px, kein <code>aria-pressed</code>, nur dunkel</strong></td><td>Auf dem Handy in der Sonne unlesbar, für Screenreader stumm.</td><td>Mindestens 13 px, <code>aria-pressed</code>, sprechendes <code>aria-label</code>, Tabelle für Screenreader, helles Thema per <code>prefers-color-scheme</code>.</td></tr>
         </tbody>
       </table>
     </div>
@@ -102,35 +111,38 @@
       <h3>Das Muster</h3>
       <p>Alle acht Befunde sind Aussagefehler, kein einziger ein Rechenfehler. Genau deshalb fällt sie kein Test, und
         genau deshalb fallen sie beim ersten Blick nicht auf: Die Zahlen stimmen, das Bild ist vertraut, das Gehirn
-        nickt.</p>
+        nickt. Die Korrekturen in der dritten Spalte hat kein Modell vorgeschlagen. Sie kamen aus dem Review: Wer weiß,
+        was ein Kreis bedeutet und was ein Ziel braucht, sieht den Fehler in Sekunden.</p>
     </div>
   </section>
 
   <section class="section-block" id="vergleich">
     <h2>Vorher und nachher</h2>
-    <p>Dieselben Daten, dieselbe API bis auf ein Feld. Der Umbau ist fast vollständig Beschriftung, Deckelung und
-      Bezug.</p>
+    <p>Dieselben Daten, dieselbe API bis auf ein Feld. Links der Erstentwurf der KI, rechts der Zweitentwurf nach der
+      Kritik eines Menschen.</p>
     <div style="display:flex; gap:1.5rem; flex-wrap:wrap; align-items:flex-start">
       <div class="shot schmal" style="flex:1 1 300px">
         <img src="assets/img/dashboard-vorher-mobile.png" alt="Erster Entwurf des Dashboards: geschlossener Ring mit 161 % vom Ziel über Kalenderwoche 36, Balken ohne Achsenbeschriftung, Kürzel Sc, Wa, Ra in der Liste" loading="lazy">
-        <div class="unterschrift">Vorher: Ring geschlossen bei 161 %, Karte „Kalenderwoche 36“, Balken ohne Achse, Kürzel.</div>
+        <div class="unterschrift">Erstentwurf: Ring geschlossen bei 161 %, Karte „Kalenderwoche 36“, gestapelte Balken ohne Achse, Kürzel.</div>
       </div>
       <div class="shot schmal" style="flex:1 1 300px">
-        <img src="assets/img/dashboard-mobile.png" alt="Dashboard nach dem Semantik-Review: Letzte Trainingswoche mit gedeckeltem grünem Ring 64,4 von 40 km, Ziel erreicht 24,4 km darüber, Kilometer je Sportart, gestapeltes Balkendiagramm mit Achse Kalenderwoche, Legende und Ziellinie, Liste mit Symbolen" loading="lazy">
-        <div class="unterschrift">Nachher: Ergebnis statt Fortschritt, Kilometer statt Prozent, Achse, Legende, Ziellinie, Symbole.</div>
+        <img src="assets/img/dashboard-mobile.png" alt="Zweitentwurf: Letzte Trainingswoche mit Bullet-Graph, 64,4 km gegen Marke bei 40 km, Badges Ziel erreicht und 3 Wochen in Folge, Kilometer je Sportart, Kennzahl-Kacheln, Wochenverlauf mit Ziellinie und Detail, Trainingskalender, Sportarten-Kacheln, Aktivitätenliste mit Symbolen" loading="lazy">
+        <div class="unterschrift">Zweitentwurf: Bullet-Graph mit Zielmarke, Badge, ein Balken je Woche mit Detail, Kalender, Kacheln, Symbole.</div>
       </div>
     </div>
     <div class="shot">
       <img src="assets/img/vergleich-desktop.png" alt="Desktop-Ansicht vorher und nachher untereinander" loading="lazy">
-      <div class="unterschrift">Desktop, zwei Spalten: oben der erste Entwurf, unten der Stand nach US-7.</div>
+      <div class="unterschrift">Desktop, zwei Spalten: oben der Erstentwurf, unten der Zweitentwurf nach US-7.</div>
     </div>
     <h3>Was besser wurde</h3>
     <ul>
-      <li><strong>Wochenkarte:</strong> „Letzte Trainingswoche, KW 36, 31.08. bis 06.09.2026 · Ziel 40 km über alle Sportarten“. Ring voll und grün, im Ring „64,4 von 40 km“, daneben „Ziel erreicht, 24,4 km darüber“, darunter Radfahren 52,6 km, Wandern 9,8 km, Schwimmen 2,0 km.</li>
-      <li><strong>Diagramm:</strong> Gestapelt je Sportart in den Sportfarben, Achse „Kalenderwoche“ mit Einheit „km“, gestrichelte Ziellinie, Legende. Die jüngste Woche ist umrandet und unter dem Diagramm beschrieben; ein Klick auf einen anderen Balken wechselt die Beschreibung. „Alles“ zeigt Monate.</li>
-      <li><strong>Kacheln:</strong> „Gesamt seit Sep 2024“, „Ø pro Woche“, „Meiste km“, „Einheiten gesamt“. Jeder Bezug steht dran, kein Wort bedeutet zweimal etwas anderes.</li>
+      <li><strong>Wochenkarte:</strong> „Letzte Trainingswoche, KW 36, 31.08. bis 06.09.2026 · Ziel 40 km über alle Sportarten“. Die große Zahl 64,4 km, daneben „24,4 km über dem Ziel“. Der Bullet-Graph: Balken nach Sportart gefärbt, Zielmarke bei 40 km, Achse 0 bis 80 km. Badges „Ziel erreicht“ und „3 Wochen in Folge“. Darunter Einheiten, Minuten, Ø je Einheit.</li>
+      <li><strong>Verlauf:</strong> Ein Balken je Woche, grün ab 40 km, sonst gold, gestrichelte Ziellinie, Achse „Kalenderwoche“ mit Einheit „km“. Tippen irgendwo in der Spalte wählt die Woche; darunter stehen Zeitraum, Summe und ein Balken je Sportart. Ab einem Jahr Monatssummen.</li>
+      <li><strong>Trainingskalender:</strong> Ein Feld je Tag der letzten acht Wochen, vier Farbstufen nach Kilometern, Zahl im Feld, Tippen zeigt die Einheit. Regelmäßigkeit wird sichtbar, die ein Wochenbalken verbirgt.</li>
+      <li><strong>Sportarten-Kacheln:</strong> Kilometer, Anteil als Balken, Einheiten je Sportart. Tippen filtert die Aktivitätenliste, noch einmal Tippen hebt den Filter auf.</li>
+      <li><strong>Kennzahlen:</strong> „Gesamt seit Sep 2024“, „Ø pro Woche“, „Beste Woche, KW 37/2025“, „Einheiten gesamt“. Jeder Bezug steht dran, kein Wort bedeutet zweimal etwas anderes.</li>
       <li><strong>Liste:</strong> Wochentag im Datum, Symbol je Sportart statt „Sc“, „20 weitere anzeigen“ und „Alle anzeigen“.</li>
-      <li><strong>Bedienung:</strong> Mindestschrift 13 px, Bedienelemente 44 px, Fokusring per Tastatur, <code>aria-pressed</code> an den Umschaltern, sprechendes <code>aria-label</code> am Ring, eine für Screenreader sichtbare Tabelle mit den Diagrammwerten, helles und dunkles Thema.</li>
+      <li><strong>Bedienung:</strong> Alles antippbar, Mindestschrift 13 px, Bedienelemente 44 px, Fokusring per Tastatur, <code>aria-pressed</code> an Umschaltern, Kalenderfeldern und Kacheln, sprechendes <code>aria-label</code> am Bullet-Graph, eine für Screenreader sichtbare Tabelle mit den Diagrammwerten, helles und dunkles Thema.</li>
     </ul>
   </section>
 
@@ -145,17 +157,19 @@
           <tr><td><strong>Bedeutung</strong></td><td>Kann ich zu jeder Zahl sagen, was sie zeigt, in welcher Einheit und für welchen Zeitraum? Steht das auch dran?</td></tr>
           <tr><td><strong>Nachrechnen</strong></td><td>Kann ich die Zahl aus den Rohdaten selbst herleiten? Eine Stichprobe per SQL oder aus der API-Antwort.</td></tr>
           <tr><td><strong>Zustände</strong></td><td>Was bedeutet das Element bei 0 %, bei 100 %, bei mehr als 100 %, ohne Daten? Was zeigt es, wenn es „voll“ ist? Ist die Aussage dann noch wahr?</td></tr>
+          <tr><td><strong>Form passt zur Aussage</strong></td><td>Ein Kreis zeigt Anteile an einem Ganzen. Ein Ziel braucht eine Marke am Balken (Bullet-Graph), damit Verfehlen und Übertreffen sichtbar bleiben. Verläufe als ein Balken je Zeitabschnitt, keine Stapel auf 375 px.</td></tr>
           <tr><td><strong>Zeitbezug</strong></td><td>Ist der Zeitraum abgeschlossen oder laufend? Ein Fortschrittsbalken für eine vergangene Woche ist ein Ergebnis, kein Fortschritt.</td></tr>
           <tr><td><strong>Achsen und Legende</strong></td><td>Hat jede Achse Titel und Einheit? Ist jede Farbe erklärt? Weiß ich, welcher Balken welche Woche ist?</td></tr>
           <tr><td><strong>Gleiche Wörter</strong></td><td>Kommt ein Begriff zweimal vor, meint er beide Male dasselbe? Sonst Bezug ergänzen.</td></tr>
           <tr><td><strong>Abkürzungen</strong></td><td>Versteht jemand ohne Einweisung „8 W“, „Sc“, „Ø“? Ausschreiben oder erklären.</td></tr>
           <tr><td><strong>Extremfälle</strong></td><td>Sieht die Ansicht mit 0, 1 und 105 Datenpunkten noch sinnvoll aus? „Alles“ ausprobieren.</td></tr>
           <tr><td><strong>Bedienbarkeit</strong></td><td>Schrift mindestens 13 px, Bedienelemente 44 px, Tastatur mit Fokusring, <code>aria-pressed</code>, sprechende <code>aria-label</code>, Kontrast, helles und dunkles Thema.</td></tr>
+          <tr><td><strong>Touch</strong></td><td>Jede Grafik ist antippbar und nennt dann ihre Zahl im Klartext: Balken, Kalenderfeld, Kachel. Kein Tooltip, der nur mit der Maus erscheint.</td></tr>
           <tr><td><strong>Zehn Sekunden</strong></td><td>Die Ansicht jemandem zehn Sekunden zeigen und erklären lassen. Was falsch erklärt wird, ist falsch dargestellt.</td></tr>
         </tbody>
       </table>
     </div>
-    <p>Nachrechnen am Beispiel: Die Chips der Wochenkarte müssen dieser Abfrage entsprechen. Sie können sie im Lab
+    <p>Nachrechnen am Beispiel: Die Aufteilung nach Sportart in der Wochenkarte muss dieser Abfrage entsprechen. Sie können sie im Lab
       <a href="index.html#datenbank" data-lab-link>auf der Startseite</a> gegen die echte Datenbank laufen lassen.</p>
     <pre class="prompt" data-kopieren="SQL-Probe">SELECT sportart, ROUND(SUM(distanz_km), 1) AS km
 FROM v_workout
@@ -168,23 +182,29 @@ ORDER BY km DESC;</pre>
     <h2>Zwei Prompts, die solche Fehler verhindern</h2>
     <h3>1. Bedeutung vor Code</h3>
     <p>Der wirksamste Schutz ist eine Tabelle vor dem Code: Für jedes Element Aussage, Einheit, Zeitbezug und Zustände,
-      vom Modell vorgeschlagen, von der Gruppe bestätigt. Erst danach darf es bauen. Die sieben Regeln sind die acht
+      vom Modell vorgeschlagen, von der Gruppe bestätigt. Erst danach darf es bauen. Die acht Regeln sind die acht
       Befunde, in Anforderungen übersetzt. Sie passen in jeden Frontend-Prompt des Kurses.</p>
     <pre class="prompt" data-kopieren="Prompt: Bedeutung vor Code">Wir bauen das Dashboard von FitTrack (Vanilla JS, Chart.js 4, API-Antworten
 siehe unten). Bevor du Code schreibst, lege die Bedeutung jedes Elements
 fest. Gib eine Tabelle mit den Spalten
-Element | zeigt | Einheit | Zeitbezug | Zustände (0 %, 100 %, über 100 %,
-keine Daten) | Beschriftung im Bild.
+Element | zeigt | Einheit | Zeitbezug | Form | Zustände (0 %, 100 %,
+über 100 %, keine Daten) | Beschriftung im Bild.
 Regeln, die die Tabelle erfüllen muss:
 1. Jede Zahl trägt Einheit und Bezug, z. B. "64,4 km, KW 36, 31.08. bis 06.09.".
-2. Ein Fortschrittselement zeigt nur laufende Zeiträume. Abgeschlossene
-   Zeiträume heißen Ergebnis. Werte über 100 % werden gedeckelt und als
-   "Ziel erreicht, +x km" beschriftet.
-3. Jede Achse hat Titel und Einheit, jede Farbe steht in einer Legende.
-4. Kein Begriff bedeutet an zwei Stellen etwas Verschiedenes.
-5. Keine Abkürzungen, die nicht im Bild erklärt sind.
-6. Beschreibe, wie die Ansicht bei 0, 1 und 105 Datenpunkten aussieht.
-7. Schrift mindestens 13 px, Bedienelemente 44 px, aria-pressed an
+2. Die Form passt zur Aussage: Ein Kreis nur für Anteile an einem Ganzen.
+   Ein Ziel als Bullet-Graph: Balken für den Ist-Wert, Marke für das Ziel,
+   Skala über das Ziel hinaus, damit Übererfüllung sichtbar bleibt.
+3. Fortschritt nur für laufende Zeiträume. Abgeschlossene Zeiträume
+   heißen Ergebnis.
+4. Jede Achse hat Titel und Einheit, jede Farbe steht in einer Legende.
+   Keine gestapelten Balken auf 375 px; Aufteilungen stehen als eigene
+   Balken im Detail.
+5. Kein Begriff bedeutet an zwei Stellen etwas Verschiedenes, keine
+   Abkürzungen, die nicht im Bild erklärt sind.
+6. Touch zuerst: Jede Grafik ist antippbar und nennt dann ihre Zahl im
+   Klartext. Nichts, was nur mit der Maus erscheint.
+7. Beschreibe, wie die Ansicht bei 0, 1 und 105 Datenpunkten aussieht.
+8. Schrift mindestens 13 px, Bedienelemente 44 px, aria-pressed an
    Umschaltern, sprechende aria-label, helles und dunkles Thema.
 Erst wenn ich die Tabelle bestätigt habe, schreibst du den Code.
 API-Antworten: [Beispiel von /api/stats und /api/stats/wochen einfügen]</pre>
@@ -194,15 +214,17 @@ API-Antworten: [Beispiel von /api/stats und /api/stats/wochen einfügen]</pre>
       es gerade gebaut hat.</p>
     <pre class="prompt" data-kopieren="Prompt: Selbstprüfung">Prüfe deinen Vorschlag wie ein kritischer Designer, der ihn zum ersten
 Mal sieht. Gehe jedes sichtbare Element durch und beantworte: Was
-bedeutet es? Woher kommt der Wert? Was zeigt es bei 0, bei mehr als
-100 %, bei 105 Datenpunkten? Nenne jede Stelle, an der die Darstellung
-mehr behauptet als die Daten hergeben, und schlage die Korrektur vor.
-Lobe nichts. Wenn du nichts findest, sage das und begründe es je Element.</pre>
+bedeutet es? Woher kommt der Wert? Passt die Form zur Aussage? Was zeigt
+es bei 0, bei mehr als 100 %, bei 105 Datenpunkten, auf 375 px Breite
+ohne Maus? Nenne jede Stelle, an der die Darstellung mehr behauptet als
+die Daten hergeben, und schlage die Korrektur vor. Lobe nichts. Wenn du
+nichts findest, sage das und begründe es je Element.</pre>
     <div class="info-box">
       <h3>Was der zweite Prompt findet, und was nicht</h3>
       <p>Er findet den geschlossenen Ring, die Zahl ohne Einheit, die fehlende Achse, das doppelte Wort. Er findet
-        nicht, ob 40 km über alle Sportarten ein sinnvolles Ziel ist, ob die Woche wirklich vorbei ist oder ob jemand
-        die Ansicht in zehn Sekunden erklären kann. Das bleibt bei der Gruppe.</p>
+        nicht, dass ein Ziel eine Marke braucht und kein Kreis, dass ein Kalender Regelmäßigkeit zeigt, die kein Balken
+        verrät, oder ob jemand die Ansicht in zehn Sekunden erklären kann. Das bleibt bei der Gruppe. Genau dort
+        entsteht aus dem Erstentwurf der Zweitentwurf.</p>
     </div>
   </section>
 
@@ -213,11 +235,13 @@ Lobe nichts. Wenn du nichts findest, sage das und begründe es je Element.</pre>
     <pre class="prompt" data-kopieren="US-7">US-7: Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard
       genau das aussagt, was die Daten hergeben, damit ich mich nicht
       auf ein schönes, aber falsches Bild verlasse.
-      Akzeptanz: Der Ring geht nie über 100 %; eine abgeschlossene Woche
-      heißt Ergebnis, nicht Fortschritt; jede Achse und jede Farbe ist
-      beschriftet; GET /api/stats/wochen liefert je Woche je_sportart;
-      Schrift mindestens 13 px, Umschalter mit aria-pressed, helles und
-      dunkles Thema.</pre>
+      Akzeptanz: Das Wochenziel ist ein Bullet-Graph mit Zielmarke, eine
+      Übererfüllung bleibt sichtbar; eine abgeschlossene Woche heißt
+      Ergebnis, nicht Fortschritt; jede Achse und jede Farbe ist
+      beschriftet; jede Grafik ist antippbar und nennt dann ihre Zahl;
+      GET /api/stats/wochen liefert je Woche je_sportart; Schrift
+      mindestens 13 px, Umschalter mit aria-pressed, helles und dunkles
+      Thema.</pre>
     <p>Das Backend liefert die Kilometer je Sportart und Woche, damit das Frontend nichts selbst zusammenrechnet.
       Erwartungswerte aus dem Fixture, von Hand: KW 23 hat Laufen 13,0, Radfahren 20,0, Schwimmen 1,5; Probe
       13,0 + 20,0 + 1,5 = 34,5, die bekannte Wochensumme.</p>
@@ -249,9 +273,11 @@ Lobe nichts. Wenn du nichts findest, sage das und begründe es je Element.</pre>
     <ul>
       <li>Tests sichern die Daten, nicht die Aussage. Grüne Tests sagen nichts darüber, ob eine Grafik die Wahrheit zeigt.</li>
       <li>Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen.</li>
-      <li>Acht Befunde im ersten Entwurf, keiner ein Rechenfehler: Ring, Zeitbezug, Achse, Kürzel, doppelte Wörter, Bedienbarkeit.</li>
+      <li>Acht Befunde im Erstentwurf, keiner ein Rechenfehler: Kreis statt Marke, Zeitbezug, Achse, Stapel, Kürzel, doppelte Wörter, Bedienbarkeit.</li>
+      <li>Die Form muss zur Aussage passen: Kreis für Anteile, Bullet-Graph für Ziele, ein Balken je Woche für Verläufe, ein Feld je Tag für Regelmäßigkeit.</li>
+      <li>KI allein liefert einen brauchbaren Erstentwurf. Gut wird er durch die Kritik eines Menschen, der weiß, was die Formen bedeuten.</li>
       <li>Der Semantik-Review stellt an jedes Element dieselbe Frage: Was bedeutet das, und stimmt es?</li>
-      <li>Bedeutung vor Code: Der Prompt lässt das Modell erst eine Tabelle vorlegen, dann bauen. Ein zweiter Prompt lässt es den eigenen Vorschlag zerlegen.</li>
+      <li>Bedeutung und Form vor Code: Der Prompt lässt das Modell erst eine Tabelle vorlegen, dann bauen. Ein zweiter Prompt lässt es den eigenen Vorschlag zerlegen.</li>
       <li>Aus dem Review wird eine Story mit Test und Tag, kein stilles Nachbessern.</li>
     </ul>
     <div data-lab-nav></div>

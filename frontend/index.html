@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
   <title>FitTrack</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230f1419'/><circle cx='16' cy='16' r='9' fill='none' stroke='%23f5b841' stroke-width='5'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230f1419'/><rect x='6' y='13' width='14' height='6' rx='2' fill='%23f5b841'/><rect x='22' y='9' width='3' height='14' fill='%23f2f5f7'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -28,44 +28,50 @@
     <p id="zeitraum" class="kopf-untertitel">…</p>
   </header>
 
-  <!-- 1. Wochenkarte: laufende Woche als Fortschritt, sonst die letzte Trainingswoche als Ergebnis -->
+  <!-- 1. Wochenkarte: Bullet-Graph mit Zielmarke, Status-Badge, Kilometer je Sportart -->
   <section id="woche" class="karte karte-woche" aria-labelledby="woche-titel">
-    <h2 id="woche-titel" class="karte-titel">…</h2>
-    <p id="woche-untertitel" class="karte-untertitel">…</p>
-    <div class="woche-inhalt">
-      <div class="ring" role="img" id="ring" aria-label="Wochenziel">
-        <svg viewBox="0 0 120 120" width="120" height="120">
-          <circle class="ring-spur" cx="60" cy="60" r="52"></circle>
-          <circle id="ring-balken" class="ring-balken" cx="60" cy="60" r="52"></circle>
-        </svg>
-        <div class="ring-text">
-          <span id="ring-zahl" class="ring-zahl">…</span>
-          <span id="ring-label" class="ring-label">von 40 km</span>
-        </div>
+    <div class="karte-kopf">
+      <div>
+        <h2 id="woche-titel" class="karte-titel">…</h2>
+        <p id="woche-untertitel" class="karte-untertitel">…</p>
       </div>
-      <div class="woche-werte">
-        <p id="woche-status" class="woche-status">…</p>
-        <dl class="woche-zahlen">
-          <div><dt>Einheiten</dt><dd id="woche-anzahl">…</dd></div>
-          <div><dt>Minuten</dt><dd id="woche-minuten">…</dd></div>
-        </dl>
-        <ul id="woche-sportarten" class="sport-chips" aria-label="Kilometer je Sportart"></ul>
+      <div class="badges">
+        <span id="badge-status" class="badge">…</span>
+        <span id="badge-serie" class="badge badge-leise" hidden>…</span>
       </div>
     </div>
+    <p class="woche-km">
+      <span id="woche-km" class="zahl-gross">…</span><span class="einheit">km</span>
+      <span id="woche-status" class="woche-status">…</span>
+    </p>
+    <figure id="bullet" class="bullet" role="img" aria-label="Wochenziel">
+      <div class="bullet-spur">
+        <div id="bullet-zielbereich" class="bullet-zielbereich"></div>
+        <div id="bullet-balken" class="bullet-balken"></div>
+        <div id="bullet-ziel" class="bullet-ziel"><span>Ziel</span></div>
+      </div>
+      <div id="bullet-achse" class="bullet-achse"></div>
+    </figure>
+    <ul id="woche-sportarten" class="sport-chips" aria-label="Kilometer je Sportart"></ul>
+    <dl class="woche-zahlen">
+      <div><dt>Einheiten</dt><dd id="woche-anzahl">…</dd></div>
+      <div><dt>Minuten</dt><dd id="woche-minuten">…</dd></div>
+      <div><dt>Ø je Einheit</dt><dd id="woche-schnitt">…</dd></div>
+    </dl>
   </section>
 
   <!-- 2. Kennzahlen über den gesamten Zeitraum -->
   <dl id="kennzahlen" class="kennzahlen" aria-label="Kennzahlen">
     <div class="kachel"><dt id="stat-gesamt-label">Gesamt</dt><dd><span id="stat-gesamt">…</span><small>km</small></dd></div>
     <div class="kachel"><dt>Ø pro Woche</dt><dd><span id="stat-woche">…</span><small>km</small></dd></div>
-    <div class="kachel"><dt>Meiste km</dt><dd><span id="stat-sport">…</span></dd></div>
+    <div class="kachel"><dt id="stat-beste-label">Beste Woche</dt><dd><span id="stat-beste">…</span><small>km</small></dd></div>
     <div class="kachel"><dt>Einheiten gesamt</dt><dd><span id="stat-anzahl">…</span></dd></div>
   </dl>
 
-  <!-- 3. Wochenverlauf: gestapelte Balken je Sportart, Zeitraumwahl, Ziel als Linie -->
-  <section id="diagramm" class="karte" aria-labelledby="diagramm-titel">
+  <!-- 3. Verlauf: ein Balken je Woche, Ziel als Linie, Tippen zeigt die Woche im Detail -->
+  <section id="verlauf" class="karte" aria-labelledby="verlauf-titel">
     <div class="karte-kopf">
-      <h2 id="diagramm-titel" class="karte-titel">Kilometer pro Woche</h2>
+      <h2 id="verlauf-titel" class="karte-titel">Kilometer pro Woche</h2>
       <div class="zeitraum-wahl" role="group" aria-label="Zeitraum">
         <button type="button" data-wochen="8" aria-pressed="true">8 Wochen</button>
         <button type="button" data-wochen="26" aria-pressed="false">6 Monate</button>
@@ -73,11 +79,18 @@
         <button type="button" data-wochen="0" aria-pressed="false">Alles</button>
       </div>
     </div>
-    <ul id="diagramm-legende" class="legende" aria-label="Legende"></ul>
+    <ul class="legende" aria-label="Legende">
+      <li class="erreicht">Ziel erreicht</li>
+      <li class="offen">Unter dem Ziel</li>
+      <li id="legende-ziel" class="ziel">Wochenziel 40 km</li>
+    </ul>
     <div class="diagramm-flaeche">
       <canvas id="wochen-chart" role="img" aria-label="Balkendiagramm, Werte stehen in der Tabelle darunter"></canvas>
     </div>
-    <p id="diagramm-auswahl" class="diagramm-auswahl" aria-live="polite">…</p>
+    <div id="verlauf-detail" class="detail" aria-live="polite">
+      <p id="detail-titel" class="detail-titel">…</p>
+      <ul id="detail-sportarten" class="detail-sportarten"></ul>
+    </div>
     <table id="diagramm-tabelle" class="nur-vorlesen">
       <caption>Kilometer je Zeitabschnitt</caption>
       <thead><tr><th>Zeitraum</th><th>Kilometer</th><th>Einheiten</th></tr></thead>
@@ -85,9 +98,30 @@
     </table>
   </section>
 
-  <!-- 4. Die letzten Trainingseinheiten -->
+  <!-- 4. Trainingskalender: ein Feld je Tag, Farbe nach Kilometern, Tippen zeigt die Einheit -->
+  <section id="kalender" class="karte" aria-labelledby="kalender-titel">
+    <h2 id="kalender-titel" class="karte-titel">Trainingskalender</h2>
+    <p id="kalender-untertitel" class="karte-untertitel">Letzte 8 Wochen, ein Feld je Tag. Tippen zeigt die Einheit.</p>
+    <div class="kalender-kopf" aria-hidden="true">
+      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+    </div>
+    <div id="kalender-raster" class="kalender-raster" role="grid" aria-label="Tage mit Training"></div>
+    <p id="kalender-detail" class="detail-titel" aria-live="polite">…</p>
+  </section>
+
+  <!-- 5. Sportarten: eine Kachel je Sportart, Tippen filtert die Aktivitäten -->
+  <section id="sportarten" class="karte" aria-labelledby="sportarten-titel">
+    <h2 id="sportarten-titel" class="karte-titel">Sportarten</h2>
+    <p class="karte-untertitel">Anteil an allen Kilometern. Tippen filtert die Liste darunter.</p>
+    <div id="sport-kacheln" class="sport-kacheln"></div>
+  </section>
+
+  <!-- 6. Die letzten Trainingseinheiten -->
   <section id="aktivitaeten" class="karte" aria-labelledby="aktivitaeten-titel">
-    <h2 id="aktivitaeten-titel" class="karte-titel">Letzte Aktivitäten</h2>
+    <div class="karte-kopf">
+      <h2 id="aktivitaeten-titel" class="karte-titel">Letzte Aktivitäten</h2>
+      <button id="filter-aufheben" type="button" class="knopf knopf-klein" hidden>Filter aufheben</button>
+    </div>
     <ol id="aktivitaeten-liste" class="aktivitaeten-liste">
       <li class="hinweis">…</li>
     </ol>

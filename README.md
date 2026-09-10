@@ -141,11 +141,13 @@ US-6: Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen
 US-7: Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard
       genau das aussagt, was die Daten hergeben, damit ich mich nicht
       auf ein schönes, aber falsches Bild verlasse.
-      Akzeptanz: Der Ring geht nie über 100 %; eine abgeschlossene Woche
-      heißt Ergebnis, nicht Fortschritt; jede Achse und jede Farbe ist
-      beschriftet; GET /api/stats/wochen liefert je Woche je_sportart;
-      Schrift mindestens 13 px, Umschalter mit aria-pressed, helles und
-      dunkles Thema. Siehe docs/checklisten.md, Abschnitt „Schön, aber falsch“.
+      Akzeptanz: Das Wochenziel ist ein Bullet-Graph mit Zielmarke, eine
+      Übererfüllung bleibt sichtbar; eine abgeschlossene Woche heißt
+      Ergebnis, nicht Fortschritt; jede Achse und jede Farbe ist
+      beschriftet; jede Grafik ist antippbar und nennt dann ihre Zahl;
+      GET /api/stats/wochen liefert je Woche je_sportart; Schrift
+      mindestens 13 px, Umschalter mit aria-pressed, helles und dunkles
+      Thema. Siehe docs/checklisten.md, Abschnitt „Schön, aber falsch“.
 ```
 
 ### Sprint 3 – Docker und Abnahme
@@ -194,7 +196,9 @@ Die Referenzlösung läuft unter <https://fittrack-k7gg.onrender.com>. Der Free-
 - `anzahl`: Anzahl der Einheiten.
 - Leere Datenliste: 0.0, 0.0, `null`, 0.
 - `je_sportart` (pro Woche in `/api/stats/wochen`): Summe `distanz_km` je Sportart, gerundet auf 1 Nachkommastelle; Wochen ohne Training liefern `{}`.
-- Wochenziel 40 km: einzige Konstante im Frontend (`WOCHENZIEL_KM` in `app.js`), gilt über alle Sportarten und steht so auch in der Wochenkarte.
+- Wochenziel 40 km: einzige Konstante im Frontend (`WOCHENZIEL_KM` in `app.js`), gilt über alle Sportarten und steht so auch in der Wochenkarte. Dargestellt als Bullet-Graph: Balken für die Ist-Kilometer, Marke für das Ziel, Skala bis über das Ziel hinaus.
+- Status-Badge: „Ziel erreicht“ ab 40 km; in der laufenden Woche „Auf Kurs“, wenn die Kilometer mindestens dem anteiligen Ziel nach verstrichenen Tagen entsprechen, sonst „Im Rückstand“; abgeschlossene Wochen unter 40 km: „Unter dem Ziel“. „n Wochen in Folge“ zählt zusammenhängende Wochen mit erreichtem Ziel.
+- Trainingskalender und Sportarten-Kacheln rechnen im Browser aus `/api/workouts`: Kilometer je Tag, Kilometer und Anteil je Sportart.
 
 Rechnet die Erwartungswerte für das Fixture selbst aus, bevor ihr die KI nach Code fragt. Sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt.
 
