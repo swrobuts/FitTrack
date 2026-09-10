@@ -57,8 +57,8 @@
   <section class="section-block" id="warum">
     <h2>Das Problem, das es löst</h2>
     <p>Software hängt an Betriebssystem, Python-Version und Bibliotheken. Jede Abweichung erzeugt einen Fehler, den
-      niemand nachstellen kann. Der Container paketiert die Anwendung mit ihrer gesamten Laufzeit. Aus einer Behauptung
-      über die Umgebung wird eine überprüfbare Zusage.</p>
+      niemand nachstellen kann. Der Container paketiert die Anwendung mit ihrer gesamten Laufzeit. Ob die Anwendung läuft, hängt dann nicht mehr vom einzelnen Rechner ab,
+      sondern lässt sich überall gleich prüfen.</p>
     <div class="karten">
       <div class="karte">
         <div class="kopfzeile">Ohne Container</div>
@@ -233,7 +233,7 @@ Erkläre in drei Sätzen, warum requirements.txt vor dem Code kopiert wird.</pre
     <h2>Zusammenfassung</h2>
     <ul>
       <li>Image ist der Bauplan, Container die laufende Instanz. <code>docker images</code> und <code>docker ps -a</code> zeigen beide.</li>
-      <li>Abhängigkeiten vor dem Code kopieren, damit der Schichten-Cache greift.</li>
+      <li>Abhängigkeiten vor dem Code kopieren, damit Docker die bereits gebauten Schichten wiederverwendet.</li>
       <li><code>--host 0.0.0.0</code> und die Shell-Form der CMD sind die zwei Stolpersteine, die den Container von außen unerreichbar machen.</li>
       <li><code>-p 8001:8000</code> weicht einem belegten Port aus. Links Rechner, rechts Container.</li>
       <li>Compose macht aus Bauen und Starten einen Befehl. <code>stop</code> hält an, <code>down</code> entfernt.</li>

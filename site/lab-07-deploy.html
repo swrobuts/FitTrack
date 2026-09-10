@@ -40,7 +40,7 @@
   <h1 class="lab-title">Render und GitHub Actions</h1>
   <p class="lab-intro">Ein Push, und Render baut dasselbe Image, das Sie in Lab 06 lokal gebaut haben, startet den
     Container und stellt ihn unter einer öffentlichen HTTPS-Adresse bereit. Parallel lässt GitHub Actions
-    <code>pytest</code> laufen. Deployment ist damit kein Handgriff am Server, sondern Teil der Kette: Commit, Push,
+    <code>pytest</code> laufen. Deployment ist damit keine Arbeit am Server, sondern Teil der Kette: Commit, Push,
     Tests, Build, Betrieb. Und die Frage, warum diese Lernumgebung auf GitHub Pages liegt, die App aber nicht.</p>
   <div class="lernziele">
     <span class="lernziel-chip">Statisch vs. Web Service</span>
@@ -84,7 +84,7 @@ flowchart LR
     C --> URL["https://fittrack-….onrender.com<br/>Health-Check auf /health"]
     GH --> P["GitHub Pages<br/>FitTrack-Lab, statisch"]
       </pre>
-      <div class="unterschrift">Ein Push auf <code>main</code> löst drei Dinge aus: Tests, Deploy der App, Deploy dieser Seiten. Was wo läuft, ist an der Kante ablesbar.</div>
+      <div class="unterschrift">Ein Push auf <code>main</code> löst drei Dinge aus: Tests, Deploy der App, Deploy dieser Seiten. An jedem Pfeil steht, was wo läuft.</div>
     </div>
   </section>
 
@@ -171,7 +171,7 @@ jobs:
     <div class="concept-box">
       <h3>Warum ein fremder Rechner</h3>
       <p>Auf dem eigenen Rechner sind die Pakete schon da, die Umgebung ist eingerichtet, ein vergessener Eintrag in
-        <code>requirements.txt</code> fällt nicht auf. Der Runner bei GitHub fängt bei null an. Besteht der Test dort,
+        <code>requirements.txt</code> fällt nicht auf. Der Runner bei GitHub beginnt mit einem leeren System. Besteht der Test dort,
         besteht er überall. Dasselbe Argument wie beim Container.</p>
     </div>
   </section>

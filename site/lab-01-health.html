@@ -178,7 +178,7 @@ def test_health():
     assert antwort.json() == {"status": "ok"}</pre>
     <div class="info-box">
       <h3>Was der rote Lauf beweist</h3>
-      <p>Ein Test, der von Beginn an grün ist, hat nichts belegt. Der rote Lauf zeigt, dass der Test überhaupt greift.
+      <p>Ein Test, der von Beginn an grün ist, hat nichts belegt. Der fehlgeschlagene Lauf zeigt, dass der Test überhaupt etwas prüft.
         Im Starter scheitert er schon am Import: <code>ModuleNotFoundError: No module named 'app.main'</code>.</p>
     </div>
   </section>
@@ -298,7 +298,7 @@ def health() -> dict:
   <section class="section-block" id="zusammenfassung">
     <h2>Zusammenfassung</h2>
     <ul>
-      <li>Der Test steht vor dem Prompt. Der rote Lauf beweist, dass er greift.</li>
+      <li>Der Test steht vor dem Prompt. Der fehlgeschlagene Lauf beweist, dass er etwas prüft.</li>
       <li>Der Prompt trägt Rolle, Kontext, Aufgabe, Randbedingungen und den Test. Der Chat sieht das Repository nicht.</li>
       <li>Die Antwort wird gelesen und geprüft, bevor sie in WebStorm landet. Ungefragte Ergänzungen werden weggelassen.</li>
       <li>Schlägt der Test danach fehl, geht der Traceback wörtlich zurück in den Chat.</li>
