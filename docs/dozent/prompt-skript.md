@@ -59,9 +59,11 @@ pytest
 **Zeigen:**
 
 - `README.md` mit Backlog und Datenmodell
-- `backend/app/data/workouts.json`: 311 echte Einheiten
-- `backend/tests/fixtures/workouts_klein.json`: 8 Einheiten für die Tests
-- `backend/tests/conftest.py`: warum die Tests das Fixture nutzen (Testdaten sind nicht Produktionsdaten)
+- `backend/app/data/fittrack.db`: SQLite-Datenbank mit 311 echten Einheiten, Schema in `schema.sql` (zwei Tabellen, eine Sicht)
+- `backend/tests/fixtures/workouts_klein.sql`: 8 Einheiten für die Tests, als lesbare SQL-Datei
+- `backend/tests/conftest.py`: warum die Tests eine eigene, frisch gebaute Testdatenbank nutzen (Testdaten sind nicht Produktionsdaten)
+
+**Datenhaltung zeigen (5 Minuten):** `schema.sql` in WebStorm öffnen und die drei Objekte erklären: Tabelle `sportart` (Name genau einmal gespeichert), Tabelle `workout` mit Fremdschlüssel und CHECK-Regeln, Sicht `v_workout`, die beide verbindet. Dann in WebStorm über das Database-Werkzeugfenster oder in DataGrip `fittrack.db` öffnen und `SELECT * FROM v_workout ORDER BY datum DESC LIMIT 5;` ausführen. Das ER-Diagramm steht im README. Botschaft: Die App liest nur die Sicht, das Schema schützt die Daten.
 
 **Agiles Setup (0:20 bis 0:40):** Vision vorlesen, Rollen vergeben, Sprint-1-Ziel festlegen: „Am Ende liefern `/api/workouts` und `/api/stats` korrekte, getestete Daten.“
 
@@ -153,9 +155,17 @@ def test_workouts_sortiert_absteigend():
     daten = client.get("/api/workouts").json()
     assert daten[0]["id"] == 8      # jüngstes Training zuerst (2026-06-21)
     assert daten[-1]["id"] == 1     # ältestes Training zuletzt (2026-06-01)
+
+
+def test_echtdaten_sind_lesbar():
+    # Rauchtest gegen die echte Datenbank: Sie muss gültig und gefüllt sein.
+    from app.daten import STANDARD_DATEI, lade_workouts
+    echt = lade_workouts(STANDARD_DATEI)
+    assert len(echt) > 250
+    assert {"Laufen", "Radfahren", "Schwimmen", "Wandern"} == {w["sportart"] for w in echt}
 ```
 
-Frage an die Gruppe: Warum 8 und nicht 311? Antwort steht in `conftest.py`.
+Frage an die Gruppe: Warum 8 und nicht 311? Antwort steht in `conftest.py`: Die Tests bauen bei jedem Lauf eine eigene Datenbank aus `schema.sql` und `workouts_klein.sql`. Nur der Rauchtest schaut in die echte Datenbank, und er prüft dort nichts Fachliches.
 
 **Prompt:**
 
@@ -170,28 +180,39 @@ app = FastAPI(title="FitTrack", version="0.1.0")
 def health() -> dict:
     return {"status": "ok"}
 
-Die Trainingsdaten liegen als JSON-Liste in backend/app/data/workouts.json.
-Jedes Element sieht so aus:
+Die Trainingsdaten liegen in der SQLite-Datenbank backend/app/data/fittrack.db.
+Das Schema (backend/app/data/schema.sql) hat zwei Tabellen und eine Sicht:
+
+CREATE TABLE sportart (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE, einheit TEXT NOT NULL DEFAULT 'km');
+CREATE TABLE workout (id INTEGER PRIMARY KEY, datum TEXT NOT NULL, sportart_id INTEGER NOT NULL REFERENCES sportart(id),
+                      dauer_min INTEGER NOT NULL, distanz_km REAL NOT NULL, kalorien INTEGER NOT NULL);
+CREATE VIEW v_workout AS SELECT w.id, w.datum, s.name AS sportart, w.dauer_min, w.distanz_km, w.kalorien
+                        FROM workout w JOIN sportart s ON s.id = w.sportart_id;
+
+Eine Zeile der Sicht v_workout sieht als Dictionary so aus:
 {"id": 1, "datum": "2026-06-01", "sportart": "Laufen",
  "dauer_min": 30, "distanz_km": 5.0, "kalorien": 350}
 Sportarten: Laufen, Radfahren, Schwimmen, Wandern. datum ist ISO-Format.
 
 Aufgabe: Implementiere GET /api/workouts. Dafür brauche ich drei Dateien:
-1. backend/app/daten.py mit einer Funktion lade_workouts() -> list[dict].
-   Der Pfad zur JSON-Datei kommt aus der Umgebungsvariable FITTRACK_DATA;
-   ist sie nicht gesetzt, gilt backend/app/data/workouts.json relativ zur
-   Datei daten.py (nicht relativ zum Arbeitsverzeichnis).
-   Die Liste ist sortiert: jüngstes Datum zuerst, bei gleichem Datum
-   höhere id zuerst.
+1. backend/app/daten.py mit einer Funktion lade_workouts(pfad=None) -> list[dict].
+   Sie liest mit dem Standardmodul sqlite3 aus der Sicht v_workout und gibt
+   eine Liste von Dictionaries zurück (sqlite3.Row als row_factory).
+   Der Pfad zur Datenbank kommt aus der Umgebungsvariable FITTRACK_DATA;
+   ist sie nicht gesetzt, gilt backend/app/data/fittrack.db relativ zur
+   Datei daten.py (nicht relativ zum Arbeitsverzeichnis). Der optionale
+   Parameter pfad überschreibt beides.
+   Sortierung in der SQL-Abfrage: ORDER BY datum DESC, id DESC.
+   Verbindung nach dem Lesen schließen (try/finally).
 2. backend/app/models.py mit einem Pydantic-Modell Workout für die sechs Felder.
 3. Ergänzung in main.py: GET /api/workouts mit response_model=list[Workout].
 
 Randbedingungen:
-- Nur Standardbibliothek, FastAPI und Pydantic
+- Nur Standardbibliothek (sqlite3, os, pathlib), FastAPI und Pydantic, kein ORM
 - Relative Imports innerhalb von app (from .daten import lade_workouts)
 - Deutsche Bezeichner und kurze deutsche Kommentare
 - Diese Tests müssen bestehen (die Tests setzen FITTRACK_DATA auf eine
-  Datei mit 8 Einheiten, ids 1 bis 8, Daten vom 2026-06-01 bis 2026-06-21):
+  Testdatenbank mit 8 Einheiten, ids 1 bis 8, Daten vom 2026-06-01 bis 2026-06-21):
 
 [die drei Tests von oben einfügen]
 
@@ -202,12 +223,14 @@ Gib die drei Dateien vollständig aus und erkläre in drei Sätzen deine Entsche
 
 - Ist der Pfad relativ zur Datei (`Path(__file__).parent`) und nicht zum Arbeitsverzeichnis? Sonst läuft die App nur aus einem bestimmten Ordner.
 - Wird die Umgebungsvariable beim Import gelesen oder bei jedem Aufruf? Beides ist hier in Ordnung, aber die Gruppe sollte es erklären können.
-- Ist die Sortierung wirklich absteigend nach Datum und id? Ein Modell sortiert gern nur nach Datum.
-- Hat das Modell `pandas` oder `orjson` eingeschmuggelt?
+- Sortiert die SQL-Abfrage nach Datum und id absteigend? Ein Modell sortiert gern nur nach Datum oder sortiert in Python nach, statt ORDER BY zu nutzen.
+- Liest der Code die Sicht `v_workout` oder baut er den JOIN selbst nach? Beides funktioniert, die Sicht ist der vereinbarte Weg.
+- Wird die Verbindung geschlossen? Offene Verbindungen sind der klassische Fehler bei SQLite.
+- Hat das Modell `pandas` oder ein ORM wie SQLAlchemy eingeschmuggelt?
 
 **WebStorm:** zwei neue Dateien `daten.py`, `models.py` in `backend/app`, `main.py` ergänzen.
 
-**Befehle:** `pytest` (4 passed). Server neu laden, <http://localhost:8000/api/workouts> zeigt 311 Einheiten.
+**Befehle:** `pytest` (5 passed). Server neu laden, <http://localhost:8000/api/workouts> zeigt 311 Einheiten.
 
 **Commit:** `feat(US-1): Workouts-Endpunkt mit Datenmodell`
 
@@ -217,7 +240,7 @@ Gib die drei Dateien vollständig aus und erkläre in drei Sätzen deine Entsche
 
 **Story:** Als Nutzer möchte ich meine Kennzahlen abrufen, damit ich meinen Fortschritt sehe. Akzeptanz: `GET /api/stats` liefert `gesamt_km`, `durchschnitt_km_pro_woche`, `lieblingssportart`, `anzahl`, korrekt berechnet für das Fixture.
 
-**Zuerst rechnen, nicht prompten.** Die Gruppe rechnet die Erwartungswerte aus `workouts_klein.json` mit dem Taschenrechner. Definitionen stehen im README. Lösung für den Dozenten: `docs/dozent/erwartungswerte.md`. Typischer Streitpunkt: Zählt die leere KW 24 mit? Ja, laut Definition. Ergebnis: 87,5 km, 3 Wochen, 29,2 km pro Woche, Radfahren, 8 Einheiten.
+**Zuerst rechnen, nicht prompten.** Die Gruppe rechnet die Erwartungswerte aus `workouts_klein.sql` mit dem Taschenrechner. Definitionen stehen im README. Lösung für den Dozenten: `docs/dozent/erwartungswerte.md`. Typischer Streitpunkt: Zählt die leere KW 24 mit? Ja, laut Definition. Ergebnis: 87,5 km, 3 Wochen, 29,2 km pro Woche, Radfahren, 8 Einheiten.
 
 **Test zuerst** (`pytest`: 5 failed):
 
@@ -309,7 +332,7 @@ aus. Erkläre in drei Sätzen, wie du die Kalenderwochen zählst.
 - Ist der Gleichstand behandelt? Der Test prüft ihn nicht. Diskussion: Was, wenn die KI ihn weglässt? Test ergänzen oder bewusst zurückstellen.
 - Enthält `statistik.py` einen FastAPI-Import? Dann ist die Trennung verfehlt.
 
-**Befehle:** `pytest` (9 passed). <http://localhost:8000/api/stats> mit den Echtdaten: 3963 km, 37,7 km pro Woche, Radfahren, 311.
+**Befehle:** `pytest` (10 passed). <http://localhost:8000/api/stats> mit den Echtdaten: 3963 km, 37,7 km pro Woche, Radfahren, 311.
 
 **Commit:** `feat(US-2): Kennzahlen-Endpunkt`
 
@@ -406,7 +429,7 @@ funktionieren? Erkläre das in zwei Sätzen.
 - Steht der Mount nach den API-Routen? Sonst fängt er `/api/...` ab und alle Tests außer `/` werden rot. Guter Moment, das live zu zeigen.
 - Alle ids aus dem Prompt vorhanden? Schritt 5 und 6 bauen darauf.
 
-**Befehle:** `pytest` (10 passed). Browser: Entwicklerwerkzeuge, Gerätesimulation 375 px. Kein horizontaler Scrollbalken? Dann Handy im WLAN.
+**Befehle:** `pytest` (11 passed). Browser: Entwicklerwerkzeuge, Gerätesimulation 375 px. Kein horizontaler Scrollbalken? Dann Handy im WLAN.
 
 **Commit:** `feat(US-4): Mobile-first Gerüst des Dashboards`
 
@@ -550,7 +573,7 @@ Erkläre in drei Sätzen, wie du die Lücken erzeugst.
 
 **Prüfpunkte A:** Lückenwochen wirklich mit 0 statt ausgelassen? Jahreswechsel: `isocalendar()` liefert das ISO-Jahr, das am 29.12. schon das Folgejahr sein kann. Das Fixture prüft das nicht; die Echtdaten enthalten zwei Jahreswechsel. Im Browser später kontrollieren, ob „2024-W01“ oder „2025-W01“ am richtigen Ort steht.
 
-**Befehle:** `pytest` (13 passed).
+**Befehle:** `pytest` (14 passed).
 
 **Prompt Teil B, Frontend:**
 
@@ -600,7 +623,7 @@ Funktionen aus. Erkläre in drei Sätzen, warum das Chart beim Umschalten
 nicht neu erzeugt wird.
 ```
 
-**Prüfpunkte B:** Wird bei jedem Klick ein neues Chart erzeugt? Dann flackert es und Chart.js meldet „Canvas is already in use“. Sind die Balken echte API-Daten? Zum Beweis eine Zahl in `workouts.json` ändern, Server neu laden, Diagramm ändert sich, Änderung mit `git checkout backend/app/data/workouts.json` zurücknehmen.
+**Prüfpunkte B:** Wird bei jedem Klick ein neues Chart erzeugt? Dann flackert es und Chart.js meldet „Canvas is already in use“. Sind die Balken echte API-Daten? Zum Beweis in WebStorm oder DataGrip eine Distanz in `fittrack.db` ändern (`UPDATE workout SET distanz_km = 99 WHERE id = 311;`), Seite neu laden, Diagramm ändert sich, Änderung mit `git checkout backend/app/data/fittrack.db` zurücknehmen.
 
 **Befehle:** Browser neu laden, Umschalter durchklicken, Konsole prüfen. Handy im WLAN: Ring, Diagramm, Tooltip per Tippen.
 

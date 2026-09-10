@@ -1,6 +1,6 @@
 # Erwartungswerte für das Fixture
 
-Datei: `backend/tests/fixtures/workouts_klein.json`. Die Studierenden rechnen diese Werte selbst, bevor sie die KI nach Code für `/api/stats` fragen. Diese Seite ist die Lösung für den Dozenten.
+Datei: `backend/tests/fixtures/workouts_klein.sql` (wird von `conftest.py` zusammen mit `schema.sql` in eine temporäre SQLite-Datenbank geladen). Die Studierenden rechnen diese Werte selbst, bevor sie die KI nach Code für `/api/stats` fragen. Diese Seite ist die Lösung für den Dozenten.
 
 ## Die 8 Einheiten
 
@@ -56,11 +56,24 @@ Sortiert nach Datum absteigend: erstes Element hat `id` 8 (21.06.), letztes Elem
 
 ```bash
 cd FitTrack
-FITTRACK_DATA=backend/tests/fixtures/workouts_klein.json .venv/bin/python -c "
-import sys; sys.path.insert(0, 'backend')
+.venv/bin/python -c "
+import sys, sqlite3, tempfile, pathlib
+sys.path.insert(0, 'backend')
+db = pathlib.Path(tempfile.mkdtemp()) / 'test.db'
+con = sqlite3.connect(db)
+con.executescript(open('backend/app/data/schema.sql').read())
+con.executescript(open('backend/tests/fixtures/workouts_klein.sql').read())
+con.commit(); con.close()
 from app.daten import lade_workouts
 from app.statistik import berechne_stats, berechne_wochen
-print(berechne_stats(lade_workouts()))
-for w in berechne_wochen(lade_workouts()): print(w)
+print(berechne_stats(lade_workouts(db)))
+for w in berechne_wochen(lade_workouts(db)): print(w)
 "
+```
+
+Oder direkt in SQL, zum Beispiel in DataGrip auf der Testdatenbank:
+
+```sql
+SELECT ROUND(SUM(distanz_km), 1) AS gesamt_km, COUNT(*) AS anzahl FROM v_workout;
+SELECT sportart, SUM(distanz_km) AS km FROM v_workout GROUP BY sportart ORDER BY km DESC;
 ```

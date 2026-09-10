@@ -28,19 +28,21 @@ FitTrack/
 │   │   ├── __init__.py
 │   │   ├── main.py            # FastAPI-Routen, StaticFiles für frontend/
 │   │   ├── models.py          # Pydantic: Workout, Stats, WochenEintrag
-│   │   ├── daten.py           # JSON laden, Pfad aus FITTRACK_DATA
+│   │   ├── daten.py           # liest per sqlite3 aus v_workout, Pfad aus FITTRACK_DATA
 │   │   ├── statistik.py       # reine Rechenfunktionen, ohne FastAPI
-│   │   └── data/workouts.json # ca. 300 Einheiten, Sep 2024 – Sep 2026
+│   │   └── data/
+│   │       ├── fittrack.db    # SQLite, ca. 300 Einheiten, Sep 2024 – Sep 2026
+│   │       └── schema.sql     # Tabellen sportart, workout; Sicht v_workout
 │   └── tests/
-│       ├── conftest.py        # setzt FITTRACK_DATA auf das Fixture
-│       ├── fixtures/workouts_klein.json   # 8 Einheiten, von Hand nachrechenbar
+│       ├── conftest.py        # baut die Testdatenbank aus schema.sql und Fixture
+│       ├── fixtures/workouts_klein.sql    # 8 Einheiten, von Hand nachrechenbar
 │       └── test_api.py
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
 │   └── app.js
 ├── scripts/
-│   └── generate_workouts.py   # erzeugt workouts.json reproduzierbar (fester Seed)
+│   └── generate_workouts.py   # erzeugt fittrack.db reproduzierbar (fester Seed)
 ├── docs/
 │   ├── kurs/FitTrack_Kurskonzept_240min.md   # unverändert
 │   ├── setup-webstorm.md
@@ -83,7 +85,7 @@ Jeder Schritt im Prompt-Skript hat dieselbe Struktur:
 
 | Schritt | Tag | Termin | Inhalt |
 |---|---|---|---|
-| 0 | `sprint-0` | 1 | Starter: Struktur, `workouts.json`, Fixture, `requirements.txt`, `conftest.py`, `test_api.py` nur mit `test_health` (rot), README, `.gitignore` |
+| 0 | `sprint-0` | 1 | Starter: Struktur, `schema.sql`, `fittrack.db`, SQL-Fixture, `requirements.txt`, `conftest.py`, `test_api.py` nur mit `test_health` (rot), README, `.gitignore` |
 | 1 | `us-3` | 1 | `GET /health` → `{"status": "ok"}` |
 | 2 | `us-1` | 1 | `GET /api/workouts`: `models.py`, `daten.py`, Liste sortiert nach Datum absteigend |
 | 3 | `us-2` | 1 | `GET /api/stats`: `statistik.py`, Erwartungswerte aus Fixture, Edge Case leere Liste |
@@ -129,11 +131,15 @@ Die Prompts werden vom Dozenten selbst gegen Claude im Chat durchgespielt. Der C
 | `distanz_km` | float, 1 Nachkommastelle | 8.3 |
 | `kalorien` | int | 512 |
 
-### Echtdaten `workouts.json`
+### Datenhaltung in SQLite
+
+Änderung vom 10.09.2026 auf Wunsch des Dozenten: statt einer JSON-Datei eine SQLite-Datenbank. Zwei Tabellen, `sportart` (id, name, einheit) und `workout` (id, datum, sportart_id, dauer_min, distanz_km, kalorien) mit Fremdschlüssel und CHECK-Regeln, dazu die Sicht `v_workout`, die beide verbindet und genau die sechs Felder der API liefert. Das Schema liegt versioniert in `schema.sql`, die Datenbank wird daraus vom Generator erzeugt. Der Datenzugriff bleibt bei der Standardbibliothek `sqlite3`, kein ORM.
+
+### Echtdaten `fittrack.db`
 
 Erzeugt durch `scripts/generate_workouts.py` mit festem Seed, damit die Datei reproduzierbar ist. Zeitraum 2024-09-02 bis 2026-09-06, rund 300 Einheiten, 2 bis 4 pro Woche. Saisonalität: Radfahren und Schwimmen vor allem April bis September, Wandern vor allem Mai bis Oktober, Laufen ganzjährig. Plausible Verhältnisse von Dauer, Distanz und Kalorien je Sportart. Einige Wochen ohne Training (Urlaub, Krankheit), damit Lücken im Diagramm sichtbar sind.
 
-### Fixture `workouts_klein.json`
+### Fixture `workouts_klein.sql`
 
 8 Einheiten über 3 Kalenderwochen, so gewählt, dass alle Kennzahlen mit Taschenrechner nachrechenbar sind und die Lieblingssportart eindeutig ist. Die Handrechnung steht in `docs/dozent/erwartungswerte.md`.
 
@@ -158,8 +164,8 @@ Die Rechenfunktionen liegen in `statistik.py` ohne FastAPI-Abhängigkeit, damit 
 ## 5. Backend
 
 - Python 3.12, `fastapi`, `uvicorn[standard]`, `pytest`, `httpx2` in `requirements.txt`, Versionen mit Untergrenze festgelegt. Starlette 1.6 verlangt für den TestClient `httpx2` statt `httpx`.
-- `daten.py` liest den Pfad aus `FITTRACK_DATA`, Standard ist `backend/app/data/workouts.json` relativ zum Modul. Damit funktioniert die App aus jedem Arbeitsverzeichnis und im Container.
-- `conftest.py` setzt `FITTRACK_DATA` auf das Fixture, bevor `app.main` importiert wird.
+- `daten.py` liest den Pfad aus `FITTRACK_DATA`, Standard ist `backend/app/data/fittrack.db` relativ zum Modul; `lade_workouts(pfad=None)` nimmt optional einen expliziten Pfad. Damit funktioniert die App aus jedem Arbeitsverzeichnis und im Container.
+- `conftest.py` baut aus `schema.sql` und dem SQL-Fixture eine temporäre Datenbank und setzt `FITTRACK_DATA` darauf, bevor `app.main` importiert wird.
 - `main.py` mountet `frontend/` als StaticFiles unter `/` mit `html=True`. API-Routen werden vor dem Mount registriert.
 - Start lokal: `uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000`.
 
@@ -201,7 +207,7 @@ CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-800
 - `test_wochen_anzahl_und_luecken`, `test_wochen_summen`, `test_wochen_leer`
 - `test_index_liefert_html`
 
-Ein Smoke-Test lädt die Echtdaten und prüft nur Anzahl größer 250 und gültige Felder, damit ein kaputtes `workouts.json` auffällt.
+Ein Smoke-Test lädt die Echtdaten und prüft nur Anzahl größer 250 und gültige Felder, damit eine kaputte `fittrack.db` auffällt.
 
 ## 9. Verifikation der Referenzlösung
 
