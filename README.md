@@ -195,6 +195,7 @@ Die Referenzlösung läuft unter <https://fittrack-k7gg.onrender.com>. Der Free-
 - `lieblingssportart`: Sportart mit der größten Summe `distanz_km`. Bei Gleichstand die alphabetisch erste.
 - `anzahl`: Anzahl der Einheiten.
 - Leere Datenliste: 0.0, 0.0, `null`, 0.
+- Kennzahl-Kacheln: Überschrift nennt den Bezug („Gesamt seit Sep 2024“, „Einheiten seit Sep 2024“), die Zeile unter der Zahl ordnet ein („in 311 Einheiten“, „Ziel in 33 von 105 Wochen“, „KW 37/2025 · 5 Einheiten“, „Ø 3,0 je Woche“). Tippen zeigt die Rechnung.
 - `je_sportart` (pro Woche in `/api/stats/wochen`): Summe `distanz_km` je Sportart, gerundet auf 1 Nachkommastelle; Wochen ohne Training liefern `{}`.
 - Wochenziel 40 km: einzige Konstante im Frontend (`WOCHENZIEL_KM` in `app.js`), gilt über alle Sportarten und steht so auch in der Wochenkarte. Dargestellt als Bullet-Graph: Balken für die Ist-Kilometer, Marke für das Ziel, Skala bis über das Ziel hinaus.
 - Status-Badge: „Ziel erreicht“ ab 40 km; in der laufenden Woche „Auf Kurs“, wenn die Kilometer mindestens dem anteiligen Ziel nach verstrichenen Tagen entsprechen, sonst „Im Rückstand“; abgeschlossene Wochen unter 40 km: „Unter dem Ziel“. „n Wochen in Folge“ zählt zusammenhängende Wochen mit erreichtem Ziel.

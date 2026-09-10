@@ -283,14 +283,20 @@ function verbindeThemaWechsel() {
 // --- Kennzahlen (US-5, ergänzt in US-7) ----------------------------------------
 
 function zeigeKennzahlen(stats, wochen) {
+  // Jede Kachel: Bezug in der Überschrift, Zahl, eine Zeile Einordnung darunter
   document.getElementById("stat-gesamt").textContent = formatZahl(stats.gesamt_km, 0);
+  document.getElementById("stat-gesamt-sub").textContent = `in ${stats.anzahl} Einheiten`;
   document.getElementById("stat-woche").textContent = formatZahl(stats.durchschnitt_km_pro_woche);
+  const erreicht = wochen.filter((w) => w.distanz_km >= WOCHENZIEL_KM).length;
+  document.getElementById("stat-woche-sub").textContent = `Ziel in ${erreicht} von ${wochen.length} Wochen`;
   document.getElementById("stat-anzahl").textContent = formatZahl(stats.anzahl, 0);
+  document.getElementById("stat-anzahl-sub").textContent = wochen.length
+    ? `Ø ${formatZahl(stats.anzahl / wochen.length)} je Woche` : "";
   // Beste Woche aus dem Wochenverlauf, mit Kalenderwoche und Jahr als Bezug
   const beste = wochen.reduce((a, b) => (b.distanz_km > a.distanz_km ? b : a), wochen[0]);
   if (beste) {
     document.getElementById("stat-beste").textContent = formatZahl(beste.distanz_km);
-    document.getElementById("stat-beste-label").textContent = `Beste Woche, KW ${kalenderwoche(beste)}/${beste.kw.slice(0, 4)}`;
+    document.getElementById("stat-beste-sub").textContent = `KW ${kalenderwoche(beste)}/${beste.kw.slice(0, 4)} · ${beste.anzahl} Einheiten`;
   }
   document.querySelectorAll("#kennzahlen .kachel").forEach((kachel) => {
     kachel.addEventListener("click", () => sheetKennzahl(kachel.dataset.kennzahl));
@@ -305,8 +311,9 @@ function zeigeZeitraum(workouts) {
   document.getElementById("zeitraum").textContent =
     `Daten vom ${formatDatum(aeltestes)} bis ${formatDatum(juengstes)}`;
   const start = alsDatum(aeltestes);
-  document.getElementById("stat-gesamt-label").textContent =
-    `Gesamt seit ${MONATE[start.getMonth()]} ${start.getFullYear()}`;
+  const seit = `seit ${MONATE[start.getMonth()]} ${start.getFullYear()}`;
+  document.getElementById("stat-gesamt-label").textContent = `Gesamt ${seit}`;
+  document.getElementById("stat-anzahl-label").textContent = `Einheiten ${seit}`;
 }
 
 // --- Wochenkarte mit Bullet-Graph (US-7) ------------------------------------------
@@ -384,7 +391,7 @@ function zeigeWoche(wochen) {
 
   document.getElementById("woche-titel").textContent = laufend ? "Diese Woche" : "Letzte Trainingswoche";
   document.getElementById("woche-untertitel").textContent =
-    `${wochenSpanne(woche)} · Ziel ${WOCHENZIEL_KM} km über alle Sportarten`;
+    `${wochenSpanne(woche)} · Ziel ${WOCHENZIEL_KM} km, alle Sportarten`;
   document.getElementById("woche-km").textContent = formatZahl(woche.distanz_km);
 
   const status = document.getElementById("woche-status");
@@ -590,7 +597,7 @@ function zeigeKalender(workouts, wochen) {
   const tage = letzteWochen.flatMap((w) => [0, 1, 2, 3, 4, 5, 6].map((i) => tageSpaeter(w.wochenstart, i)));
   const groesste = Math.max(1, ...tage.map((t) => kmJeTag.get(t) ?? 0));
   document.getElementById("kalender-untertitel").textContent =
-    `${formatKurz(tage[0])} bis ${formatDatum(tage[tage.length - 1])}. Tag antippen öffnet die Einheit.`;
+    `${formatKurz(tage[0])} bis ${formatDatum(tage[tage.length - 1])}`;
 
   tage.forEach((tag) => {
     const km = kmJeTag.get(tag) ?? 0;

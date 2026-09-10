@@ -72,10 +72,26 @@
 
   <!-- 2. Kennzahlen über den gesamten Zeitraum. Tippen zeigt die Rechnung. -->
   <div id="kennzahlen" class="kennzahlen" role="list" aria-label="Kennzahlen">
-    <button type="button" class="kachel tippbar" data-kennzahl="gesamt" role="listitem"><span id="stat-gesamt-label" class="kachel-label">Gesamt</span><span class="kachel-wert"><span id="stat-gesamt">…</span><small>km</small></span></button>
-    <button type="button" class="kachel tippbar" data-kennzahl="woche" role="listitem"><span class="kachel-label">Ø pro Woche</span><span class="kachel-wert"><span id="stat-woche">…</span><small>km</small></span></button>
-    <button type="button" class="kachel tippbar" data-kennzahl="beste" role="listitem"><span id="stat-beste-label" class="kachel-label">Beste Woche</span><span class="kachel-wert"><span id="stat-beste">…</span><small>km</small></span></button>
-    <button type="button" class="kachel tippbar" data-kennzahl="anzahl" role="listitem"><span class="kachel-label">Einheiten gesamt</span><span class="kachel-wert"><span id="stat-anzahl">…</span></span></button>
+    <button type="button" class="kachel tippbar" data-kennzahl="gesamt" role="listitem">
+      <span id="stat-gesamt-label" class="kachel-label">Gesamt</span>
+      <span class="kachel-wert"><span id="stat-gesamt">…</span><small>km</small></span>
+      <span id="stat-gesamt-sub" class="kachel-sub">…</span>
+    </button>
+    <button type="button" class="kachel tippbar" data-kennzahl="woche" role="listitem">
+      <span class="kachel-label">Ø pro Woche</span>
+      <span class="kachel-wert"><span id="stat-woche">…</span><small>km</small></span>
+      <span id="stat-woche-sub" class="kachel-sub">…</span>
+    </button>
+    <button type="button" class="kachel tippbar" data-kennzahl="beste" role="listitem">
+      <span class="kachel-label">Beste Woche</span>
+      <span class="kachel-wert"><span id="stat-beste">…</span><small>km</small></span>
+      <span id="stat-beste-sub" class="kachel-sub">…</span>
+    </button>
+    <button type="button" class="kachel tippbar" data-kennzahl="anzahl" role="listitem">
+      <span id="stat-anzahl-label" class="kachel-label">Einheiten</span>
+      <span class="kachel-wert"><span id="stat-anzahl">…</span></span>
+      <span id="stat-anzahl-sub" class="kachel-sub">…</span>
+    </button>
   </div>
 
   <!-- 3. Sportarten: eine Kachel je Sportart. Tippen öffnet die Sportart mit Filter für die Liste. -->
@@ -83,7 +99,6 @@
     <div class="karte-kopf">
       <div>
         <h2 id="sportarten-titel" class="karte-titel">Sportarten</h2>
-        <p class="karte-untertitel">Anteil an allen Kilometern.</p>
       </div>
     </div>
     <div id="sport-kacheln" class="sport-kacheln"></div>
@@ -110,23 +125,22 @@
     <div class="karte-kopf">
       <div>
         <h2 id="verlauf-titel" class="karte-titel">Kilometer pro Woche</h2>
-        <p class="karte-untertitel">Balken antippen öffnet die Woche.</p>
-      </div>
-      <div class="zeitraum-wahl" role="group" aria-label="Zeitraum">
-        <button type="button" data-wochen="8" aria-pressed="true">8 Wochen</button>
-        <button type="button" data-wochen="26" aria-pressed="false">6 Monate</button>
-        <button type="button" data-wochen="52" aria-pressed="false">1 Jahr</button>
-        <button type="button" data-wochen="0" aria-pressed="false">Alles</button>
+        <ul class="legende" aria-label="Legende">
+          <li class="erreicht">Ziel erreicht</li>
+          <li class="offen">Unter dem Ziel</li>
+          <li id="legende-ziel" class="ziel">Wochenziel 40 km</li>
+        </ul>
       </div>
     </div>
     <div class="diagramm-flaeche">
       <canvas id="wochen-chart" role="img" aria-label="Balkendiagramm, Werte stehen in der Tabelle darunter"></canvas>
     </div>
-    <ul class="legende" aria-label="Legende">
-      <li class="erreicht">Ziel erreicht</li>
-      <li class="offen">Unter dem Ziel</li>
-      <li id="legende-ziel" class="ziel">Wochenziel 40 km</li>
-    </ul>
+    <div class="zeitraum-wahl" role="group" aria-label="Zeitraum">
+      <button type="button" data-wochen="8" aria-pressed="true">8 Wochen</button>
+      <button type="button" data-wochen="26" aria-pressed="false">6 Monate</button>
+      <button type="button" data-wochen="52" aria-pressed="false">1 Jahr</button>
+      <button type="button" data-wochen="0" aria-pressed="false">Alles</button>
+    </div>
     <table id="diagramm-tabelle" class="nur-vorlesen">
       <caption>Kilometer je Zeitabschnitt</caption>
       <thead><tr><th>Zeitraum</th><th>Kilometer</th><th>Einheiten</th></tr></thead>
@@ -139,7 +153,7 @@
     <div class="karte-kopf">
       <div>
         <h2 id="kalender-titel" class="karte-titel">Trainingskalender</h2>
-        <p id="kalender-untertitel" class="karte-untertitel">Letzte 8 Wochen. Tag antippen öffnet die Einheit.</p>
+        <p id="kalender-untertitel" class="karte-untertitel">Letzte 8 Wochen</p>
       </div>
     </div>
     <div class="kalender-kopf" aria-hidden="true">

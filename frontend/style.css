@@ -101,7 +101,7 @@ svg { display: block; }
   padding: 20px;
 }
 
-.karte-titel { font-size: 17px; font-weight: 600; }
+.karte-titel { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
 .karte-untertitel { font-size: 14px; color: var(--text-2); margin-top: 2px; }
 .karte-kopf { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
 
@@ -175,15 +175,16 @@ svg { display: block; }
 .kennzahlen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .kachel {
   border: 0; border-radius: var(--radius); background: var(--karte);
-  padding: 14px 16px; min-height: 92px; text-align: left;
-  display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  padding: 16px; min-height: 108px; text-align: left;
+  display: flex; flex-direction: column; justify-content: center; gap: 6px;
 }
 .kachel-label { font-size: 13px; color: var(--text-2); }
 .kachel-wert { font-size: var(--zahl); font-weight: 800; line-height: 1; display: flex; align-items: baseline; gap: 4px; overflow-wrap: anywhere; }
 .kachel-wert small { font-size: 14px; font-weight: 500; color: var(--text-2); }
+.kachel-sub { font-size: 13px; color: var(--text-2); }
 
 /* Zeitraumwahl: segmentierte Buttons, jeder mindestens 44 px hoch */
-.zeitraum-wahl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--karte-hell); border-radius: 12px; padding: 4px; }
+.zeitraum-wahl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--karte-hell); border-radius: 12px; padding: 4px; margin-top: 14px; }
 .zeitraum-wahl button {
   min-width: 0; min-height: var(--touch);
   border: 0; border-radius: 9px; background: transparent; padding: 0 4px;
@@ -192,7 +193,7 @@ svg { display: block; }
 .zeitraum-wahl button[aria-pressed="true"] { background: var(--karte); color: var(--text); }
 .zeitraum-wahl button:focus-visible { outline: 2px solid var(--akzent); outline-offset: 1px; }
 
-.legende { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; }
 .legende li { font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
 .legende li::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--sport-farbe); }
 .legende li.erreicht::before { background: var(--erreicht); }
@@ -312,6 +313,7 @@ svg { display: block; }
 @media (max-width: 379px) {
   :root { --abstand: 12px; }
   .karte { padding: 16px; }
+  .kachel { padding: 14px; }
   .zeitraum-wahl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sport-kacheln { grid-template-columns: minmax(0, 1fr); }   /* eine Kachel je Zeile, sonst quetscht sich der Name */
   .zahl-gross { font-size: 36px; }
@@ -338,11 +340,9 @@ svg { display: block; }
   #kalender { grid-area: kalender; }
   #sportarten { grid-area: sportarten; display: flex; flex-direction: column; align-self: start; position: sticky; top: 20px; }   /* wächst nicht mit der Liste, bleibt beim Scrollen sichtbar */
   #sportarten .sport-kacheln { flex: 1; }
-  #sportarten .sport-kacheln button { justify-content: space-between; min-height: 200px; }   /* so hoch, dass die Karte neben sechs Einträgen endet */
+  #sportarten .sport-kacheln button { justify-content: space-between; min-height: 205px; }   /* so hoch, dass die Karte neben sechs Einträgen endet */
   #aktivitaeten { grid-area: aktivitaeten; }
   .karte-kopf { flex-direction: row; align-items: flex-start; justify-content: space-between; }
-  .karte-kopf .karte-titel { white-space: nowrap; }
-  .zeitraum-wahl { flex: 0 0 300px; }
   .diagramm-flaeche { height: 240px; }
   .sheet {
     inset: 50% auto auto 50%; transform: translate(-50%, -50%);
