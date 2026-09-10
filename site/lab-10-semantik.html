@@ -24,7 +24,7 @@
 
 <nav class="sidebar" aria-label="Lab-Navigation">
   <div class="sidebar-title">Abschnitte</div>
-  <a class="sidebar-link" href="#botschaft">Die Botschaft</a>
+  <a class="sidebar-link" href="#botschaft">Worum es geht</a>
   <a class="sidebar-link" href="#moment">Der Moment im Sprint Review</a>
   <a class="sidebar-link" href="#befunde">Acht Befunde</a>
   <a class="sidebar-link" href="#vergleich">Vorher und nachher</a>
@@ -38,7 +38,7 @@
 <div class="lab-header">
   <div class="lab-num-big">10</div>
   <h1 class="lab-title">US-7: Schön, aber falsch</h1>
-  <p class="lab-intro">Nach Lab 04 sind alle Tests grün und das Dashboard sieht aus wie eine Sport-App. Genau dann zeigte
+  <p class="lab-intro">Nach Lab 04 bestehen alle Tests, und das Dashboard sieht aus wie eine Sport-App. Genau dann zeigte
     der Erstentwurf der KI einen geschlossenen Ring mit „161 % vom Ziel“ über einer Woche, die längst vorbei war. Kein
     Test hat das bemerkt. Dieses Lab zeigt, warum generierte Oberflächen besonders viel Misstrauen verdienen, wenn sie
     gut aussehen, wie ein Mensch mit konkreter Kritik aus dem brauchbaren Erstentwurf den guten Zweitentwurf macht, und
@@ -56,7 +56,7 @@
 <main class="main-content">
 
   <section class="section-block" id="botschaft">
-    <h2>Die Botschaft</h2>
+    <h2>Worum es geht</h2>
     <div class="concept-box">
       <h3>Tests sichern die Daten, nicht die Aussage. KI allein liefert einen Schritt, KI mit Kritik ein Ergebnis.</h3>
       <p>Die 14 Tests aus Lab 01 bis 04 prüfen Status, Felder, Summen und Lückenwochen. Alles davon war richtig. Was
@@ -73,7 +73,7 @@
     <h2>Der Moment im Sprint Review</h2>
     <p>Das Dashboard liegt auf dem Beamer. Die Gruppe hat Sprint 2 abgeschlossen, das Diagramm zeigt echte Daten aus
       der API, die Buttons sind 44 Pixel hoch. Die Frage der Dozentin oder des Dozenten lautet nicht „Gefällt es
-      euch?“, sondern:</p>
+      Ihnen?“, sondern:</p>
     <div class="warn-box">
       <h3>„Was bedeutet 161 %?“</h3>
       <p>Der Ring ist geschlossen. Bei 100 % wäre er auch geschlossen, bei 300 % ebenso. Die Grafik trägt oberhalb
@@ -110,8 +110,8 @@
     <div class="tip-box">
       <h3>Das Muster</h3>
       <p>Alle acht Befunde sind Aussagefehler, kein einziger ein Rechenfehler. Genau deshalb fällt sie kein Test, und
-        genau deshalb fallen sie beim ersten Blick nicht auf: Die Zahlen stimmen, das Bild ist vertraut, das Gehirn
-        nickt. Die Korrekturen in der dritten Spalte hat kein Modell vorgeschlagen. Sie kamen aus dem Review: Wer weiß,
+        genau deshalb fallen sie beim ersten Blick nicht auf: Die Zahlen stimmen, das Bild ist vertraut, und beim ersten Blick fällt
+        nichts auf. Die Korrekturen in der dritten Spalte hat kein Modell vorgeschlagen. Sie kamen aus dem Review: Wer weiß,
         was ein Kreis bedeutet und was ein Ziel braucht, sieht den Fehler in Sekunden.</p>
     </div>
   </section>
@@ -238,8 +238,8 @@ nichts findest, sage das und begründe es je Element.</pre>
 
   <section class="section-block" id="story">
     <h2>US-7 und ihr Test</h2>
-    <p>Aus dem Review wird eine Story, damit der Umbau denselben Weg geht wie jede andere Änderung: Test rot, Prompt,
-      Prüfen, Code, Test grün, Commit mit Story-Bezug, Tag <code>us-7</code>.</p>
+    <p>Aus dem Review wird eine Story, damit der Umbau denselben Weg geht wie jede andere Änderung: Test schlägt fehl, Prompt,
+      Prüfen, Code, Test besteht, Commit mit Story-Bezug, Tag <code>us-7</code>.</p>
     <pre class="prompt" data-kopieren="US-7">US-7: Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard
       genau das aussagt, was die Daten hergeben, damit ich mich nicht
       auf ein schönes, aber falsches Bild verlasse.
@@ -262,8 +262,8 @@ nichts findest, sage das und begründe es je Element.</pre>
       <h3>Ein bestehender Test ändert sich</h3>
       <p><code>test_wochen_anzahl_und_luecken</code> vergleicht KW 24 als ganzes Dictionary und bekommt nun
         <code>"je_sportart": {}</code> dazu. Das ist eine bewusste Änderung der Spezifikation durch die Story, kein
-        „Test passend machen“. Der Unterschied: Die Story kam zuerst, der Test folgt ihr. Anders herum wäre es
-        Betrug am eigenen Prüfsystem.</p>
+        „Test passend machen“. Der Unterschied: Die Story kam zuerst, der Test folgt ihr. Anders herum wäre der Test
+        kein Prüfmittel mehr, sondern nur eine Beschreibung des Codes.</p>
     </div>
   </section>
 
@@ -279,8 +279,8 @@ nichts findest, sage das und begründe es je Element.</pre>
   <section class="section-block" id="zusammenfassung">
     <h2>Zusammenfassung</h2>
     <ul>
-      <li>Tests sichern die Daten, nicht die Aussage. Grüne Tests sagen nichts darüber, ob eine Grafik die Wahrheit zeigt.</li>
-      <li>Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen.</li>
+      <li>Tests sichern die Daten, nicht die Aussage. Bestandene Tests sagen nichts darüber, ob eine Grafik die Wahrheit zeigt.</li>
+      <li>Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie dazu verleiten, die Prüfung abzukürzen.</li>
       <li>Acht Befunde im Erstentwurf, keiner ein Rechenfehler: Kreis statt Marke, Zeitbezug, Achse, Stapel, Kürzel, doppelte Wörter, Bedienbarkeit.</li>
       <li>Die Form muss zur Aussage passen: Kreis für Anteile, Bullet-Graph für Ziele, ein Balken je Woche für Verläufe, ein Feld je Tag für Regelmäßigkeit.</li>
       <li>KI allein liefert einen brauchbaren Erstentwurf. Gut wird er durch die Kritik eines Menschen, der weiß, was die Formen bedeuten.</li>

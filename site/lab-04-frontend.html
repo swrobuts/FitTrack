@@ -416,7 +416,7 @@ nicht neu erzeugt wird.</pre>
     <ul class="pruefpunkte">
       <li><strong>Viewport-Meta vorhanden?</strong> Ohne sie zeigt das Handy eine geschrumpfte Desktop-Seite.</li>
       <li><strong>Feste Breiten in Pixeln?</strong> <code>width: 400px</code> ist ein Verstoß gegen Regel 2.</li>
-      <li><strong>Mount nach den Routen?</strong> Steht <code>app.mount("/")</code> vor <code>/api/…</code>, werden alle Tests außer <code>/</code> rot. Das lässt sich live zeigen.</li>
+      <li><strong>Mount nach den Routen?</strong> Steht <code>app.mount("/")</code> vor <code>/api/…</code>, schlagen alle Tests außer dem für <code>/</code> fehl. Das lässt sich live zeigen.</li>
       <li><strong>Steht eine Zahl im JavaScript, die aus der API kommen müsste?</strong> Dann ist US-5 verfehlt.</li>
       <li><strong>Server aus, Seite neu laden:</strong> Erscheint der Hinweistext, oder bleibt alles bei „…“?</li>
       <li><strong>Wird bei jedem Klick ein neues Chart erzeugt?</strong> Dann meldet die Konsole „Canvas is already in use“.</li>

@@ -41,12 +41,12 @@
   <p class="lab-intro">Hier entscheidet sich, ob die Tests etwas beweisen. Die Erwartungswerte für Gesamtdistanz,
     Wochenschnitt und Lieblingssportart rechnet die Gruppe selbst aus den acht Testdaten, mit dem Taschenrechner, vor
     dem ersten Prompt. Wer die Werte vom Modell erzeugen lässt, prüft nur, ob die KI mit sich selbst übereinstimmt.
-    Dazu kommt der Randfall, an dem generierter Code am häufigsten versagt: die leere Liste.</p>
+    Dazu kommt der Sonderfall, an dem generierter Code am häufigsten scheitert: die leere Liste.</p>
   <div class="lernziele">
     <span class="lernziel-chip">Erwartungswerte von Hand</span>
     <span class="lernziel-chip">statistik.py ohne FastAPI</span>
     <span class="lernziel-chip">Kalenderwochen mit Lücke</span>
-    <span class="lernziel-chip">Randfall leere Liste</span>
+    <span class="lernziel-chip">Sonderfall leere Liste</span>
     <span class="lernziel-chip">monkeypatch</span>
   </div>
   <div data-einordnung></div>
@@ -273,7 +273,7 @@ sequenceDiagram
 
   <section class="section-block" id="uebungen">
     <h2>Übungen</h2>
-    <p>Vier Übungen: einmal rechnen, einmal SQL, einmal Randfälle zuordnen, einmal zu Rundung und Wochenzählung.</p>
+    <p>Vier Übungen: einmal rechnen, einmal SQL, einmal Sonderfälle zuordnen, einmal zu Rundung und Wochenzählung.</p>
     <div data-uebung="P03-01"></div>
     <div data-uebung="P03-02"></div>
     <div data-uebung="P03-03"></div>
@@ -285,7 +285,7 @@ sequenceDiagram
     <h2>Zusammenfassung</h2>
     <ul>
       <li>Erwartungswerte kommen aus den Testdaten und vom Menschen, nie vom Modell. Sonst prüft der Test nur Konsistenz.</li>
-      <li>Jede Kennzahl hat eine Definition, die den Randfall benennt. Ohne Definition ist „korrekt berechnet“ nicht prüfbar.</li>
+      <li>Jede Kennzahl hat eine Definition, die den Sonderfall benennt. Ohne Definition ist „korrekt berechnet“ nicht prüfbar.</li>
       <li>Die Rechenlogik liegt in einer Datei ohne Framework. Sie nimmt eine Liste und gibt ein Dictionary zurück.</li>
       <li><code>monkeypatch</code> tauscht die Ladefunktion für einen Test aus. Deshalb der Import <code>from .daten import lade_workouts</code>.</li>
       <li>Auf den Echtdaten: 3963 km, 37,7 km pro Woche, Radfahren, 311 Einheiten.</li>

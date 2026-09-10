@@ -38,11 +38,11 @@
           "erklaerung": { "de": "Prüfbar heißt: Ein Test oder eine Messung kann Ja oder Nein sagen. „Stimmen“ und „modern“ brauchen erst eine Definition. Für die Kennzahlen steht sie im README, für „modern“ gibt es keine.", "en": "Checkable means a test or measurement can say yes or no." }
         },
         {
-          "frage": { "de": "Das Modell liefert zu seinem Code gleich passende Tests mit. Alle grün. Was ist damit bewiesen?", "en": "The model delivers matching tests with its code. All green. What does that prove?" },
+          "frage": { "de": "Das Modell liefert zu seinem Code gleich passende Tests mit. Alle bestehen. Was ist damit bewiesen?", "en": "The model delivers matching tests with its code. All green. What does that prove?" },
           "optionen": [
             { "de": "Dass Code und Tests aus derselben Quelle konsistent sind. Ob sie die Story erfüllen, bleibt offen, bis ein Mensch die Erwartung geprüft hat.", "en": "That code and tests from the same source are consistent." },
             { "de": "Dass die Story erfüllt ist.", "en": "That the story is fulfilled." },
-            { "de": "Dass keine Randfälle mehr offen sind.", "en": "That no edge cases remain." }
+            { "de": "Dass keine Sonderfälle mehr offen sind.", "en": "That no edge cases remain." }
           ],
           "richtig": [0],
           "erklaerung": { "de": "Deshalb stehen die Tests im Kurs vor dem Prompt und stammen von der Rolle Quality. Mitgelieferte Tests des Modells sind ein Vorschlag, den man gegen die Story liest.", "en": "That is why tests come before the prompt and from the quality role." }

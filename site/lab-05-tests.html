@@ -60,7 +60,7 @@
     <div class="concept-box">
       <h3>Wir schreiben die Tests, bevor die KI den Code schreibt.</h3>
       <p>Dann prüfen wir gegen das Sollverhalten aus der Story, nicht gegen das, was die KI zufällig gebaut hat. Die
-        Reihenfolge ist der Wirkstoff: Danach ist ein Test nur noch eine Beschreibung des Vorhandenen.</p>
+        Reihenfolge ist entscheidend: Ein Test, der nach dem Code entsteht, beschreibt nur das Vorhandene.</p>
     </div>
     <div class="karten">
       <div class="karte">
@@ -69,7 +69,7 @@
           Nie aus der Antwort des Modells.</p>
       </div>
       <div class="karte">
-        <div class="kopfzeile">Randfälle mitdenken</div>
+        <div class="kopfzeile">Sonderfälle mitdenken</div>
         <p>Leere Liste, eine einzige Einheit, Wochen ohne Training, Jahreswechsel. Hier versagt generierter Code
           erfahrungsgemäß zuerst.</p>
       </div>
@@ -118,11 +118,11 @@ flowchart TB
           <tr><td><code>test_stats_durchschnitt</code></td><td>US-2</td><td>Wochenzählung mit Lücke</td><td>29.2</td></tr>
           <tr><td><code>test_stats_lieblingssportart</code></td><td>US-2</td><td>Definition über Distanz</td><td>Radfahren</td></tr>
           <tr><td><code>test_stats_anzahl</code></td><td>US-2</td><td>Zählung</td><td>8</td></tr>
-          <tr><td><code>test_stats_leere_liste</code></td><td>US-2</td><td>Randfall ohne Daten</td><td>0.0, 0.0, null, 0</td></tr>
+          <tr><td><code>test_stats_leere_liste</code></td><td>US-2</td><td>Sonderfall ohne Daten</td><td>0.0, 0.0, null, 0</td></tr>
           <tr><td><code>test_index_liefert_html</code></td><td>US-4</td><td>Auslieferung des Frontends</td><td>200, text/html, „FitTrack“</td></tr>
           <tr><td><code>test_wochen_anzahl_und_luecken</code></td><td>US-6</td><td>Lückenwoche mit Nullwerten</td><td>3 Wochen, KW 24 leer</td></tr>
           <tr><td><code>test_wochen_summen</code></td><td>US-6</td><td>Summen je Woche</td><td>34.5 / 4 / 175 und 53.0 / 4 / 285</td></tr>
-          <tr><td><code>test_wochen_leer</code></td><td>US-6</td><td>Randfall ohne Daten</td><td>leere Liste</td></tr>
+          <tr><td><code>test_wochen_leer</code></td><td>US-6</td><td>Sonderfall ohne Daten</td><td>leere Liste</td></tr>
           <tr><td><code>test_wochen_je_sportart</code></td><td>US-7</td><td>Kilometer je Sportart und Woche</td><td>KW 23: Laufen 13.0, Radfahren 20.0, Schwimmen 1.5; KW 24: leer</td></tr>
         </tbody>
       </table>
@@ -187,14 +187,14 @@ flowchart LR
     <p>Gilt für jede Story gleich und wird nicht je Fall verhandelt.</p>
     <ul>
       <li>Code läuft lokal ohne Fehler</li>
-      <li>Zugehörige Tests vorhanden und grün (<code>pytest</code>)</li>
+      <li>Zugehörige Tests vorhanden und bestanden (<code>pytest</code>)</li>
       <li>Akzeptanzkriterium der Story nachweislich erfüllt, Demo am Handy</li>
       <li>Code von mindestens einer weiteren Person nach der Review-Checkliste geprüft</li>
       <li>Commit mit aussagekräftiger Nachricht und Story-Bezug</li>
     </ul>
     <div class="shot">
       <img src="assets/img/github-actions.png" alt="GitHub Actions: Workflow-Läufe mit grünem Haken für pytest" loading="lazy">
-      <div class="unterschrift">Ab Lab 07 prüft GitHub Actions den zweiten Punkt bei jedem Push. Der grüne Haken ist die maschinelle Definition of Done.</div>
+      <div class="unterschrift">Ab Lab 07 prüft GitHub Actions den zweiten Punkt bei jedem Push. Der grüne Haken am Commit ist der maschinelle Teil der Definition of Done.</div>
     </div>
   </section>
 
@@ -208,7 +208,7 @@ flowchart LR
         <tbody>
           <tr><td>Kann ich jede Funktion in einem Satz erklären, ohne nachzusehen?</td><td>Verständnis. Was niemand erklären kann, wird nicht committet.</td></tr>
           <tr><td>Gibt es jede importierte Bibliothek und jede aufgerufene Funktion wirklich?</td><td>Halluzinierte Pakete und Methoden.</td></tr>
-          <tr><td>Leere Liste, fehlender Wert, ungültige Kennung: Was passiert dann?</td><td>Randfälle.</td></tr>
+          <tr><td>Leere Liste, fehlender Wert, ungültige Kennung: Was passiert dann?</td><td>Sonderfälle.</td></tr>
           <tr><td>Steht etwas im Code, das in die Daten oder die Konfiguration gehört?</td><td>Hartkodierte Werte, etwa ein Pfad oder ein Port.</td></tr>
           <tr><td>Prüfen die Tests das Verhalten aus der Story oder nur sich selbst?</td><td>Tests, die vom Modell mitgeliefert wurden.</td></tr>
           <tr><td>Benennung und Struktur wie im übrigen Projekt?</td><td>Fremdkörper, englische Namen neben deutschen, andere Ordnerlogik.</td></tr>
@@ -222,7 +222,7 @@ flowchart LR
     <p>Am Schluss steht kein Eindruck, sondern eine Durchsicht mit sieben Punkten, die abgehakt wird.</p>
     <ul>
       <li>Alle User Stories aus dem Backlog: erfüllt oder bewusst zurückgestellt, dokumentiert</li>
-      <li><code>pytest</code> läuft komplett grün</li>
+      <li><code>pytest</code> läuft komplett durch, alle Tests bestehen</li>
       <li>App läuft im Docker-Container, <code>/health</code> antwortet</li>
       <li>Darstellung auf dem Smartphone geprüft: keine horizontalen Scrollbalken, Karten stapeln sich</li>
       <li>Diagramm zeigt echte Daten aus der API, nichts hartkodiert</li>
@@ -244,7 +244,7 @@ flowchart LR
   <section class="section-block" id="zusammenfassung">
     <h2>Zusammenfassung</h2>
     <ul>
-      <li>Tests vor dem Code, Erwartungswerte vom Menschen. Sonst ist ein grüner Test ein Konsistenznachweis.</li>
+      <li>Tests vor dem Code, Erwartungswerte vom Menschen. Sonst belegt ein bestandener Test nur, dass Code und Test zueinander passen.</li>
       <li>Drei Ebenen: Rechenlogik, API, Gerät. Viele schnelle Prüfungen unten, wenige aufwendige oben.</li>
       <li>15 Tests, jeder mit Story und Erwartung. Testdaten getrennt von Echtdaten, dasselbe Schema.</li>
       <li>Ein Akzeptanzkriterium ist ein Satz, der sich in einen Test oder eine Messung am Gerät übersetzen lässt.</li>

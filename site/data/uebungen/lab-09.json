@@ -18,7 +18,7 @@
         {
           "frage": { "de": "Das Kontingent im Chat ist mitten im Sprint erschöpft. Was ändert sich am Vorgehen?", "en": "The chat quota runs out mid-sprint. What changes?" },
           "optionen": [
-            { "de": "Nur der Anbieter. Derselbe Prompt geht an das lokale Modell, Test rot, Prüfen, Test grün, Commit wie zuvor.", "en": "Only the provider." },
+            { "de": "Nur der Anbieter. Derselbe Prompt geht an das lokale Modell, Test schlägt fehl, Prüfen, Test besteht, Commit wie zuvor.", "en": "Only the provider." },
             { "de": "Der Sprint wird abgebrochen.", "en": "The sprint is cancelled." },
             { "de": "Die Tests werden weggelassen, um Zeit zu sparen.", "en": "Tests are dropped to save time." }
           ],
@@ -57,7 +57,7 @@
       "aufgabe": { "de": "<p>Zwei Antworten auf denselben Prompt. Welche ist besser?</p>", "en": "<p>Two answers to the same prompt. Which is better?</p>" },
       "fragen": [
         {
-          "frage": { "de": "Antwort A: elegant formatiert, ausführliche Erklärung, nutzt pandas, Test für den Durchschnitt rot. Antwort B: karg, drei Sätze Erklärung, nur Standardbibliothek, alle fünf Tests grün. Welche übernimmt die Gruppe?", "en": "Answer A: elegant, verbose, uses pandas, average test red. Answer B: plain, three sentences, standard library only, all five tests green. Which does the group adopt?" },
+          "frage": { "de": "Antwort A: elegant formatiert, ausführliche Erklärung, nutzt pandas, der Test für den Durchschnitt schlägt fehl. Antwort B: karg, drei Sätze Erklärung, nur Standardbibliothek, alle fünf Tests bestehen. Welche übernimmt die Gruppe?", "en": "Answer A: elegant, verbose, uses pandas, average test red. Answer B: plain, three sentences, standard library only, all five tests green. Which does the group adopt?" },
           "optionen": [
             { "de": "B. Sie erfüllt die Randbedingung und besteht die Tests. A hat die Randbedingung ignoriert und rechnet falsch, so gut sie auch aussieht.", "en": "B. It meets the constraint and passes the tests." },
             { "de": "A, weil die Erklärung ausführlicher ist.", "en": "A, because the explanation is longer." },

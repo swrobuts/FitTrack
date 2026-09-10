@@ -29,7 +29,7 @@
     <span class="hero-tag">Lernumgebung · Ein Softwareprojekt from scratch</span>
     <h1 class="hero-title">FitTrack</h1>
     <p class="hero-subtitle">Ein vollständiges Softwareprojekt von der Konzeption bis zum Deployment</p>
-    <p class="hero-desc">Zehn Schritte führen von der User Story über den roten Test und den Prompt im Chat bis zum Container
+    <p class="hero-desc">Zehn Schritte führen von der User Story über den ersten, noch fehlschlagenden Test und den Prompt im Chat bis zum Container
       und zur öffentlichen Adresse. Jeder Schritt zeigt, was technisch passiert, welcher Prompt ihn auslöst und woran
       man prüft, ob er gelungen ist. Die Konsole in diesen Seiten ist nachgebildet, die Datenbank ist echt: SQLite
       läuft mit dem Schema der App in Ihrem Browserfenster.</p>
@@ -70,7 +70,7 @@
     <h2>Zehn Schritte, ein Commit je Schritt</h2>
     <p>Die Referenzlösung im Repository trägt für jeden Schritt einen Git-Tag. Wer einen Stand sehen will, holt ihn
       mit <code>git checkout &lt;tag&gt;</code>. Die Studierenden beginnen auf dem Branch <code>starter</code>, der
-      genau dem Stand nach Schritt 0 entspricht: Struktur, Datenbank, Testdaten und ein roter Test.</p>
+      genau dem Stand nach Schritt 0 entspricht: Struktur, Datenbank, Testdaten und ein Test, der noch fehlschlägt.</p>
   </div>
   <div class="table-scroll">
     <table>
@@ -78,7 +78,7 @@
         <tr><th>Schritt</th><th>Tag</th><th>Story</th><th>Was entsteht</th><th>Lab</th></tr>
       </thead>
       <tbody>
-        <tr><td>0</td><td><code>sprint-0</code></td><td>Starter</td><td>Struktur, <code>schema.sql</code>, <code>fittrack.db</code>, SQL-Fixture, roter Health-Test</td><td><a href="lab-00-setup.html" data-lab-link>Lab 00</a></td></tr>
+        <tr><td>0</td><td><code>sprint-0</code></td><td>Starter</td><td>Struktur, <code>schema.sql</code>, <code>fittrack.db</code>, SQL-Testdaten, ein erster Test, der noch fehlschlägt</td><td><a href="lab-00-setup.html" data-lab-link>Lab 00</a></td></tr>
         <tr><td>1</td><td><code>us-3</code></td><td>US-3</td><td><code>GET /health</code>, die Schleife einmal ganz</td><td><a href="lab-01-health.html" data-lab-link>Lab 01</a></td></tr>
         <tr><td>2</td><td><code>us-1</code></td><td>US-1</td><td><code>daten.py</code> liest die Sicht <code>v_workout</code>, <code>GET /api/workouts</code></td><td><a href="lab-02-daten.html" data-lab-link>Lab 02</a></td></tr>
         <tr><td>3</td><td><code>us-2</code></td><td>US-2</td><td><code>statistik.py</code>, <code>GET /api/stats</code>, Erwartungswerte von Hand</td><td><a href="lab-03-kennzahlen.html" data-lab-link>Lab 03</a></td></tr>
@@ -112,7 +112,7 @@
   <div class="section-head">
     <span class="badge">Die elf Labs</span>
     <div class="accent-line"></div>
-    <h2>Vom roten Test zur öffentlichen Adresse</h2>
+    <h2>Vom ersten Test bis zur öffentlichen Adresse</h2>
     <p>Die Labs folgen dem Bauweg. Jedes erklärt zuerst, was in dem Schritt technisch passiert, zeigt dann den
       Prompt, mit dem der Schritt im Chat ausgelöst wird, nennt die Prüfpunkte für die Antwort und lässt Sie zuletzt
       ausprobieren, was Sie gelesen haben.</p>
@@ -124,7 +124,7 @@
       <div class="lab-num">00</div>
       <h3>Setup und Micro-Scrum</h3>
       <div class="sub">Repo, venv, Rollen, Definition of Done</div>
-      <div class="desc">Werkzeugkette in Betrieb nehmen, Starter klonen, den ersten Test rot sehen. Vision, User Stories,
+      <div class="desc">Werkzeugkette in Betrieb nehmen, Starter klonen, den ersten Test fehlschlagen sehen. Vision, User Stories,
         drei rotierende Rollen und die Liste, die entscheidet, wann etwas fertig ist.</div>
       <div class="meta">4 Übungen · 45 Min</div>
     </a>
@@ -132,7 +132,7 @@
     <a class="lab-card" href="lab-01-health.html" data-lab-link>
       <div class="lab-num">01</div>
       <h3>US-3: Der Health-Endpunkt</h3>
-      <div class="sub">Test rot, Prompt, Prüfen, Test grün, Commit</div>
+      <div class="sub">Test schlägt fehl, Prompt, Prüfen, Test besteht, Commit</div>
       <div class="desc">Der kleinste Endpunkt der App, gewählt, weil er die ganze Schleife in zehn Minuten zeigt. Und
         weil der Container und Render ihn später als Lebenszeichen brauchen.</div>
       <div class="meta">3 Übungen · 30 Min</div>
@@ -152,7 +152,7 @@
       <h3>US-2: Kennzahlen und Erwartungswerte</h3>
       <div class="sub">statistik.py, Fixture, monkeypatch</div>
       <div class="desc">Die Erwartungswerte rechnet die Gruppe selbst, sonst prüft der Test nur, ob die KI mit sich
-        selbst übereinstimmt. Randfall leere Liste, Rundung, Kalenderwochen mit Lücke.</div>
+        selbst übereinstimmt. Sonderfall leere Liste, Rundung, Kalenderwochen mit Lücke.</div>
       <div class="meta">4 Übungen · 45 Min</div>
     </a>
 
@@ -214,7 +214,7 @@
       <div class="lab-num">10</div>
       <h3>US-7: Schön, aber falsch</h3>
       <div class="sub">Bullet-Graph statt Ring, Erstentwurf und Zweitentwurf</div>
-      <div class="desc">Alle Tests grün, und der Ring zeigt 161 % für eine Woche, die vorbei ist. Acht Befunde, der
+      <div class="desc">Alle Tests bestanden, und der Ring zeigt 161 % für eine Woche, die vorbei ist. Acht Befunde, der
         Zweitentwurf nach menschlicher Kritik, eine Checkliste und zwei Prompts, die solche Fehler verhindern.</div>
       <div class="meta">3 Übungen · 45 Min</div>
     </a>

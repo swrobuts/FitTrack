@@ -117,7 +117,7 @@
         {
           "was": "pytest",
           "bedeutet": {
-            "de": "Findet über pytest.ini den Ordner backend/tests und führt alle Tests aus. Jetzt: 1 error, weil app.main noch nicht existiert. Genau so soll es sein.",
+            "de": "Findet über pytest.ini den Ordner backend/tests und führt alle Tests aus. Jetzt: 1 error, weil app.main noch nicht existiert. Das ist der erwartete Ausgangszustand.",
             "en": "Finds backend/tests via pytest.ini and runs all tests. Now: 1 error, because app.main does not exist yet. That is exactly the point."
           }
         }
@@ -239,7 +239,7 @@
           },
           "optionen": [
             {
-              "de": "Weil sonst gegen die eigene Lösung getestet wird statt gegen die Anforderung. Getrennte Köpfe, getrennte Fehlerquellen.",
+              "de": "Weil sonst gegen die eigene Lösung getestet wird statt gegen die Anforderung. Getrennte Rollen, getrennte Fehlerquellen.",
               "en": "Because otherwise you test against your own solution rather than the requirement."
             },
             {
@@ -294,7 +294,7 @@
           "mehrfach": true,
           "optionen": [
             {
-              "de": "Tests vorhanden und grün",
+              "de": "Tests vorhanden und bestanden",
               "en": "Tests present and green"
             },
             {

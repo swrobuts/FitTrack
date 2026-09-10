@@ -60,8 +60,8 @@
         <thead><tr><th></th><th>Vibe Coding</th><th>FitTrack-Workflow</th><th>Agentic Coding</th></tr></thead>
         <tbody>
           <tr><td>Wer schreibt den Code?</td><td>Das Modell, auf Zuruf im Chat oder Editor</td><td>Das Modell im Chat, Übernahme von Hand</td><td>Ein Agent ändert Dateien und führt Befehle aus</td></tr>
-          <tr><td>Wer prüft ihn?</td><td>Niemand vor dem Start, „Accept All“</td><td>Die Gruppe: lesen, Test rot → grün, Review, Commit</td><td>Der Mensch prüft Diff, Testlauf und Ergebnis</td></tr>
-          <tr><td>Fertig heißt</td><td>Es läuft, die Fehlermeldung ist weg</td><td>Akzeptanzkriterium erfüllt, Test grün, PO nimmt ab</td><td>Aufgabe erledigt, Tests grün, Pull Request reviewt</td></tr>
+          <tr><td>Wer prüft ihn?</td><td>Niemand vor dem Start, „Accept All“</td><td>Die Gruppe: lesen, Test fehlschlagend, dann bestanden, Review, Commit</td><td>Der Mensch prüft Diff, Testlauf und Ergebnis</td></tr>
+          <tr><td>Fertig heißt</td><td>Es läuft, die Fehlermeldung ist weg</td><td>Akzeptanzkriterium erfüllt, Test bestanden, PO nimmt ab</td><td>Aufgabe erledigt, Tests bestanden, Pull Request reviewt</td></tr>
           <tr><td>Geeignet für</td><td>Wegwerf-Prototyp, Layoutversuch</td><td>Kleines Projekt mit Abnahme, Lernsituation</td><td>Große Codebasis mit Testsuite, erfahrenes Team</td></tr>
           <tr><td>Wo es eng wird</td><td>Sicherheit, Wartbarkeit, Verantwortung</td><td>Tempo bei vielen Dateien, Kontextgröße</td><td>Kosten, Nebenwirkungen, Prompt Injection</td></tr>
         </tbody>
@@ -135,11 +135,11 @@ Randbedingungen:                                              ← Randbedingunge
   <section class="section-block" id="review">
     <h2>Review wie ein fremder Pull Request</h2>
     <p>Übernommener Code wird gelesen wie der Beitrag einer neuen Kollegin: wohlwollend, aber vollständig. Sechs
-      Fragen, und wer eine nicht beantworten kann, hat den Befund schon gefunden.</p>
+      Fragen; bleibt eine offen, ist das bereits ein Befund.</p>
     <ul>
       <li><strong>Verstanden?</strong> Kann ich jede Funktion in einem Satz erklären, ohne nachzusehen?</li>
       <li><strong>Existiert alles?</strong> Gibt es jede importierte Bibliothek und jede aufgerufene Funktion wirklich?</li>
-      <li><strong>Randfälle?</strong> Leere Liste, fehlender Wert, ungültige Kennung: Was passiert dann?</li>
+      <li><strong>Sonderfälle?</strong> Leere Liste, fehlender Wert, ungültige Kennung: Was passiert dann?</li>
       <li><strong>Hartkodiert?</strong> Steht etwas im Code, das in die Daten oder die Konfiguration gehört?</li>
       <li><strong>Testen die Tests?</strong> Prüfen sie das Verhalten aus der Story oder nur sich selbst?</li>
       <li><strong>Passt der Stil?</strong> Benennung und Struktur wie im übrigen Projekt, oder ein Fremdkörper?</li>
@@ -155,12 +155,12 @@ Randbedingungen:                                              ← Randbedingunge
         <thead><tr><th>Fehler</th><th>Wo</th><th>Wie er auffällt</th></tr></thead>
         <tbody>
           <tr><td>Nur Wochen mit Training gezählt</td><td>US-2</td><td><code>test_stats_durchschnitt</code> erwartet 29,2, bekommt 43,8</td></tr>
-          <tr><td>Datenbankpfad relativ zum Arbeitsverzeichnis</td><td>US-1</td><td>Tests grün, Container liefert 500</td></tr>
+          <tr><td>Datenbankpfad relativ zum Arbeitsverzeichnis</td><td>US-1</td><td>Tests bestehen, Container liefert 500</td></tr>
           <tr><td>Sortierung in Python statt in SQL, nur nach Datum</td><td>US-1</td><td><code>test_workouts_sortiert_absteigend</code></td></tr>
-          <tr><td>StaticFiles-Mount vor den Routen</td><td>US-4</td><td>alle API-Tests rot, nur <code>/</code> grün</td></tr>
+          <tr><td>StaticFiles-Mount vor den Routen</td><td>US-4</td><td>alle API-Tests schlagen fehl, nur der für <code>/</code> besteht</td></tr>
           <tr><td>Chart bei jedem Klick neu erzeugt</td><td>US-6</td><td>Konsole: „Canvas is already in use“</td></tr>
           <tr><td>CMD in Exec-Form mit <code>${PORT}</code></td><td>Docker</td><td>lokal läuft es, bei Render Timeout</td></tr>
-          <tr><td>pandas oder ein ORM eingeschmuggelt</td><td>überall</td><td>Import fehlt in <code>requirements.txt</code>, GitHub Actions rot</td></tr>
+          <tr><td>pandas oder ein ORM eingeschmuggelt</td><td>überall</td><td>Import fehlt in <code>requirements.txt</code>, GitHub Actions meldet Fehler</td></tr>
           <tr><td>Ungefragte Zutaten: CORS, Logging, Middleware</td><td>US-3</td><td>niemand kann erklären, wofür</td></tr>
         </tbody>
       </table>
@@ -183,7 +183,7 @@ Randbedingungen:                                              ← Randbedingunge
       <li>Autonomie des Werkzeugs und Prüfung durch den Menschen sind zwei Achsen. FitTrack wählt wenig Autonomie, volle Prüfung.</li>
       <li>Rolle, Kontext, Aufgabe, Randbedingungen. Fehlt eines, füllt das Modell die Lücke, plausibel und falsch.</li>
       <li>Eine Story je Prompt, Fehlermeldungen wörtlich, Erklärung anfordern, nichts Unverstandenes committen.</li>
-      <li>Sechs Fragen an jeden übernommenen Code. Wer eine nicht beantworten kann, hat den Befund.</li>
+      <li>Sechs Fragen an jeden übernommenen Code. Bleibt eine offen, ist das bereits ein Befund.</li>
       <li>Die typischen Fehler sind bekannt und als Prüfpunkte hinterlegt. Die Tests fangen die meisten, die Prüfung den Rest.</li>
     </ul>
     <div data-lab-nav></div>

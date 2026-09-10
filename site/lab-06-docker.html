@@ -89,7 +89,7 @@
       <h3>Die Datenbank reist mit</h3>
       <p><code>COPY backend/ ./backend/</code> nimmt <code>fittrack.db</code> mit ins Image. Für eine App, die nur liest,
         ist das richtig. Sobald eine App schreibt, gehört die Datenbank in ein Volume außerhalb des Containers, sonst
-        sind die Daten beim nächsten Neubau weg. Das ist der Unterschied zu Lab 05 im PITM-Lab.</p>
+        sind die Daten beim nächsten Neubau weg. Für FitTrack, das nur liest, ist das nicht nötig.</p>
     </div>
   </section>
 

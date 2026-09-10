@@ -132,8 +132,8 @@ erDiagram
   <section class="section-block" id="schema">
     <h2>Das Schema lesen</h2>
     <p>Die Datei <code>backend/app/data/schema.sql</code> ist versioniert. Die Datenbank selbst erzeugt
-      <code>scripts/generate_workouts.py</code> daraus. Wer das Schema ändert, ändert die Datei und baut neu. Das ist
-      der Unterschied zwischen einer Datenbank, die man hat, und einer, die man beherrscht.</p>
+      <code>scripts/generate_workouts.py</code> daraus. Wer das Schema ändert, ändert die Datei und baut neu. So bleibt
+      nachvollziehbar, welche Struktur die Datenbank hat und warum.</p>
     <pre class="code-block" data-kopieren="backend/app/data/schema.sql">PRAGMA foreign_keys = ON;
 
 CREATE TABLE sportart (

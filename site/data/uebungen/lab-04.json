@@ -63,7 +63,7 @@
       "aufgabe": { "de": "<p>Zwei Fehler, die in fast jeder Gruppe einmal passieren.</p>", "en": "<p>Two mistakes that happen in almost every group once.</p>" },
       "fragen": [
         {
-          "frage": { "de": "Nach dem Einbau von StaticFiles sind plötzlich alle API-Tests rot, nur test_index_liefert_html ist grün. Ursache?", "en": "After adding StaticFiles all API tests are red, only test_index_liefert_html is green. Cause?" },
+          "frage": { "de": "Nach dem Einbau von StaticFiles schlagen plötzlich alle API-Tests fehl, nur test_index_liefert_html besteht. Ursache?", "en": "After adding StaticFiles all API tests are red, only test_index_liefert_html is green. Cause?" },
           "optionen": [
             { "de": "Der Mount auf \"/\" steht vor den API-Routen und fängt jede Anfrage ab. Er muss ans Ende von main.py.", "en": "The mount on \"/\" sits before the API routes and catches every request." },
             { "de": "Der Ordner frontend/ ist leer.", "en": "The frontend folder is empty." },

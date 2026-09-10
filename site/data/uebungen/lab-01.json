@@ -11,7 +11,7 @@
         {
           "was": "pytest",
           "bedeutet": {
-            "de": "Ein Punkt je bestandenem Test. Ist etwas rot, steht darunter der Traceback: Datei, Zeile, Erwartung, tatsächlicher Wert. Genau diesen Block kopieren Sie in den Chat, nicht eine Umschreibung.",
+            "de": "Ein Punkt je bestandenem Test. Schlägt einer fehl, steht darunter der Traceback: Datei, Zeile, Erwartung, tatsächlicher Wert. Genau diesen Block kopieren Sie in den Chat, nicht eine Umschreibung.",
             "en": "One dot per passed test. If something is red, the traceback follows: file, line, expectation, actual value. Copy exactly that block into the chat, not a paraphrase."
           }
         }
@@ -93,7 +93,7 @@
       "fragen": [
         {
           "frage": {
-            "de": "Der Test ist nach dem Übernehmen des Codes immer noch rot. Was ist der nächste Schritt?",
+            "de": "Der Test schlägt nach dem Übernehmen des Codes immer noch fehl. Was ist der nächste Schritt?",
             "en": "The test is still red after taking over the code. What is the next step?"
           },
           "optionen": [
@@ -156,7 +156,7 @@
               "en": "Leave them out. Uninvited additions do not belong in the commit, even if they work."
             },
             {
-              "de": "Übernehmen, das Modell wird schon wissen, warum.",
+              "de": "Übernehmen, das Modell hat es vermutlich aus gutem Grund ergänzt.",
               "en": "Take them over, the model will know why."
             },
             {
@@ -253,7 +253,7 @@
         }
       ],
       "rueckmeldung": {
-        "de": "Die Trennung ist der Wirkstoff: Wer die Erwartung festlegt, promptet nicht, und wer promptet, nimmt nicht ab.",
+        "de": "Die Trennung ist entscheidend: Wer die Erwartung festlegt, promptet nicht, und wer promptet, nimmt nicht ab.",
         "en": "The separation is the active ingredient."
       }
     },

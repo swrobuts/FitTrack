@@ -16,7 +16,7 @@
       "titel": { "de": "Container starten", "en": "Start the container" },
       "befehl": "docker run -d -p 8000:8000 --name fittrack fittrack",
       "teile": [
-        { "was": "-d", "bedeutet": { "de": "Im Hintergrund. Ohne -d bleibt das Terminal am Log hängen, das ist beim ersten Mal auch lehrreich.", "en": "Detached, in the background." } },
+        { "was": "-d", "bedeutet": { "de": "Im Hintergrund. Ohne -d bleibt das Terminal am Log hängen; beim ersten Start ist das nützlich, um die Ausgabe zu sehen.", "en": "Detached, in the background." } },
         { "was": "-p 8000:8000", "bedeutet": { "de": "Port des Rechners auf Port des Containers. Danach antwortet http://localhost:8000 und im WLAN http://<IP>:8000.", "en": "Host port to container port." } },
         { "was": "--name fittrack fittrack", "bedeutet": { "de": "Erst der Name des Containers, dann der Name des Images. Der Containername macht docker stop und docker logs lesbar.", "en": "Container name first, then image name." } }
       ]
@@ -64,7 +64,7 @@
         { "text": { "de": "Laufende Container anzeigen", "en": "Show running containers" }, "muster": "^docker\\s+ps\\s*$" },
         { "text": { "de": "Container stoppen", "en": "Stop the container" }, "muster": "^docker\\s+stop\\b" }
       ],
-      "rueckmeldung": { "de": "Auf dem eigenen Rechner jetzt: http://localhost:8000/health im Browser, dann http://<IP>:8000 auf dem Handy. Botschaft: Was hier läuft, läuft identisch auf jedem Server.", "en": "On your own machine now: localhost:8000/health, then the phone." }
+      "rueckmeldung": { "de": "Auf dem eigenen Rechner jetzt: http://localhost:8000/health im Browser, dann http://<IP>:8000 auf dem Handy. Ergebnis: Was hier läuft, läuft identisch auf jedem Server.", "en": "On your own machine now: localhost:8000/health, then the phone." }
     },
     {
       "id": "P06-03", "typ": "quiz",

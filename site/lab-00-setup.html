@@ -40,14 +40,14 @@
   <h1 class="lab-title">Setup und Micro-Scrum</h1>
   <p class="lab-intro">Bevor die erste Zeile Code entsteht, muss die Werkzeugkette laufen und die Gruppe wissen, wer was
     tut. Dieses Lab bringt beides in Betrieb: Docker, WebStorm, Git und den Chat auf der einen Seite, Vision, User
-    Stories, drei Rollen und die Definition of Done auf der anderen. Am Ende sehen Sie den ersten Test rot. Das ist kein
-    Fehler, sondern der Ausgangspunkt der ganzen Methode.</p>
+    Stories, drei Rollen und die Definition of Done auf der anderen. Am Ende sehen Sie den ersten Test fehlschlagen. Das ist kein
+    Fehler, sondern der Ausgangspunkt der Methode: Der Test beschreibt, was die App können soll, bevor es den Code gibt.</p>
   <div class="lernziele">
     <span class="lernziel-chip">Docker · WebStorm · Git</span>
     <span class="lernziel-chip">Branch starter</span>
     <span class="lernziel-chip">PO · Dev · QA</span>
     <span class="lernziel-chip">Definition of Done</span>
-    <span class="lernziel-chip">Test rot</span>
+    <span class="lernziel-chip">Der erste Test</span>
   </div>
   <div data-einordnung></div>
 </div>
@@ -105,14 +105,13 @@ flowchart LR
   <section class="section-block" id="starter">
     <h2>Den Starter holen</h2>
     <p>Der Branch <code>starter</code> im Repository enthält den Ausgangsstand: Ordnerstruktur, Datenbank, Testdaten,
-      README und genau einen Test, der noch rot ist. Die vier Befehle unten sind der gesamte Setup-Aufwand.</p>
+      README und genau einen Test, der noch fehlschlägt. Die vier Befehle unten sind der gesamte Setup-Aufwand.</p>
     <div data-befehl="B01"></div>
     <div data-befehl="B02"></div>
     <div class="warn-box">
-      <h3>Rot ist richtig</h3>
+      <h3>Das Fehlschlagen ist beabsichtigt</h3>
       <p>Nach <code>pytest</code> erscheint <code>ModuleNotFoundError: No module named 'app.main'</code>. Der Test in
-        <code>backend/tests/test_api.py</code> beschreibt, was die App können soll, bevor es den Code gibt. Er wird in
-        Lab 01 grün.</p>
+        <code>backend/tests/test_api.py</code> beschreibt, was die App können soll, bevor es den Code gibt. Er besteht ab Lab 01.</p>
     </div>
   </section>
 
@@ -192,7 +191,7 @@ stateDiagram-v2
         <div class="kopfzeile">Nachweis durch die Maschine</div>
         <ul>
           <li>Code läuft lokal ohne Fehler</li>
-          <li>Zugehörige Tests vorhanden und grün (<code>pytest</code>)</li>
+          <li>Zugehörige Tests vorhanden und bestanden (<code>pytest</code>)</li>
           <li>Commit und Push mit Story-Bezug, etwa <code>feat(US-2): Kennzahlen-Endpunkt</code></li>
         </ul>
       </div>
@@ -206,7 +205,7 @@ stateDiagram-v2
     </div>
     <div class="concept-box">
       <h3>Warum beides</h3>
-      <p>Eine grüne Testreihe belegt, dass der Code tut, was die Tests beschreiben. Ob die Tests die Story beschreiben,
+      <p>Eine bestandene Testreihe belegt, dass der Code tut, was die Tests beschreiben. Ob die Tests die Story beschreiben,
         kann nur ein Mensch beurteilen. Deshalb steht die Demo gleichberechtigt daneben.</p>
     </div>
   </section>
@@ -237,9 +236,9 @@ stateDiagram-v2
   <section class="section-block" id="zusammenfassung">
     <h2>Zusammenfassung</h2>
     <ul>
-      <li>Der Starter liegt auf dem Branch <code>starter</code>. Nach venv und <code>pip install</code> ist der erste Test rot, und das ist der Plan.</li>
+      <li>Der Starter liegt auf dem Branch <code>starter</code>. Nach venv und <code>pip install</code> schlägt der erste Test fehl, und das ist beabsichtigt.</li>
       <li>Drei Rollen trennen Perspektiven: Wer die Erwartung festlegt, promptet nicht selbst. Die Rollen rotieren je Sprint.</li>
-      <li>Die Definition of Done verlangt beides: grüne Tests und eine Demo am Gerät, dazu ein Review durch eine zweite Person.</li>
+      <li>Die Definition of Done verlangt beides: bestandene Tests und eine Demo am Gerät, dazu ein Review durch eine zweite Person.</li>
       <li>Sechs Stories mit Akzeptanzkriterien bilden das Backlog, US-7 kommt in Lab 10 aus dem Review dazu. US-1 und US-3 sind Pflicht.</li>
       <li>Zwei Datenbanken, ein Schema: Echtdaten in <code>fittrack.db</code>, Testdaten als SQL-Datei, die die Tests selbst einspielen.</li>
     </ul>

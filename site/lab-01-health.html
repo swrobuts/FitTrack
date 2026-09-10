@@ -31,7 +31,7 @@
   <a class="sidebar-link" href="#prompt">Der Prompt</a>
   <a class="sidebar-link" href="#pruefen">Prüfpunkte</a>
   <a class="sidebar-link" href="#technik">Was technisch passiert</a>
-  <a class="sidebar-link" href="#commit">Grün, Demo, Commit</a>
+  <a class="sidebar-link" href="#commit">Test bestanden, Demo, Commit</a>
   <a class="sidebar-link" href="#uebungen">Übungen</a>
   <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
 </nav>
@@ -40,11 +40,11 @@
   <div class="lab-num-big">01</div>
   <h1 class="lab-title">US-3: Der Health-Endpunkt</h1>
   <p class="lab-intro">Der kleinste Endpunkt der App, und trotzdem die wichtigste Übung des Kurses: An ihm läuft die
-    Schleife zum ersten Mal vollständig. Test rot, Prompt in den Chat, Antwort lesen und prüfen, Code in WebStorm,
-    Test grün, Demo, Commit. Wer diese Folge einmal an einer Zeile Code durchlaufen hat, kann sie an jeder Story
+    Schleife zum ersten Mal vollständig. Test schreiben und fehlschlagen sehen, Prompt in den Chat, Antwort lesen und prüfen, Code in WebStorm,
+    Test bestehen sehen, Demo, Commit. Wer diese Folge einmal an einer Zeile Code durchlaufen hat, kann sie an jeder Story
     wiederholen.</p>
   <div class="lernziele">
-    <span class="lernziel-chip">Test rot → grün</span>
+    <span class="lernziel-chip">Test: fehlschlagend, dann bestanden</span>
     <span class="lernziel-chip">Prompt mit Kontext</span>
     <span class="lernziel-chip">FastAPI · uvicorn</span>
     <span class="lernziel-chip">/docs</span>
@@ -80,7 +80,7 @@ flowchart TD
     F -- "grün" --> H["Demo am Gerät,<br/>PO nimmt ab"]
     H --> I["Commit mit Story-Bezug, Push"]
       </pre>
-      <div class="unterschrift">Die Schleife hat genau eine Rückführung: Ist der Test nach der Übernahme rot, geht die Fehlermeldung wörtlich zurück in den Chat, nicht sinngemäß.</div>
+      <div class="unterschrift">Die Schleife hat genau eine Rückführung: Schlägt der Test nach der Übernahme fehl, geht die Fehlermeldung wörtlich zurück in den Chat, nicht sinngemäß.</div>
     </div>
   </section>
 
@@ -93,7 +93,7 @@ flowchart TD
     <h3>1. Erwartungswert von Hand rechnen</h3>
     <p>Die Testdaten sind acht Einheiten in <code>backend/tests/fixtures/workouts_klein.sql</code>. Kilometer
       addieren: 5,0 + 20,0 + 8,0 + 1,5 + 30,0 + 9,0 + 10,0 + 4,0 = <strong>87,5</strong>. Das ist die Zahl, die die
-      App liefern muss. Sie kommt aus Ihrem Taschenrechner, nicht aus dem Chat.</p>
+      App liefern muss. Sie wird selbst gerechnet, nicht vom Chat erfragt.</p>
     <h3>2. Den Test in die Datei schreiben</h3>
     <p>In WebStorm <code>backend/tests/test_api.py</code> öffnen und ergänzen:</p>
     <pre class="code-block">def test_stats_gesamt_km():
@@ -106,11 +106,12 @@ flowchart TD
     <p>Im Terminal von WebStorm, im Projektordner:</p>
     <pre class="code-block">pytest</pre>
     <p>pytest sucht alle Funktionen, die mit <code>test_</code> beginnen, führt sie aus und meldet je Test PASSED oder
-      FAILED. Solange der Endpunkt noch fehlt, sieht das so aus:</p>
+      FAILED. Im Terminal erscheint FAILED rot und PASSED grün; deshalb heißt es im Kurs kurz „der Test ist rot“ für
+      fehlgeschlagen und „grün“ für bestanden. Solange der Endpunkt noch fehlt, sieht das so aus:</p>
     <pre class="code-block">FAILED backend/tests/test_api.py::test_stats_gesamt_km - ... 404
 1 failed in 0.16s</pre>
     <div class="tip-box">
-      <h3>Rot ist hier richtig</h3>
+      <h3>Das Fehlschlagen ist hier richtig</h3>
       <p>Es beweist, dass der Test etwas prüft, was noch fehlt. Ein Test, der von Anfang an grün ist, hat nichts
         belegt.</p>
     </div>
@@ -147,7 +148,7 @@ backend/tests/test_api.py:52: AssertionError</pre>
       <p><code>conftest.py</code> baut vor jedem Lauf aus <code>schema.sql</code> und dem Fixture eine temporäre
         Testdatenbank und setzt <code>FITTRACK_DATA</code> darauf. Die Tests laufen nie gegen die 311 Echtdaten.
         <code>TestClient</code> ruft die App im selben Prozess auf, ein Server wird nicht gestartet; deshalb dauern
-        alle 15 Tests unter einer Sekunde. Für den Randfall „keine Daten“ tauscht <code>monkeypatch</code> die
+        alle 15 Tests unter einer Sekunde. Für den Sonderfall „keine Daten“ tauscht <code>monkeypatch</code> die
         Ladefunktion vorübergehend gegen eine leere Liste aus.</p>
     </div>
     <div class="warn-box">
@@ -271,7 +272,7 @@ def health() -> dict:
   </section>
 
   <section class="section-block" id="commit">
-    <h2>Grün, Demo, Commit</h2>
+    <h2>Test bestanden, Demo, Commit</h2>
     <div data-befehl="B01"></div>
     <div data-befehl="B02"></div>
     <p>Demo für den Product Owner: <a href="http://localhost:8000/health" target="_blank" rel="noopener">localhost:8000/health</a>
@@ -299,9 +300,9 @@ def health() -> dict:
     <ul>
       <li>Der Test steht vor dem Prompt. Der rote Lauf beweist, dass er greift.</li>
       <li>Der Prompt trägt Rolle, Kontext, Aufgabe, Randbedingungen und den Test. Der Chat sieht das Repository nicht.</li>
-      <li>Die Antwort wird gelesen und geprüft, bevor sie in WebStorm landet. Ungefragte Zutaten fliegen raus.</li>
-      <li>Ist der Test danach rot, geht der Traceback wörtlich zurück in den Chat.</li>
-      <li>Grün, Demo unter <code>/health</code>, Commit mit <code>feat(US-3)</code>. Damit ist die Story nach Definition of Done fertig.</li>
+      <li>Die Antwort wird gelesen und geprüft, bevor sie in WebStorm landet. Ungefragte Ergänzungen werden weggelassen.</li>
+      <li>Schlägt der Test danach fehl, geht der Traceback wörtlich zurück in den Chat.</li>
+      <li>Test bestanden, Demo unter <code>/health</code>, Commit mit <code>feat(US-3)</code>. Damit ist die Story nach Definition of Done fertig.</li>
     </ul>
     <div data-lab-nav></div>
   </section>

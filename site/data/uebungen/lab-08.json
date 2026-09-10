@@ -28,7 +28,7 @@
           "erklaerung": { "de": "Die Erklärung ist der Anlass für die Prüfung. Stimmt sie nicht mit dem Code überein, ist das selbst ein Befund.", "en": "The explanation is the trigger for the review." }
         },
         {
-          "frage": { "de": "Der Test ist nach der Übernahme rot. Welche Rückmeldung an den Chat ist richtig?", "en": "The test is red after adoption. Which feedback to the chat is right?" },
+          "frage": { "de": "Der Test schlägt nach der Übernahme fehl. Welche Rückmeldung an den Chat ist richtig?", "en": "The test is red after adoption. Which feedback to the chat is right?" },
           "optionen": [
             { "de": "Der komplette Traceback aus pytest, unverändert.", "en": "The complete pytest traceback, unchanged." },
             { "de": "„Der Durchschnitt stimmt irgendwie nicht.“", "en": "“The average is somehow wrong.”" },
@@ -53,7 +53,7 @@
       "paare": [
         { "begriff": { "de": "Das Modell liefert main.py, models.py, statistik.py, app.js und ein Dockerfile in einer Antwort, und nichts davon passt zusammen", "en": "The model delivers five files at once and nothing fits" }, "ziel": "eine" },
         { "begriff": { "de": "Der Code ruft lade_daten() auf, die Funktion heißt aber lade_workouts()", "en": "The code calls lade_daten() but the function is lade_workouts()" }, "ziel": "kontext" },
-        { "begriff": { "de": "import pandas as pd in daten.py, GitHub Actions rot", "en": "import pandas in daten.py, Actions red" }, "ziel": "rand" },
+        { "begriff": { "de": "import pandas as pd in daten.py, GitHub Actions meldet Fehler", "en": "import pandas in daten.py, Actions red" }, "ziel": "rand" },
         { "begriff": { "de": "Drei Runden Chat, weil „geht nicht“ als Rückmeldung nichts erklärt", "en": "Three chat rounds because “does not work” explains nothing" }, "ziel": "woertlich" },
         { "begriff": { "de": "Im Review kann niemand sagen, was die Middleware in main.py tut", "en": "In review nobody can say what the middleware does" }, "ziel": "verstanden" }
       ],
@@ -65,11 +65,11 @@
       "aufgabe": { "de": "<p>Zwei Fragen zu den Achsen.</p>", "en": "<p>Two questions on the axes.</p>" },
       "fragen": [
         {
-          "frage": { "de": "Ein Editor-Agent hat 14 Dateien geändert und die Tests selbst laufen lassen, alle grün. Ist das Vibe Coding?", "en": "An editor agent changed 14 files and ran the tests itself, all green. Is that vibe coding?" },
+          "frage": { "de": "Ein Editor-Agent hat 14 Dateien geändert und die Tests selbst laufen lassen, alle bestanden. Ist das Vibe Coding?", "en": "An editor agent changed 14 files and ran the tests itself, all green. Is that vibe coding?" },
           "optionen": [
             { "de": "Nicht zwingend. Vibe Coding beschreibt, ob geprüft wird, agentisch beschreibt, wer handelt. Liest der Mensch den Diff und beurteilt das Ergebnis, ist es Agentic Engineering; übernimmt er ungelesen, ist es Vibe Coding mit einem Agenten.", "en": "Not necessarily. Vibe describes whether you review, agentic describes who acts." },
             { "de": "Ja, weil ein Agent beteiligt war.", "en": "Yes, because an agent was involved." },
-            { "de": "Nein, weil die Tests grün sind.", "en": "No, because the tests are green." }
+            { "de": "Nein, weil die Tests bestehen.", "en": "No, because the tests are green." }
           ],
           "richtig": [0],
           "erklaerung": { "de": "Zwei Achsen, zwei Entscheidungen. Der FitTrack-Workflow ist bewusst wenig autonom und voll geprüft, beides lässt sich später unabhängig voneinander verändern.", "en": "Two axes, two decisions." }
@@ -92,7 +92,7 @@
       "aufgabe": { "de": "<p>Ein Modell hat für US-2 diesen Ausschnitt geliefert:</p><pre class=\"code-block\">import pandas as pd\n\ndef berechne_stats(workouts):\n    df = pd.DataFrame(workouts)\n    wochen = df['datum'].str[:7].nunique()\n    return {'gesamt_km': round(df.distanz_km.sum(), 1),\n            'durchschnitt_km_pro_woche': round(df.distanz_km.sum() / wochen, 1),\n            'lieblingssportart': df.groupby('sportart').distanz_km.sum().idxmax(),\n            'anzahl': len(df)}</pre><p>Gehen Sie die Review-Fragen durch und haken Sie jede ab, für die Sie einen Befund gefunden haben.</p>", "en": "<p>A model delivered this snippet for US-2. Go through the review questions and tick each one where you found an issue.</p>" },
       "schritte": [
         { "text": { "de": "Existiert alles? <code>pandas</code> steht nicht in <code>requirements.txt</code> und war als Randbedingung ausgeschlossen.", "en": "Does everything exist? pandas is not in requirements.txt." } },
-        { "text": { "de": "Randfälle? Bei leerer Liste hat der DataFrame keine Spalte <code>datum</code>, der Code wirft einen KeyError statt 0.0, 0.0, None, 0.", "en": "Edge cases? An empty list raises KeyError." } },
+        { "text": { "de": "Sonderfälle? Bei leerer Liste hat der DataFrame keine Spalte <code>datum</code>, der Code wirft einen KeyError statt 0.0, 0.0, None, 0.", "en": "Edge cases? An empty list raises KeyError." } },
         { "text": { "de": "Stimmt die Rechnung? <code>str[:7]</code> zählt Monate, nicht ISO-Kalenderwochen, und nur solche mit Training. Der Test erwartet 29,2.", "en": "Is the calculation right? str[:7] counts months, not ISO weeks." } },
         { "text": { "de": "Gleichstand? <code>idxmax()</code> nimmt den ersten Treffer in Gruppenreihenfolge, nicht den alphabetisch ersten.", "en": "Ties? idxmax() takes the first hit in group order." } },
         { "text": { "de": "Stil? Englische Namen wie <code>df</code>, keine Docstrings, keine Hilfsfunktionen wie im übrigen Projekt.", "en": "Style? English names, no docstrings, no helpers." } }

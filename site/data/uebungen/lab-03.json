@@ -3,7 +3,7 @@
     {
       "id": "P03-01", "typ": "quiz",
       "titel": { "de": "Erwartungswerte aus den Testdaten", "en": "Expected values from the test data" },
-      "aufgabe": { "de": "<p>Rechnen Sie mit der Tabelle oben. Taschenrechner erlaubt, Chat nicht.</p>", "en": "<p>Calculate with the table above. Calculator allowed, chat not.</p>" },
+      "aufgabe": { "de": "<p>Rechnen Sie mit der Tabelle oben selbst, ohne den Chat. Ein Taschenrechner genügt.</p>", "en": "<p>Calculate with the table above. Calculator allowed, chat not.</p>" },
       "fragen": [
         {
           "frage": { "de": "Wie groß ist gesamt_km?", "en": "What is gesamt_km?" },
@@ -37,7 +37,7 @@
     {
       "id": "P03-03", "typ": "zuordnen",
       "titel": { "de": "Test und Randfall", "en": "Test and edge case" },
-      "aufgabe": { "de": "<p>Welcher Test fängt welchen Fehler, den generierter Code typischerweise macht?</p>", "en": "<p>Which test catches which typical mistake of generated code?</p>" },
+      "aufgabe": { "de": "<p>Welcher Test deckt welchen Fehler auf, der in generiertem Code typischerweise vorkommt?</p>", "en": "<p>Which test catches which typical mistake of generated code?</p>" },
       "ziele": [
         { "id": "durchschnitt", "text": { "de": "test_stats_durchschnitt", "en": "test_stats_durchschnitt" } },
         { "id": "leer", "text": { "de": "test_stats_leere_liste", "en": "test_stats_leere_liste" } },

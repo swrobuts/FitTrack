@@ -133,7 +133,7 @@ flowchart LR
     <div class="warn-box">
       <h3>Cold Start</h3>
       <p>Nach 15 Minuten ohne Verkehr schläft der Dienst ein. Der nächste Aufruf wartet bis zu einer Minute. Vor
-        einer Demo die URL einmal aufrufen, sonst wartet der Raum mit. Teuer wird es nie: Bei Erreichen der Grenzen
+        einer Demo die URL einmal aufrufen, sonst warten alle im Raum mit. Teuer wird es nie: Bei Erreichen der Grenzen
         hält Render an, statt abzurechnen.</p>
     </div>
     <p>Quelle: Preisseite und Dokumentation von Render, Stand September 2026.</p>
@@ -142,7 +142,7 @@ flowchart LR
   <section class="section-block" id="ci">
     <h2>GitHub Actions</h2>
     <p>Eine Datei im Repository, und bei jedem Push läuft <code>pytest</code> auf einem frischen Rechner bei GitHub. Das
-      Ergebnis erscheint als Haken oder Kreuz am Commit. Rote Tests fallen so auf, bevor jemand den Stand übernimmt.</p>
+      Ergebnis erscheint als Haken oder Kreuz am Commit. Fehlgeschlagene Tests fallen so auf, bevor jemand den Stand übernimmt.</p>
     <pre class="code-block" data-kopieren=".github/workflows/tests.yml">name: Tests
 
 on: [push, pull_request]
@@ -166,7 +166,7 @@ jobs:
         run: pytest</pre>
     <div class="shot">
       <img src="assets/img/github-actions.png" alt="GitHub Actions, Reiter Workflow runs, mit erfolgreichen Läufen des Workflows Tests" loading="lazy">
-      <div class="unterschrift">Jeder Lauf gehört zu einem Commit. Der grüne Haken ist die maschinelle Definition of Done, ohne dass jemand etwas tun muss.</div>
+      <div class="unterschrift">Jeder Lauf gehört zu einem Commit. Der grüne Haken am Commit ist der maschinelle Teil der Definition of Done, ohne dass jemand etwas tun muss.</div>
     </div>
     <div class="concept-box">
       <h3>Warum ein fremder Rechner</h3>
