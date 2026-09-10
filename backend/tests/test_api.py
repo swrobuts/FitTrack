@@ -84,3 +84,11 @@ def test_stats_leere_liste(monkeypatch):
         "lieblingssportart": None,
         "anzahl": 0,
     }
+
+
+# US-4: Frontend wird von FastAPI ausgeliefert
+def test_index_liefert_html():
+    antwort = client.get("/")
+    assert antwort.status_code == 200
+    assert "text/html" in antwort.headers["content-type"]
+    assert "FitTrack" in antwort.text

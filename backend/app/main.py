@@ -4,11 +4,16 @@ Start lokal (aus dem Projektordner FitTrack/):
     uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
 """
 
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from .daten import lade_workouts
 from .models import Stats, Workout
 from .statistik import berechne_stats
+
+FRONTEND_ORDNER = Path(__file__).parent.parent.parent / "frontend"
 
 app = FastAPI(title="FitTrack", version="0.1.0")
 
@@ -29,3 +34,8 @@ def workouts() -> list[dict]:
 def stats() -> dict:
     """Kennzahlen über alle Trainingseinheiten."""
     return berechne_stats(lade_workouts())
+
+
+# Das Frontend liegt als statische Dateien im Ordner frontend/. Der Mount muss
+# NACH den API-Routen stehen, sonst fängt er alle Anfragen ab.
+app.mount("/", StaticFiles(directory=FRONTEND_ORDNER, html=True), name="frontend")

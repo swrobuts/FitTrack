@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <!-- Ohne diese Zeile zeigt das Smartphone die Seite verkleinert wie eine Desktop-Seite -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FitTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="seite">
+
+  <header class="kopf">
+    <h1>FitTrack</h1>
+    <p id="zeitraum" class="kopf-untertitel">…</p>
+  </header>
+
+  <!-- 1. Wochenziel-Ring: die jüngste Trainingswoche gegen das Wochenziel -->
+  <section id="woche" class="karte karte-woche" aria-labelledby="woche-titel">
+    <h2 id="woche-titel" class="karte-titel">…</h2>
+    <div class="woche-inhalt">
+      <div class="ring" role="img" aria-label="Fortschritt zum Wochenziel">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <circle class="ring-spur" cx="60" cy="60" r="52"></circle>
+          <circle id="ring-balken" class="ring-balken" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="ring-text">
+          <span id="ring-prozent" class="ring-zahl">…</span>
+          <span class="ring-label">vom Ziel</span>
+        </div>
+      </div>
+      <dl class="woche-werte">
+        <div><dt>Kilometer</dt><dd id="woche-km">…</dd></div>
+        <div><dt>Einheiten</dt><dd id="woche-anzahl">…</dd></div>
+        <div><dt>Minuten</dt><dd id="woche-minuten">…</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 2. Kennzahlen über den gesamten Zeitraum -->
+  <section id="kennzahlen" class="kennzahlen" aria-label="Kennzahlen">
+    <div class="kachel"><dt>Gesamt</dt><dd><span id="stat-gesamt">…</span><small>km</small></dd></div>
+    <div class="kachel"><dt>Pro Woche</dt><dd><span id="stat-woche">…</span><small>km</small></dd></div>
+    <div class="kachel"><dt>Lieblingssport</dt><dd><span id="stat-sport">…</span></dd></div>
+    <div class="kachel"><dt>Einheiten</dt><dd><span id="stat-anzahl">…</span></dd></div>
+  </section>
+
+  <!-- 3. Wochenverlauf als Balkendiagramm mit Zeitraumwahl -->
+  <section id="diagramm" class="karte" aria-labelledby="diagramm-titel">
+    <div class="karte-kopf">
+      <h2 id="diagramm-titel" class="karte-titel">Kilometer pro Woche</h2>
+      <div class="zeitraum-wahl" role="group" aria-label="Zeitraum">
+        <button type="button" data-wochen="8" class="aktiv">8 W</button>
+        <button type="button" data-wochen="26">6 M</button>
+        <button type="button" data-wochen="52">1 J</button>
+        <button type="button" data-wochen="0">Alles</button>
+      </div>
+    </div>
+    <div class="diagramm-flaeche">
+      <canvas id="wochen-chart" aria-label="Balkendiagramm Kilometer pro Woche"></canvas>
+    </div>
+  </section>
+
+  <!-- 4. Die letzten Trainingseinheiten -->
+  <section id="aktivitaeten" class="karte" aria-labelledby="aktivitaeten-titel">
+    <h2 id="aktivitaeten-titel" class="karte-titel">Letzte Aktivitäten</h2>
+    <ol id="aktivitaeten-liste" class="aktivitaeten-liste">
+      <li class="hinweis">…</li>
+    </ol>
+    <button id="mehr-anzeigen" type="button" class="knopf-breit" hidden>Mehr anzeigen</button>
+  </section>
+
+</main>
+</body>
+</html>
