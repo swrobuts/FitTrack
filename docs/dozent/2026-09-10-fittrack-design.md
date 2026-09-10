@@ -1,7 +1,7 @@
 # FitTrack – Design-Spec
 
-Stand: 10.09.2026. Grundlage: `docs/kurs/FitTrack_Kurskonzept_240min.md`.
-Dieses Dokument beschreibt die Referenzlösung und das Lehrmaterial, das daraus abgeleitet wird.
+Stand: 10.09.2026, fortgeschrieben bis US-7. Grundlage: `docs/kurs/FitTrack_Kurskonzept_240min.md`.
+Dieses Dokument beschreibt die Referenzlösung und das Lehrmaterial, das daraus abgeleitet wird. Der ursprüngliche Implementierungsplan liegt in `docs/dozent/archiv/`.
 
 ## 1. Ziel
 
@@ -19,7 +19,7 @@ Abweichungen vom Kurskonzept:
 
 ## 2. Repo
 
-Pfad: `Vorlesungen/Datenbasierte Fallstudien/FitTrack` (eingebettetes Repo im Elternrepo, dort per `.gitignore` ausgeschlossen). GitHub: `swrobuts/FitTrack`, privat.
+Pfad: `Vorlesungen/Datenbasierte Fallstudien/FitTrack` (eingebettetes Repo im Elternrepo, dort per `.gitignore` ausgeschlossen). GitHub: `swrobuts/FitTrack`, öffentlich. Lernumgebung: <https://swrobuts.github.io/FitTrack/>, App: <https://fittrack-k7gg.onrender.com>.
 
 ```text
 FitTrack/
@@ -49,6 +49,7 @@ FitTrack/
 │   ├── checklisten.md         # DoD, Review, End-Abnahme
 │   └── dozent/
 │       ├── 2026-09-10-fittrack-design.md     # dieses Dokument
+│       └── archiv/                           # ursprünglicher Implementierungsplan (JSON-Stand)
 │       ├── prompt-skript.md   # der Kern: alle Prompts in Reihenfolge
 │       ├── erwartungswerte.md # Handrechnung für das Fixture
 │       ├── lmstudio-demo.md
@@ -114,7 +115,17 @@ US-6: Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen
       Akzeptanz: GET /api/stats/wochen liefert pro Kalenderwoche distanz_km
       und anzahl, auch für Wochen ohne Training; das Diagramm zeigt diese
       Daten; Umschalter 8 W / 6 M / 1 J / Alles.
+
+US-7: Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard
+      genau das aussagt, was die Daten hergeben, damit ich mich nicht
+      auf ein schönes, aber falsches Bild verlasse.
+      Akzeptanz: Bullet-Graph mit Zielmarke statt Ring, Übererfüllung sichtbar;
+      abgeschlossene Woche heißt Ergebnis; jede Achse und Farbe beschriftet;
+      jede Grafik antippbar; GET /api/stats/wochen liefert je_sportart;
+      Zeitbezug an jeder Karte; 13 px, aria-pressed, hell und dunkel.
 ```
+
+US-7 entsteht im Sprint Review 2 aus der Kritik am Erstentwurf (Ring bei 161 % über einer vergangenen Woche, gestapelte Säulen ohne Achse). Sie ist das Lehrstück „Schön, aber falsch“ im Deck, in Lab 10 und in Schritt 6b des Prompt-Skripts.
 
 Die Prompts werden vom Dozenten selbst gegen Claude im Chat durchgespielt. Der Code im Repo ist das Ergebnis eines sauberen Durchlaufs nach Review, nicht die rohe Modellantwort. Der Prompt für US-2 dient zusätzlich als Vergleichsprompt für die LM-Studio-Demo.
 
@@ -153,7 +164,7 @@ Erzeugt durch `scripts/generate_workouts.py` mit festem Seed, damit die Datei re
 
 ### Wochenverlauf (`/api/stats/wochen`)
 
-Liste aufsteigend nach Woche. Jeder Eintrag: `kw` als ISO-Wochenstring `2026-W23`, `wochenstart` als ISO-Datum des Montags, `distanz_km`, `anzahl`, `dauer_min`. Alle Wochen zwischen erster und letzter Trainingswoche sind enthalten, Wochen ohne Training mit 0. Leere Liste ergibt leere Liste.
+Liste aufsteigend nach Woche. Jeder Eintrag: `kw` als ISO-Wochenstring `2026-W23`, `wochenstart` als ISO-Datum des Montags, `distanz_km`, `anzahl`, `dauer_min` und seit US-7 `je_sportart` (Kilometer je Sportart, leeres Objekt in Wochen ohne Training). Alle Wochen zwischen erster und letzter Trainingswoche sind enthalten, Wochen ohne Training mit 0. Leere Liste ergibt leere Liste.
 
 ### `/api/workouts`
 
@@ -171,19 +182,25 @@ Die Rechenfunktionen liegen in `statistik.py` ohne FastAPI-Abhängigkeit, damit 
 
 ## 6. Frontend
 
-Anlehnung an Garmin Connect, Apple Fitness und RingConn: dunkler Hintergrund, abgerundete Karten, große Kennzahlen, je Sportart eine Akzentfarbe, ruhige Typografie. Keine Bilder, keine Emojis, Sportarten werden über Farbe und ein zweibuchstabiges Kürzel im Kreis unterschieden (La, Ra, Sc, Wa).
+Anlehnung an Garmin Connect, Apple Fitness und RingConn: Karten, große Kennzahlen, je Sportart eine Akzentfarbe und ein SVG-Symbol, ruhige Typografie. Dunkel ist Standard, hell folgt dem Gerät oder dem Umschalter im Kopf (`light-dark()` im CSS, Wahl im `localStorage`).
 
-Aufbau von oben nach unten auf dem Smartphone:
+### Erstentwurf (US-4 bis US-6, Tag `us-6`)
 
-1. Kopfzeile: Titel, Zeitraum der Daten.
-2. Wochenziel-Ring: Fortschritt der jüngsten Woche im Datensatz gegenüber einem Wochenziel (40 km, Konstante in `app.js`), daneben km, Einheiten und Minuten dieser Woche. Der Text zeigt den echten Prozentwert, der Ring ist ab 100 % voll. Quelle: letzter Eintrag von `/api/stats/wochen`. Die jüngste Datenwoche statt der Kalenderwoche von heute, weil die Beispieldaten im September 2026 enden und der Ring sonst nach dem Kurs dauerhaft leer wäre.
-3. Kennzahl-Karten in 2er-Raster: Gesamt-km, Ø km pro Woche, Lieblingssportart, Einheiten gesamt. Quelle: `/api/stats`.
-4. Diagramm-Karte: Balkendiagramm Wochen-km, Umschalter 8 W / 6 M / 1 J / Alles als segmentierte Buttons mit 44 px Höhe. Quelle: `/api/stats/wochen`, Filterung im Browser.
-5. Letzte Aktivitäten: die 10 jüngsten Einheiten, je Zeile Sportart-Symbol, Datum, Dauer, Distanz, Kalorien. Quelle: `/api/workouts`. Button „Mehr anzeigen“ lädt weitere 10 aus der schon geladenen Liste.
+Wochenziel-Ring für die jüngste Datenwoche, vier Kennzahl-Kacheln, Balkendiagramm mit Umschalter „8 W / 6 M / 1 J / Alles“, Liste mit Kürzeln „La, Ra, Sc, Wa“. Dieser Stand besteht alle Tests und ist bewusst der Erstentwurf der KI: Ring geschlossen bei 161 %, vergangene Woche als Fortschritt, Balken ohne Achse, Stapel auf 375 px unlesbar, Kürzel, „Einheiten“ zweimal mit anderem Bezug, 12 px, kein `aria-pressed`, nur dunkel.
 
-CSS: Custom Properties für Farben und Abstände, Basis-Styles für schmale Screens, ein Breakpoint `@media (min-width: 768px)` für Tablet und Desktop (Karten in 4er-Raster, Diagramm und Liste nebeneinander). Schriftgröße mindestens 16 px, Touch-Targets mindestens 44 px, kein horizontales Scrollen bei 375 px. Chart.js 4 per CDN, Balkenfarbe aus den Custom Properties, Tooltip zeigt Kalenderwoche und km.
+### Zweitentwurf (US-7, Tag `us-7`), Reihenfolge auf dem Smartphone
 
-Fehlerfall: Antwortet die API nicht, zeigt jede Karte einen kurzen Hinweistext statt leerer Felder. Ladezustand: Platzhalter „…“ bis die Daten da sind.
+1. Kopfzeile: Titel, „Daten vom … bis …“, Thema-Umschalter.
+2. Wochenkarte: „Letzte Trainingswoche“ oder „Diese Woche“ mit Wochenspanne, Badge (Ziel erreicht, Auf Kurs, Im Rückstand, Unter dem Ziel; Serie erreichter Wochen), große Kilometerzahl mit Abstand zum Ziel, Bullet-Graph (Balken nach Sportart gefärbt, Zielmarke 40 km, Skala über das Ziel hinaus), Kilometer je Sportart, Einheiten, Minuten, Ø je Einheit.
+3. Kennzahl-Kacheln (2er-Raster, weiß): Bezug in der Überschrift („Gesamt seit Sep 2024“, „Einheiten seit Sep 2024“), Zahl, Einordnung darunter („Ziel in 33 von 105 Wochen“, „KW 37/2025 · 4 Einheiten“, „Ø 3,0 je Woche“).
+4. Sportarten: eine Kachel je Sportart mit Kilometern, Anteil als Balken, Einheiten, Ø je Einheit, letzte Einheit; Untertitel „Alle 311 Einheiten seit Sep 2024“.
+5. Letzte Aktivitäten: 10 Einträge (Desktop 6), Untertitel mit der Spanne der sichtbaren Einträge, „20 weitere anzeigen“, „Alle anzeigen“, „Wieder einklappen“.
+6. Kilometer pro Woche: Legende unter der Überschrift, Untertitel mit KW-Spanne und Jahr, ein Balken je Woche (grün ab Ziel), Ziellinie, Zeitraumwahl unter dem Diagramm; ab einem Jahr Monatssummen.
+7. Trainingskalender: letzte 8 Wochen, ein Feld je Tag, vier Farbstufen, Zahl im Feld.
+
+Jedes Objekt (Woche, Balken, Kalendertag, Kennzahl, Sportart, Einheit) öffnet beim Antippen ein Sheet (`<dialog>`, auf dem Handy von unten, am Desktop mittig) mit den Details, zum Beispiel der Rechnung einer Kennzahl oder dem Tempo einer Einheit. Keine Tooltips, die nur mit der Maus erscheinen. Desktop ab 768 px in zwei Spalten: Woche und Kennzahlen, Sportarten und Aktivitäten, Verlauf und Kalender.
+
+CSS: Custom Properties, Basis für schmale Screens, Raster mit `minmax(0, 1fr)`, ein Breakpoint bei 768 px, eine Stufe unter 380 px für Frontdisplays. Schrift mindestens 13 px in Beschriftungen und 16 px im Fließtext, Bedienelemente 44 px, `viewport-fit=cover` mit `safe-area`-Rändern. Chart.js 4 per CDN; die Farben werden über ein Sondenelement aufgelöst, weil `light-dark()` roh nicht lesbar ist. Fehlerfall: Antwortet die API nicht, zeigt jede Karte einen kurzen Hinweistext.
 
 ## 7. Docker, Render, CI
 
@@ -205,6 +222,7 @@ CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-800
 - `test_workouts_liefert_liste`, `test_workouts_felder`, `test_workouts_sortiert_absteigend`
 - `test_stats_gesamt_km`, `test_stats_durchschnitt`, `test_stats_lieblingssportart`, `test_stats_leere_liste` (über `monkeypatch` auf leere Liste)
 - `test_wochen_anzahl_und_luecken`, `test_wochen_summen`, `test_wochen_leer`
+- `test_wochen_je_sportart` (US-7)
 - `test_index_liefert_html`
 
 Ein Smoke-Test lädt die Echtdaten und prüft nur Anzahl größer 250 und gültige Felder, damit eine kaputte `fittrack.db` auffällt.
@@ -214,8 +232,9 @@ Ein Smoke-Test lädt die Echtdaten und prüft nur Anzahl größer 250 und gülti
 - `pytest` grün nach jedem Schritt, Commit erst danach.
 - `docker build` und `docker run`, `curl /health` aus dem Container.
 - Oberfläche im Browser bei 375 px und 1024 px Breite geprüft: kein horizontales Scrollen, Diagramm und Umschalter funktionieren, Liste lädt nach.
-- Render-Deploy wird nicht vom Assistenten ausgeführt (fremdes Konto), nur dokumentiert.
+- Render-Deploy per Blueprint eingerichtet, Auto-Deploy bei jedem Push auf `main`; die Lernumgebung wird per GitHub Actions auf Pages veröffentlicht.
+- Dashboard bei 320, 353, 375 und 1280 px geprüft: kein horizontales Scrollen, jedes Sheet öffnet und schließt, Thema-Wahl bleibt nach Neuladen.
 
 ## 10. Nicht enthalten
 
-Kein CSV-Import, keine Datenbank, kein Login, kein Schreiben von Workouts, kein Build-Step im Frontend, kein docker-compose. Das Konzept nennt diese Punkte als Ausbaustufen; sie bleiben Ausblick.
+Kein CSV-Import, kein Datenbankserver (SQLite ist eine Datei), kein Login, kein Schreiben von Workouts, kein Build-Step im Frontend. Docker Compose ist nur Bequemlichkeit für WebStorm, kein Lernziel.

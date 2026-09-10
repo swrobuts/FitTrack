@@ -216,5 +216,6 @@ Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: elf Labs ent
 - `docs/dozent/prompt-skript.md`: alle Prompts in Schrittreihenfolge mit Prüfpunkten und Befehlen
 - `docs/dozent/erwartungswerte.md`: Handrechnung für das Fixture
 - `docs/dozent/render-deploy.md` und `docs/dozent/lmstudio-demo.md`
-- `docs/kurs/`: das Kurskonzept
+- `docs/dozent/2026-09-10-fittrack-design.md`: Design der Referenzlösung, fortgeschrieben bis US-7; `docs/dozent/archiv/`: der ursprüngliche Plan
+- `docs/kurs/`: das Kurskonzept, auf den Stand der Referenzlösung fortgeschrieben
 - Branch `starter` ist der Ausgangsstand für Studierende. Jeder Schritt ist ein Tag: `sprint-0`, `us-3`, `us-1`, `us-2`, `us-4`, `us-5`, `us-6`, `us-7`, `docker`, `render`, `ci`. Anzeigen mit `git checkout <tag>`, zurück mit `git checkout main`.

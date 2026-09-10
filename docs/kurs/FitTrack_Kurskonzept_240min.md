@@ -5,6 +5,8 @@
 **Methodik:** Micro-Scrum (agil), KI-unterstützt, nicht agentisch
 **Philosophie:** Kein reines Vibe Coding – sondern ein echtes Softwareprojekt mit Konzeption, Tests, Abnahme und Deployment
 
+> **Stand 10.09.2026, auf die Referenzlösung fortgeschrieben.** Die ursprüngliche Fassung sah eine JSON-Datei, VS Code und rund 30 Datensätze vor. Die Referenzlösung nutzt SQLite mit versioniertem Schema, WebStorm, 311 Einheiten über zwei Jahre, einen Deploy auf Render und eine siebte Story aus dem Semantik-Review des Dashboards. Materialien: Foliendeck `Winf_FitTrack.pptx`, Lernumgebung <https://swrobuts.github.io/FitTrack/>, Prompt-Skript `docs/dozent/prompt-skript.md`, Live-App <https://fittrack-k7gg.onrender.com>.
+
 ---
 
 ## 1. Überblick und Lernziele
@@ -47,26 +49,33 @@ Eine mobile-first Web-App zur Analyse persönlicher Fitness-Daten.
 | Frontend | HTML + CSS (Custom Properties, Flexbox/Grid) + Vanilla JS + Chart.js | Kein Build-Step, volle Kontrolle, responsive Design greifbar |
 | Backend | Python FastAPI | Studierende können Python; echte REST-API; automatische Doku (/docs) |
 | Tests | pytest + fastapi TestClient | Test-First einfach umsetzbar |
-| Daten | JSON-Datei (workouts.json), später CSV-Import | Kein DB-Setup nötig, aber saubere Datenmodell-Schicht |
-| Container | Docker (ein Dockerfile, später optional docker-compose) | Branchenstandard, reproduzierbares Deployment |
+| Daten | SQLite-Datei `fittrack.db`, Schema in `schema.sql` (zwei Tabellen, eine Sicht) | Kein Server nötig, Python bringt `sqlite3` mit; Regeln und Beziehungen liegen in der Datenbank, nicht im Code |
+| Container | Docker (Dockerfile, docker-compose.yml), Deploy per `render.yaml` auf Render.com | Branchenstandard, reproduzierbares Deployment, öffentliche Adresse bei jedem Push |
 
 ### Ziel-Repostruktur
 
 ```text
-fittrack/
+FitTrack/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py          # FastAPI-Routen
+│   │   ├── main.py          # FastAPI-Routen, liefert frontend/ aus
 │   │   ├── models.py        # Pydantic-Datenmodell
+│   │   ├── daten.py         # liest die Sicht v_workout per sqlite3
+│   │   ├── statistik.py     # Kennzahlen, ohne FastAPI
 │   │   └── data/
-│   │       └── workouts.json
+│   │       ├── fittrack.db  # 311 Einheiten, Sep 2024 bis Sep 2026
+│   │       └── schema.sql   # Tabellen sportart, workout; Sicht v_workout
 │   └── tests/
+│       ├── conftest.py      # baut die Testdatenbank aus schema.sql und Fixture
+│       ├── fixtures/workouts_klein.sql   # 8 Einheiten, von Hand nachrechenbar
 │       └── test_api.py      # Test-First!
 ├── frontend/
 │   ├── index.html           # mobile-first
 │   ├── style.css
 │   └── app.js               # fetch() + Chart.js
-├── Dockerfile
+├── site/                    # Lernumgebung FitTrack-Lab (GitHub Pages)
+├── docs/                    # Checklisten, Setup, Dozentenmaterial
+├── Dockerfile  docker-compose.yml  render.yaml
 ├── requirements.txt
 └── README.md                # Setup-Anleitung + Abnahmekriterien
 ```
@@ -75,7 +84,7 @@ fittrack/
 
 ## 3. Toolchain und Setup (Dozenten-Vorbereitung + Studierenden-Check)
 
-> **Tipp:** Vorbereitete README mit allen Befehlen ins Kurs-Repo legen (GitHub Classroom). Studierende installieren VOR dem 1. Termin. Im Raum: 10 min Setup-Check einplanen.
+> **Tipp:** Die README des Repos enthält alle Befehle. Studierende klonen den Branch `starter` von `github.com/swrobuts/FitTrack` (oder ein GitHub-Classroom-Assignment daraus) und installieren VOR dem 1. Termin. Im Raum: 10 min Setup-Check einplanen. Ausführliche Anleitung: `docs/setup-webstorm.md`.
 
 ### 3.1 Docker – die Container-Erklärung für Studierende (2 Minuten, Folie)
 
@@ -95,15 +104,16 @@ docker ps / docker stop <id>        # laufende Container sehen/stoppen
 ### 3.2 Checkliste Installation (vor dem 1. Termin)
 
 - [ ] **Docker Desktop** installiert → Test: `docker run hello-world`
-- [ ] **VS Code** (+ Python-Extension) installiert
+- [ ] **WebStorm** (+ Python-Plugin) installiert; PyCharm geht genauso
 - [ ] **Git** konfiguriert (`git config --global user.name/email`)
 - [ ] **Claude** (claude.ai) – kostenloses Konto angelegt
 - [ ] (Optional) **LM Studio** installiert – für die lokale Variante (Abschnitt 9)
 
 ### 3.3 Kurs-Repo vorbereiten (Dozent)
 
-- GitHub Classroom Assignment anlegen (jede Kleingruppe erhält eigenes Repo)
-- Starter-Repo enthält: Ordnerstruktur (s. o.), `workouts.json` mit ~30 Beispieldatensätzen, leere `test_api.py` mit einer Funktion `health()` als Startpunkt, README mit Setup-Schritten
+- Branch `starter` im Repo `swrobuts/FitTrack` ist der Ausgangsstand; wahlweise daraus ein GitHub-Classroom-Assignment anlegen (jede Kleingruppe erhält eigenes Repo)
+- Der Starter enthält: Ordnerstruktur (s. o.), `fittrack.db` mit 311 Einheiten und `schema.sql`, das SQL-Fixture mit 8 Einheiten, `conftest.py`, `test_api.py` mit einem roten Health-Test, README mit Setup-Schritten
+- Jeder Lehrschritt ist als Git-Tag vorzeigbar: `sprint-0`, `us-3`, `us-1`, `us-2`, `us-4`, `us-5`, `us-6`, `us-7`, `docker`, `render`, `ci`
 
 ---
 
@@ -133,7 +143,7 @@ docker ps / docker stop <id>        # laufende Container sehen/stoppen
 - [ ] Code läuft lokal ohne Fehler
 - [ ] Zugehörige Tests vorhanden und grün (`pytest`)
 - [ ] Abnahmekriterium der Story nachweislich erfüllt (Demo am Handy!)
-- [ ] Code von mindestens einer Person reviewingt (Review-Checkliste, Abschnitt 8)
+- [ ] Code von mindestens einer Person reviewt (Review-Checkliste, Abschnitt 8)
 - [ ] Commit + Push mit aussagekräftiger Message
 
 ---
@@ -143,7 +153,7 @@ docker ps / docker stop <id>        # laufende Container sehen/stoppen
 | Zeit | Phase | Inhalt | Format |
 |---|---|---|---|
 | 0:00–0:10 | Kickoff | Vision, Live-Demo des Endzustands (Dozent zeigt fertige App im Container auf dem Handy) | Plenum |
-| 0:10–0:20 | Setup-Check | Docker-Test bei allen, Repo klonen, venv + `pip install fastapi uvicorn pytest httpx` | Mitmachen |
+| 0:10–0:20 | Setup-Check | Docker-Test bei allen, Branch `starter` klonen, venv + `pip install -r requirements.txt`, `pytest` ist rot | Mitmachen |
 | 0:20–0:40 | Agiles Setup | Product Vision, User Stories schreiben, Backlog priorisieren, Rollen vergeben, Sprint 1 planen | Gruppen |
 | 0:40–0:55 | Testkonzept | Aus Akzeptanzkriterien pytest-Tests ableiten → Tests zuerst schreiben (rot) | Gruppen + Vorführung |
 | 0:55–1:45 | **Sprint 1** | Datenmodell + API-Endpunkte mit Claude entwickeln (Chat-Workflow, s. Abschnitt 8) | Gruppen |
@@ -165,7 +175,7 @@ US-1: Als Nutzer möchte ich alle meine Trainingseinheiten als JSON abrufen,
 US-2: Als Nutzer möchte ich meine Kennzahlen abrufen,
       damit ich meinen Fortschritt sehe.
       Akzeptanz: GET /api/stats liefert gesamt_km, durchschnitt_km_pro_woche,
-      lieblingssportart – korrekt berechnet für den Beispieldatensatz.
+      lieblingssportart, anzahl – korrekt berechnet für das Fixture (8 Einheiten).
 
 US-3: Als Entwickler möchte ich einen Health-Endpunkt,
       damit ich später im Container prüfen kann, ob die App läuft.
@@ -184,25 +194,22 @@ from app.main import app
 client = TestClient(app)
 
 def test_health():
-    r = client.get("/health")
-    assert r.status_code == 200
-    assert r.json() == {"status": "ok"}
+    antwort = client.get("/health")
+    assert antwort.status_code == 200
+    assert antwort.json() == {"status": "ok"}
 
-def test_workouts_returns_list():
-    r = client.get("/api/workouts")
-    assert r.status_code == 200
-    assert isinstance(r.json(), list)
-    assert len(r.json()) > 0
+def test_workouts_liefert_liste():
+    antwort = client.get("/api/workouts")
+    assert antwort.status_code == 200
+    assert isinstance(antwort.json(), list)
+    assert len(antwort.json()) == 8          # das Fixture hat acht Einheiten
 
-def test_stats_are_correct():
-    r = client.get("/api/stats")
-    data = r.json()
-    assert "gesamt_km" in data
-    assert "lieblingssportart" in data
-    assert data["gesamt_km"] == pytest.approx(123.4)  # Wert vorher manuell aus Daten berechnen!
+def test_stats_gesamt_km():
+    stats = client.get("/api/stats").json()
+    assert stats["gesamt_km"] == 87.5        # von Hand aus dem Fixture gerechnet
 ```
 
-> **Wichtige didaktische Pointe:** Den erwarteten Wert (`123.4`) berechnen die Studierenden selbst aus den Daten – nicht von der KI vorgeben lassen. Sonst testen wir nur, dass die KI mit sich selbst konsistent ist.
+> **Wichtige didaktische Pointe:** Den erwarteten Wert (`87.5`) berechnen die Studierenden selbst aus den acht Fixture-Einheiten – nicht von der KI vorgeben lassen. Sonst testen wir nur, dass die KI mit sich selbst konsistent ist. Die Handrechnung steht in `docs/dozent/erwartungswerte.md`. Die Tests laufen gegen eine temporäre Testdatenbank, nicht gegen die 311 Echtdaten.
 
 ---
 
@@ -211,9 +218,9 @@ def test_stats_are_correct():
 | Zeit | Phase | Inhalt | Format |
 |---|---|---|---|
 | 0:00–0:05 | Recap | Stand des Backlogs, Sprint Goal 2 vorstellen | Plenum |
-| 0:05–1:00 | **Sprint 2** | Mobile-first Frontend: HTML-Struktur, CSS (Breakpoint!), fetch() + Chart.js | Gruppen |
-| 1:00–1:10 | Sprint Review 2 | Abnahme AM SMARTPHONE (Handy im WLAN → `http://<rechner-ip>:8000`) | Gruppen |
-| 1:10–1:35 | **Sprint 3** | Dockerfile schreiben, Image bauen, Container starten, Handy-Test aus dem Container | Mitmachen |
+| 0:05–1:00 | **Sprint 2** | Mobile-first Frontend: HTML-Struktur, CSS (Breakpoint!), fetch() + Chart.js (US-4 bis US-6) | Gruppen |
+| 1:00–1:10 | Sprint Review 2 | Abnahme AM SMARTPHONE (Handy im WLAN → `http://<rechner-ip>:8000`) und Semantik-Review: „Was bedeutet 161 %?“ Der Erstentwurf der KI besteht alle Tests und ist trotzdem falsch; daraus entsteht US-7 (Schritt 6b im Prompt-Skript) | Gruppen |
+| 1:10–1:35 | **Sprint 3** | Dockerfile schreiben, Image bauen, Container starten, Handy-Test aus dem Container; Deploy auf Render per `render.yaml` | Mitmachen |
 | 1:35–1:45 | Exkurs | Lokale LLMs: Live-Demo LM Studio + Qwen3-Coder (Abschnitt 9) | Vorführung |
 | 1:45–1:55 | Abnahme & Review | Abschluss-Abnahme gegen Gesamt-Checkliste, Code-Review nach Checkliste | Gruppen |
 | 1:55–2:00 | Retrospektive | Was hat der KI-Workflow gebracht? Wo war Review unverzichtbar? | Plenum |
@@ -221,6 +228,10 @@ def test_stats_are_correct():
 ### Sprint-2-Ziel
 
 *„Die App sieht auf dem Smartphone gut aus und zeigt Daten + Statistik + Diagramm live aus der API."*
+
+### Die siebte Story: Schön, aber falsch
+
+Nach US-6 sind alle Tests grün, und das Dashboard sieht aus wie eine Sport-App. Genau dann zeigt der Erstentwurf der KI einen geschlossenen Ring mit „161 % vom Ziel“ über einer Woche, die längst vorbei ist, dazu gestapelte Säulen ohne Achse. Kein Test hat das gesehen, weil Tests die API prüfen und nicht die Aussage der Oberfläche. Daraus wird US-7: Bullet-Graph mit Zielmarke statt Ring, ein Balken je Woche, Trainingskalender, Sportarten-Kacheln, ein Sheet für jedes antippbare Objekt, Zeitbezug an jeder Karte. Die Lehre: KI allein liefert einen brauchbaren Erstentwurf, KI mit der Kritik eines Menschen ein gutes Ergebnis. Checkliste „Semantik-Review“ in `docs/checklisten.md`, Befundtabelle und die zwei Prompts in `docs/dozent/prompt-skript.md`, Schritt 6b, Lernumgebung Lab 10.
 
 ### Mobile-First in 3 Regeln (Folieninhalt)
 
@@ -238,12 +249,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
 EXPOSE 8000
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 ```
 
-**Vorführen:** `docker build` → `docker run -p 8000:8000 fittrack` → App auf dem Handy im WLAN öffnen. Botschaft: *„Was hier läuft, läuft identisch auf jedem Server der Welt."*
+Der Port kommt aus der Variablen `PORT`, weil Render ihn vorgibt; lokal bleibt es 8000.
 
-**Ausbaustufe (falls Zeit):** docker-compose mit getrenntem nginx-Container fürs Frontend – zeigt, wie Services orchestriert werden.
+**Vorführen:** `docker build` → `docker run -p 8000:8000 fittrack` → App auf dem Handy im WLAN öffnen. Botschaft: *„Was hier läuft, läuft identisch auf jedem Server der Welt."* Beweis direkt danach: `render.yaml` committen, pushen, Render baut dasselbe Image und stellt es unter <https://fittrack-k7gg.onrender.com> bereit (`docs/dozent/render-deploy.md`).
+
+**Ausbaustufe (falls Zeit):** `docker-compose.yml` mit dem Port als Variable `FITTRACK_PORT`; in WebStorm startet der grüne Pfeil neben `services:` den Container (`docs/setup-webstorm.md`, Abschnitt 9).
 
 ---
 
@@ -253,7 +266,7 @@ CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 | Ebene | Womit | Beispiel |
 |---|---|---|
-| Unit-Tests | pytest | `test_stats_are_correct()` – Berechnungslogik |
+| Unit-Tests | pytest | `test_stats_gesamt_km()` – Berechnungslogik gegen das Fixture |
 | Integration/API-Tests | pytest + TestClient | Endpunkt liefert 200 + korrekte Struktur |
 | Manuelle Abnahmetests | Checkliste am Handy | Responsive Darstellung, Bedienbarkeit, echte Daten |
 
@@ -272,8 +285,9 @@ CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 - [ ] App läuft im Docker-Container (`/health` → ok)
 - [ ] Darstellung auf Smartphone getestet (Breite ≤ 480 px): keine horizontalen Scrollbalken, Karten stapeln sich
 - [ ] Diagramm zeigt echte Daten aus der API (nicht hartkodiert)
+- [ ] Semantik-Review über das ganze Dashboard: jede Zahl mit Einheit und Zeitbezug, Form passt zur Aussage, alles antippbar (`docs/checklisten.md`)
 - [ ] README beschreibt Setup, Test-Ausführung, Docker-Start
-- [ ] Git-Historie zeigt sinnvolle Commits mit Bezug zu den Stories (US-1, US-2 …)
+- [ ] Git-Historie zeigt sinnvolle Commits mit Bezug zu den Stories (US-1 bis US-7)
 
 ---
 
@@ -299,14 +313,17 @@ grün → Commit mit Story-Bezug
 
 ```text
 Du bist ein erfahrener Python-Entwickler. Kontext: Wir bauen mit FastAPI
-eine kleine Fitness-App. Es gibt eine JSON-Datei mit Trainingseinheiten
+eine kleine Fitness-App. Eine Funktion lade_workouts() in backend/app/daten.py
+liefert die Trainingseinheiten als Liste von Dictionaries aus einer SQLite-Sicht
 (Felder: id, datum, sportart, dauer_min, distanz_km, kalorien).
 
 Aufgabe: Implementiere den Endpunkt GET /api/stats mit folgenden
 Anforderungen:
 - Rückgabe: {"gesamt_km": float, "durchschnitt_km_pro_woche": float,
-  "lieblingssportart": str}
+  "lieblingssportart": str | null, "anzahl": int}
 - lieblingssportart = die Sportart mit der größten Gesamtdistanz
+- durchschnitt_km_pro_woche = gesamt_km geteilt durch die Kalenderwochen von
+  der ersten bis zur letzten Trainingswoche, Wochen ohne Training zählen mit
 
 Randbedingungen:
 - Nur Standardbibliothek + FastAPI/Pydantic, keine zusätzlichen Pakete
@@ -322,6 +339,7 @@ Randbedingungen:
 4. **Erklärung anfordern** – „Erkläre deine Entscheidungen" zwingt zur Auseinandersetzung mit dem Code
 5. **Fehlermeldungen wörtlich zurückspielen** – Traceback kopieren, nicht paraphrasieren
 6. **Niemals Unverstandenes committen** – jede Zeile im Code muss jemand in der Gruppe erklären können
+7. **Bei Oberflächen erst die Bedeutung, dann der Code** – für jedes Element Aussage, Einheit, Zeitbezug, Form und Zustände bestätigen lassen, danach einen Selbstprüfungs-Prompt („Nenne jede Stelle, an der die Darstellung mehr behauptet als die Daten hergeben“); beide Prompts stehen im Prompt-Skript, Schritt 6b
 
 ### Review-Checkliste für übernommenen KI-Code (QA-Rolle)
 
@@ -346,22 +364,22 @@ Randbedingungen:
 |---|---|---|---|---|
 | **Qwen3-Coder-30B-A3B** ⭐ | ~18,6 GB | 32–48 GB RAM (Mac M-Series / 24-GB-GPU) | Coding-Spezialist, MoE (nur 3B aktiv → schnell), 256K Kontext, Apache-2.0 | Dozenten-Demo, leistungsstarke Rechner |
 | **Qwen2.5-Coder 7B** | ~4,7 GB | 8–16 GB RAM | solider Coding-Einstieg | Studierende mit normalen Laptops |
-| **Gemma 3 27B** | ~17 GB | 24–32 GB RAM | starker Generalist, multimodal; beim Coding schwächer als Qwen3-Coder | Demo „Generalist vs. Spezialist" |
-| **Gemma 3 4B** | ~3 GB | 8 GB RAM | kleinster brauchbarer Einstieg | alte Rechner |
+| **Gemma 4 27B** | ~17 GB | 24–32 GB RAM | starker Generalist, multimodal; beim Coding schwächer als Qwen3-Coder | Demo „Generalist vs. Spezialist" |
+| **Gemma 4 4B** | ~3 GB | 8 GB RAM | kleinster brauchbarer Einstieg | alte Rechner |
 
-> **Hinweis zur Modellwahl:** Für das Coding-Beispiel ist Qwen3-Coder-30B-A3B die bessere Wahl als Gemma 3 – es ist das aktuell führende Open-Source-Coding-Modell, direkt über den LM-Studio-Katalog installierbar (Suche: „Qwen3 Coder 30B"). Gemma 3 eignet sich gut als Kontrast: gleicher Prompt, spürbar anderer Code – hervorragender Diskussionsanlass über Modellspezialisierung.
+> **Hinweis zur Modellwahl:** Für das Coding-Beispiel ist Qwen3-Coder-30B-A3B die bessere Wahl als Gemma 4 – es ist das aktuell führende Open-Source-Coding-Modell, direkt über den LM-Studio-Katalog installierbar (Suche: „Qwen3 Coder 30B"). Gemma 4 eignet sich gut als Kontrast: gleicher Prompt, spürbar anderer Code – hervorragender Diskussionsanlass über Modellspezialisierung. Modellangaben nach dem LM-Studio-Katalog, Stand September 2026; vor jedem Semester nachsehen.
 
 ### Demo-Ablauf (vorbereiten!)
 
 1. LM Studio öffnen → Discover → „Qwen3 Coder 30B A3B" → Q4_K_M herunterladen (VOR der Veranstaltung!)
 2. Prompt aus Abschnitt 8 (die /api/stats-Anfrage) an Qwen3-Coder stellen
-3. Gleichen Prompt an Gemma 3 27B (falls geladen) oder ein kleineres Modell → Unterschiede zeigen
+3. Gleichen Prompt an Gemma 4 27B (falls geladen) oder ein kleineres Modell → Unterschiede zeigen
 4. Vergleichen mit der Claude-Antwort: Qualität, Stil, Erklärungen
 5. Diskussionsfragen: Wann reicht lokal? (Datenschutz, Kosten, Offline) Wann Cloud? (Komplexität, Kontextlänge)
 
 ### Verbinden mit der IDE (Ausblick, 2 Min)
 
-LM Studio stellt einen lokalen OpenAI-kompatiblen Server bereit (Developer-Tab → Start Server, `http://localhost:1234/v1`). Damit lässt sich z. B. VS Code mit der Continue-Extension anbinden – Autocomplete und Chat komplett lokal, kostenfrei.
+LM Studio stellt einen lokalen OpenAI-kompatiblen Server bereit (Developer-Tab → Start Server, `http://localhost:1234/v1`). Damit lässt sich WebStorm über das Plugin „Continue“ oder den JetBrains AI Assistant mit lokalem Modell anbinden – Autocomplete und Chat komplett lokal, kostenfrei.
 
 ---
 
@@ -369,15 +387,16 @@ LM Studio stellt einen lokalen OpenAI-kompatiblen Server bereit (Developer-Tab �
 
 **Eine Woche vorher:**
 
-- [ ] GitHub Classroom Assignment + Starter-Repo anlegen (Struktur s. Abschnitt 2, `workouts.json` mit ~30 Datensätzen)
-- [ ] README mit Installationsanleitung (Abschnitt 3.2) verteilen
+- [ ] Branch `starter` prüfen (`git clone -b starter https://github.com/swrobuts/FitTrack.git`, `pytest` rot), wahlweise GitHub-Classroom-Assignment daraus anlegen
+- [ ] README und `docs/setup-webstorm.md` als Installationsanleitung verteilen, Link auf die Lernumgebung mitgeben
+- [ ] Render-URL einmal aufrufen, damit der Dienst wach ist; Deck und Prompt-Skript bereitlegen
 - [ ] Fertige Referenz-App einmal komplett durchspielen (Zeit nehmen! ggf. Umfang kürzen)
 - [ ] LM Studio: Modelle herunterladen, Demo-Prompts testen
 
 **Am Veranstaltungstag:**
 
 - [ ] WLAN-/Hotspot-Zugang für Handy-Tests klären; lokale IP des Dozenten-Rechners notieren
-- [ ] Referenz-Container starten (`docker run -p 8000:8000 fittrack`) – für die Eröffnungs-Demo
+- [ ] Referenz-Container starten (`docker run -p 8000:8000 fittrack`) oder die Render-URL aufrufen – für die Eröffnungs-Demo
 - [ ] Terminal + Browser + Claude + LM Studio in virtuellen Desktops/Spaces vorbereitet
 - [ ] Ausgedruckte Checklisten (DoD, Review, End-Abnahme) pro Gruppe
 
@@ -388,7 +407,7 @@ LM Studio stellt einen lokalen OpenAI-kompatiblen Server bereit (Developer-Tab �
 | Docker-Installation schlägt fehl | Lokal mit `uvicorn` laufen lassen, Docker nur vorführen |
 | Claude-Limit erreicht | Auf lokales Modell (LM Studio) ausweichen – der Workflow ist identisch |
 | Gruppe zu langsam | Sprint Goals priorisieren: US-1 und US-3 sind Pflicht, US-2 optional |
-| Zeitnot in Termin 2 | Sprint 3 kürzen: fertiges Dockerfile verteilen, nur `build`/`run` gemeinsam machen |
+| Zeitnot in Termin 2 | Schritt 6 Teil B (Diagramm) weglassen, Sprint 3 kürzen: fertiges Dockerfile verteilen, nur `build`/`run` gemeinsam machen |
 
 ---
 
@@ -420,4 +439,5 @@ LM Studio stellt einen lokalen OpenAI-kompatiblen Server bereit (Developer-Tab �
 **Tools:**
 
 - FastAPI: https://fastapi.tiangolo.com | Chart.js: https://www.chartjs.org | pytest: https://docs.pytest.org
-- GitHub Classroom: https://classroom.github.com | LM Studio: https://lmstudio.ai
+- GitHub Classroom: https://classroom.github.com | LM Studio: https://lmstudio.ai | Render: https://render.com
+- Stephen Few: *Information Dashboard Design* – Bullet-Graph und die Frage, welche Form welche Aussage trägt (Hintergrund zu US-7)

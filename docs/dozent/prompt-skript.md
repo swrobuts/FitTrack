@@ -505,6 +505,8 @@ funktioniert, ohne die API erneut zu fragen.
 
 Zwei Teile: erst der Endpunkt mit Test, dann das Diagramm.
 
+**Hinweis:** Ring und gestapelte Säulen aus Teil B sind bewusst der Erstentwurf. Er besteht alle Tests und ist trotzdem falsch, das zeigt Schritt 6b. Deshalb hier nichts vorwegnehmen, sondern den Entwurf so übernehmen, wie ihn das Modell liefert.
+
 **Test zuerst** (`pytest`: 3 failed). Erwartungswerte wieder von Hand, siehe `erwartungswerte.md`:
 
 ```python

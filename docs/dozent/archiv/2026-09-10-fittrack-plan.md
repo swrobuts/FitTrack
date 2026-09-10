@@ -1,4 +1,7 @@
-# FitTrack – Implementierungsplan
+# FitTrack – Implementierungsplan (Archiv)
+
+> **Historisches Dokument vom 10.09.2026, Stand vor der Umstellung auf SQLite und vor US-7.** Es beschreibt, wie die Referenzlösung ursprünglich geplant war (JSON-Datei, `workouts.json`, Ring im Frontend). Der gültige Stand steht in `README.md`, `docs/dozent/2026-09-10-fittrack-design.md` und `docs/dozent/prompt-skript.md`. Aufbewahrt, weil die Abweichung vom Plan selbst ein Lehrstück ist.
+
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
