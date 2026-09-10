@@ -7,7 +7,7 @@ Entwickelt im Kurs „Datenbasierte Fallstudien“ als Micro-Scrum-Projekt mit K
 
 | | |
 |---|---|
-| **Lernumgebung** | <https://swrobuts.github.io/FitTrack/> – zehn Labs mit Prompts, Diagrammen, Konsole und SQLite im Browser |
+| **Lernumgebung** | <https://swrobuts.github.io/FitTrack/> – elf Labs mit Prompts, Diagrammen, Konsole und SQLite im Browser |
 | **Live-App** | <https://fittrack-k7gg.onrender.com> – die fertige Referenz auf Render |
 | **Starter für Studierende** | Branch [`starter`](https://github.com/swrobuts/FitTrack/tree/starter) |
 

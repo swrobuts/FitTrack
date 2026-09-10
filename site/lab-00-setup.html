@@ -68,7 +68,7 @@
     <div class="diagramm">
       <pre class="mermaid">
 flowchart LR
-    V["Vision"] --> B["Product Backlog<br/>6 User Stories"] --> S1["Sprint 1<br/>Daten und API"] --> S2["Sprint 2<br/>Frontend"] --> S3["Sprint 3<br/>Docker und Abnahme"] --> R["Review und<br/>Retrospektive"]
+    V["Vision"] --> B["Product Backlog<br/>6 User Stories,<br/>US-7 aus dem Review"] --> S1["Sprint 1<br/>Daten und API"] --> S2["Sprint 2<br/>Frontend"] --> S3["Sprint 3<br/>Docker und Abnahme"] --> R["Review und<br/>Retrospektive"]
       </pre>
       <div class="unterschrift">Die Iteration in Miniatur. Jeder Sprint endet mit einer Abnahme gegen Test und Akzeptanzkriterium.</div>
     </div>
@@ -213,7 +213,7 @@ stateDiagram-v2
 
   <section class="section-block" id="backlog">
     <h2>Das Product Backlog</h2>
-    <p>Sechs User Stories in derselben Form: Nutzen und Akzeptanzkriterium. Damit sind sie prompt- und prüfbar
+    <p>Sechs User Stories in derselben Form: Nutzen und Akzeptanzkriterium. Eine siebte, US-7, entsteht in Lab 10 aus dem Semantik-Review des Dashboards. Damit sind sie prompt- und prüfbar
       zugleich. Bei Zeitnot sind US-1 und US-3 Pflicht, US-2 ist verhandelbar. Diese Entscheidung fällt beim Planen,
       nicht unter Druck kurz vor dem Review.</p>
     <div class="story"><strong>US-1 · Daten abrufen.</strong> Als Nutzer möchte ich alle meine Trainingseinheiten als JSON abrufen, damit die App sie anzeigen kann. <em>Akzeptanz:</em> <code>GET /api/workouts</code> liefert Status 200 und eine Liste; jedes Element enthält id, datum, sportart, dauer_min, distanz_km, kalorien.</div>
@@ -240,7 +240,7 @@ stateDiagram-v2
       <li>Der Starter liegt auf dem Branch <code>starter</code>. Nach venv und <code>pip install</code> ist der erste Test rot, und das ist der Plan.</li>
       <li>Drei Rollen trennen Perspektiven: Wer die Erwartung festlegt, promptet nicht selbst. Die Rollen rotieren je Sprint.</li>
       <li>Die Definition of Done verlangt beides: grüne Tests und eine Demo am Gerät, dazu ein Review durch eine zweite Person.</li>
-      <li>Sechs Stories mit Akzeptanzkriterien bilden das Backlog. US-1 und US-3 sind Pflicht.</li>
+      <li>Sechs Stories mit Akzeptanzkriterien bilden das Backlog, US-7 kommt in Lab 10 aus dem Review dazu. US-1 und US-3 sind Pflicht.</li>
       <li>Zwei Datenbanken, ein Schema: Echtdaten in <code>fittrack.db</code>, Testdaten als SQL-Datei, die die Tests selbst einspielen.</li>
     </ul>
     <div data-lab-nav></div>

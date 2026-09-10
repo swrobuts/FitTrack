@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FitTrack-Lab · Ein Softwareprojekt in neun Schritten · THWS Business School</title>
+  <title>FitTrack-Lab · Ein Softwareprojekt in zehn Schritten · THWS Business School</title>
   <meta name="description" content="Interaktive Lernumgebung zum Kurs FitTrack: Micro-Scrum, Test-First, KI-gestütztes Entwickeln im Chat, SQLite, FastAPI, mobile-first Frontend, Docker und Deployment auf Render. Mit Prompts, Diagrammen, Konsole und Übungen." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,7 @@
     <span class="hero-tag">Lernumgebung · Ein Softwareprojekt from scratch</span>
     <h1 class="hero-title">FitTrack</h1>
     <p class="hero-subtitle">Ein vollständiges Softwareprojekt, klein genug für vier Stunden</p>
-    <p class="hero-desc">Neun Schritte führen von der User Story über den roten Test und den Prompt im Chat bis zum Container
+    <p class="hero-desc">Zehn Schritte führen von der User Story über den roten Test und den Prompt im Chat bis zum Container
       und zur öffentlichen Adresse. Jeder Schritt zeigt, was technisch passiert, welcher Prompt ihn auslöst und woran
       man prüft, ob er gelungen ist. Die Konsole in diesen Seiten ist nachgebildet, die Datenbank ist echt: SQLite
       läuft mit dem Schema der App in Ihrem Browserfenster.</p>
@@ -67,7 +67,7 @@
   <div class="section-head">
     <span class="badge">Der Bauweg</span>
     <div class="accent-line"></div>
-    <h2>Neun Schritte, ein Commit je Schritt</h2>
+    <h2>Zehn Schritte, ein Commit je Schritt</h2>
     <p>Die Referenzlösung im Repository trägt für jeden Schritt einen Git-Tag. Wer einen Stand sehen will, holt ihn
       mit <code>git checkout &lt;tag&gt;</code>. Die Studierenden beginnen auf dem Branch <code>starter</code>, der
       genau dem Stand nach Schritt 0 entspricht: Struktur, Datenbank, Testdaten und ein roter Test.</p>
@@ -84,7 +84,8 @@
         <tr><td>3</td><td><code>us-2</code></td><td>US-2</td><td><code>statistik.py</code>, <code>GET /api/stats</code>, Erwartungswerte von Hand</td><td><a href="lab-03-kennzahlen.html" data-lab-link>Lab 03</a></td></tr>
         <tr><td>4</td><td><code>us-4</code></td><td>US-4</td><td>Mobile-first Gerüst, FastAPI liefert <code>frontend/</code> aus</td><td rowspan="3"><a href="lab-04-frontend.html" data-lab-link>Lab 04</a></td></tr>
         <tr><td>5</td><td><code>us-5</code></td><td>US-5</td><td>Kennzahlen und Aktivitäten per <code>fetch</code></td></tr>
-        <tr><td>6</td><td><code>us-6</code></td><td>US-6</td><td><code>GET /api/stats/wochen</code>, Ring, Chart.js, Zeitraumwahl</td></tr>
+        <tr><td>6</td><td><code>us-6</code></td><td>US-6</td><td><code>GET /api/stats/wochen</code>, Ring (Erstentwurf), Chart.js, Zeitraumwahl</td></tr>
+        <tr><td>6b</td><td><code>us-7</code></td><td>US-7</td><td>Zweitentwurf nach Semantik-Review: Bullet-Graph, Kalender, Kacheln, Sheet, <code>je_sportart</code></td><td><a href="lab-10-semantik.html" data-lab-link>Lab 10</a></td></tr>
         <tr><td>7</td><td><code>docker</code></td><td>Sprint 3</td><td>Dockerfile, Image, Container, Handy-Test</td><td><a href="lab-06-docker.html" data-lab-link>Lab 06</a></td></tr>
         <tr><td>8</td><td><code>render</code></td><td>Sprint 3</td><td><code>render.yaml</code>, öffentliche Adresse, Health-Check</td><td rowspan="2"><a href="lab-07-deploy.html" data-lab-link>Lab 07</a></td></tr>
         <tr><td>9</td><td><code>ci</code></td><td>optional</td><td>GitHub Actions führt pytest bei jedem Push aus</td></tr>
@@ -109,7 +110,7 @@
 
 <section class="section" id="labs">
   <div class="section-head">
-    <span class="badge">Die zehn Labs</span>
+    <span class="badge">Die elf Labs</span>
     <div class="accent-line"></div>
     <h2>Vom roten Test zur öffentlichen Adresse</h2>
     <p>Die Labs folgen dem Bauweg. Jedes erklärt zuerst, was in dem Schritt technisch passiert, zeigt dann den
@@ -168,7 +169,7 @@
       <div class="lab-num">05</div>
       <h3>Testkonzept und Abnahme</h3>
       <div class="sub">Testpyramide, DoD, Abnahmekriterien</div>
-      <div class="desc">14 Tests, drei Ebenen, zwei Datenbanken. Was die Maschine prüft, was der Mensch am Gerät prüft,
+      <div class="desc">15 Tests, drei Ebenen, zwei Datenbanken. Was die Maschine prüft, was der Mensch am Gerät prüft,
         und warum KI-erzeugte Tests für KI-erzeugten Code kein Qualitätsnachweis sind.</div>
       <div class="meta">4 Übungen · 45 Min</div>
     </a>
