@@ -6,6 +6,9 @@ Start lokal (aus dem Projektordner FitTrack/):
 
 from fastapi import FastAPI
 
+from .daten import lade_workouts
+from .models import Workout
+
 app = FastAPI(title="FitTrack", version="0.1.0")
 
 
@@ -13,3 +16,9 @@ app = FastAPI(title="FitTrack", version="0.1.0")
 def health() -> dict:
     """Antwortet mit ok, wenn die App läuft. Wird später vom Container genutzt."""
     return {"status": "ok"}
+
+
+@app.get("/api/workouts", response_model=list[Workout])
+def workouts() -> list[dict]:
+    """Alle Trainingseinheiten, jüngste zuerst."""
+    return lade_workouts()
