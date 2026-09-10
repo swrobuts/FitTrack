@@ -132,6 +132,53 @@ flowchart LR
       </pre>
       <div class="unterschrift">Derselbe Server liefert die drei statischen Dateien und die API. Der Mount für <code>frontend/</code> steht nach den Routen, sonst fängt er <code>/api/…</code> ab.</div>
     </div>
+    <h3>Erst die Seite, dann die Daten</h3>
+    <p>Ein Aufruf des Dashboards läuft in zwei Phasen. In der ersten liefert FastAPI nur Dateien aus, dabei wird nichts
+      gerechnet. In der zweiten fragt <code>app.js</code> die API, und erst dort liest das Backend aus der Datenbank
+      und rechnet. FastAPI ist also das Backend und zugleich der Auslieferer des Frontends, ein einziger Prozess.</p>
+    <div class="diagramm">
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant B as Browser
+    participant F as FastAPI (uvicorn)
+    participant D as daten.py
+    participant DB as fittrack.db
+    rect rgb(249, 240, 220)
+        Note over B,F: Phase 1: Auslieferung, nichts wird gerechnet
+        B->>F: GET /
+        F-->>B: index.html, style.css, app.js (StaticFiles)
+    end
+    rect rgb(247, 236, 238)
+        Note over B,DB: Phase 2: app.js holt die Daten per fetch
+        B->>F: fetch("/api/stats")
+        F->>D: lade_workouts()
+        D->>DB: SELECT … FROM v_workout
+        DB-->>D: Zeilen
+        D-->>F: Liste von Dictionaries
+        F-->>B: JSON: gesamt_km, durchschnitt, lieblingssportart, anzahl
+        B->>B: zeigeKennzahlen(stats)
+    end
+      </pre>
+      <div class="unterschrift">Derselbe Prozess beantwortet beide Phasen. Für <code>/api/workouts</code> und <code>/api/stats/wochen</code> wiederholt sich Phase 2 mit anderen Funktionen.</div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Umgebung</th><th>Seite kommt von</th><th>fetch geht an</th></tr></thead>
+        <tbody>
+          <tr><td>Entwicklung</td><td><code>http://localhost:8000</code></td><td><code>http://localhost:8000/api/stats</code></td></tr>
+          <tr><td>Handy im WLAN</td><td><code>http://192.168.x.y:8000</code></td><td><code>http://192.168.x.y:8000/api/stats</code></td></tr>
+          <tr><td>Render</td><td><code>https://fittrack-k7gg.onrender.com</code></td><td><code>https://fittrack-k7gg.onrender.com/api/stats</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="info-box">
+      <h3>Die Adresse steht nirgends im Code</h3>
+      <p><code>fetch("/api/stats")</code> ist ein relativer Pfad. Der Browser hängt ihn an die Adresse, von der die Seite
+        kam. Deshalb läuft derselbe <code>app.js</code> unverändert auf dem eigenen Rechner, im WLAN und bei Render. Und
+        deshalb reicht GitHub Pages für die App nicht: Pages könnte Phase 1 erledigen, aber niemand würde Phase 2
+        beantworten.</p>
+    </div>
     <div class="concept-box">
       <h3>Warum kein Framework</h3>
       <p>Kein React, kein Build-Schritt. Drei Dateien, die jede Person in der Gruppe lesen kann, und ein Diagramm aus
