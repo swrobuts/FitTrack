@@ -725,6 +725,10 @@ function zeigeAktivitaeten(workouts) {
     knopfMehr.hidden = knopfAlle.hidden = rest <= 0;
     knopfMehr.textContent = `${Math.min(rest, LISTEN_SCHRITT)} weitere anzeigen`;
     knopfZu.hidden = sichtbar <= start;
+    // Zeitbezug: welche Einheiten gerade zu sehen sind, jüngste zuerst
+    const aelteste = workouts[sichtbar - 1];
+    document.getElementById("aktivitaeten-untertitel").textContent =
+      `${sichtbar} von ${workouts.length} Einheiten${aktiverFilter ? ` ${aktiverFilter}` : ""}, ${formatKurz(aelteste.datum)} bis ${formatDatum(workouts[0].datum)}`;
   }
 
   function zeigeWeitere(anzahl) {
@@ -747,6 +751,7 @@ function zeigeAktivitaeten(workouts) {
   if (workouts.length === 0) {
     liste.innerHTML = '<li class="hinweis">Noch keine Trainingseinheiten vorhanden.</li>';
     knopfMehr.hidden = knopfAlle.hidden = knopfZu.hidden = true;
+    document.getElementById("aktivitaeten-untertitel").textContent = "";
     return;
   }
   zeigeWeitere(start);
