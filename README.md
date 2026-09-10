@@ -156,6 +156,10 @@ Falls Port 8000 auf dem Rechner belegt ist: `docker run -p 8001:8000 fittrack` u
 
 `render.yaml` beschreibt den Web Service. Render baut das Dockerfile aus dem GitHub-Repo und stellt die App unter einer öffentlichen HTTPS-Adresse bereit. Einrichtung: bei Render anmelden, `New → Blueprint`, Repo verbinden, `Apply`. Jeder Push auf `main` löst einen neuen Deploy aus.
 
+## Tests bei jedem Push (GitHub Actions)
+
+`.github/workflows/tests.yml` führt `pytest` bei jedem Push und Pull Request aus. Das Ergebnis steht im Reiter „Actions“ und als Haken oder Kreuz am Commit. Rote Tests fallen so auf, bevor jemand den Stand übernimmt.
+
 ## Wie die Kennzahlen definiert sind
 
 - `gesamt_km`: Summe aller `distanz_km`, gerundet auf 1 Nachkommastelle.

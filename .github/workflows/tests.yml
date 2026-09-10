@@ -1,0 +1,23 @@
+# GitHub Actions: führt bei jedem Push und Pull Request die Tests aus.
+# Ergebnis erscheint im Reiter „Actions“ des Repos und als Haken/Kreuz am Commit.
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Python 3.12 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: Tests ausführen
+        run: pytest
