@@ -1,0 +1,274 @@
+{
+  "uebungen": [
+    {
+      "id": "P10-01",
+      "typ": "quiz",
+      "titel": {
+        "de": "Was bedeutet 161 %?",
+        "en": "What does 161 % mean?"
+      },
+      "aufgabe": {
+        "de": "<p>Der erste Entwurf des Dashboards. Alle 14 Tests waren grün.</p>",
+        "en": "<p>The first dashboard draft. All 14 tests were green.</p>"
+      },
+      "fragen": [
+        {
+          "frage": {
+            "de": "Der Ring ist geschlossen und zeigt „161 % vom Ziel“. Welche Aussage trifft zu?",
+            "en": "The ring is closed and shows 161 % of goal. Which statement holds?"
+          },
+          "optionen": [
+            {
+              "de": "Ein voller Ring sieht bei 100 % und bei 161 % gleich aus. Die Grafik trägt keine Information mehr, die Zahl hat keine Einheit.",
+              "en": "A full ring looks the same at 100 % and 161 %."
+            },
+            {
+              "de": "161 % ist eine korrekte Angabe, also ist die Darstellung in Ordnung.",
+              "en": "161 % is correct, so the display is fine."
+            },
+            {
+              "de": "Der Ring müsste sich ein zweites Mal um sich selbst legen.",
+              "en": "The ring should wrap a second time."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "Die Zahl stimmt rechnerisch, die Darstellung sagt trotzdem nichts: Ab 100 % ist der Ring voll, egal ob 100 oder 300 %. Deshalb wird er gedeckelt, zeigt die Kilometer und daneben steht „Ziel erreicht, 24,4 km darüber“.",
+            "en": "The number is arithmetically right, the display still says nothing above 100 %."
+          }
+        },
+        {
+          "frage": {
+            "de": "Heute ist Donnerstag in KW 37. Die Karte hieß „Kalenderwoche 36“ mit Fortschrittsring. Was ist falsch?",
+            "en": "Today is Thursday of week 37; the card said week 36 with a progress ring. What is wrong?"
+          },
+          "optionen": [
+            {
+              "de": "Eine abgeschlossene Woche ist ein Ergebnis, kein Fortschritt. Die Karte muss „Letzte Trainingswoche“ heißen und die Datumsspanne nennen.",
+              "en": "A finished week is a result, not progress."
+            },
+            {
+              "de": "Nichts, die Daten enden nun einmal in KW 36.",
+              "en": "Nothing, the data end in week 36."
+            },
+            {
+              "de": "Der Ring müsste für KW 37 leer sein und 0 % zeigen.",
+              "en": "The ring should show 0 % for week 37."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "Fortschritt gibt es nur in laufenden Zeiträumen. Für die laufende Woche ohne Training wäre ein leerer Ring mit „0 %“ ebenso irreführend: Er sähe aus wie ein Fehler. Die Lösung: laufende Woche mit Daten als Fortschritt und „Stand Do“, sonst die letzte Trainingswoche als Ergebnis.",
+            "en": "Progress exists only for running periods."
+          }
+        },
+        {
+          "frage": {
+            "de": "Warum hat keiner der 14 Tests diese Fehler gefunden?",
+            "en": "Why did none of the 14 tests catch these errors?"
+          },
+          "optionen": [
+            {
+              "de": "Die Tests prüfen die API-Antworten. Was die Oberfläche daraus behauptet, prüft kein Test, das prüft nur ein Mensch mit einer Frage: Was bedeutet das?",
+              "en": "Tests check the API answers, not what the UI claims."
+            },
+            {
+              "de": "Die Tests waren schlecht geschrieben.",
+              "en": "The tests were badly written."
+            },
+            {
+              "de": "Chart.js hat einen Fehler.",
+              "en": "Chart.js has a bug."
+            }
+          ],
+          "richtig": [
+            0
+          ],
+          "erklaerung": {
+            "de": "Tests sichern die Daten, nicht die Aussage. Deshalb gehört zu jeder Abnahme einer Oberfläche der Semantik-Review, und deshalb legt der Prompt die Bedeutung fest, bevor Code entsteht.",
+            "en": "Tests secure the data, not the message."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P10-02",
+      "typ": "zuordnen",
+      "titel": {
+        "de": "Befund und Prüfpunkt",
+        "en": "Finding and check"
+      },
+      "aufgabe": {
+        "de": "<p>Ordnen Sie jeden Befund aus dem ersten Entwurf dem Punkt der Checkliste zu, der ihn gefunden hätte.</p>",
+        "en": "<p>Assign each finding to the checklist item that would have caught it.</p>"
+      },
+      "ziele": [
+        {
+          "id": "zustand",
+          "text": {
+            "de": "Zustände: 0 %, 100 %, darüber",
+            "en": "States"
+          }
+        },
+        {
+          "id": "zeit",
+          "text": {
+            "de": "Zeitbezug: laufend oder abgeschlossen",
+            "en": "Time reference"
+          }
+        },
+        {
+          "id": "beschriftung",
+          "text": {
+            "de": "Achsen, Legende, Begriffe",
+            "en": "Labels"
+          }
+        },
+        {
+          "id": "bedienung",
+          "text": {
+            "de": "Bedienbarkeit",
+            "en": "Usability"
+          }
+        }
+      ],
+      "paare": [
+        {
+          "begriff": {
+            "de": "Ring geschlossen bei 161 %",
+            "en": "Ring closed at 161 %"
+          },
+          "ziel": "zustand"
+        },
+        {
+          "begriff": {
+            "de": "„Kalenderwoche 36“ als Fortschritt, obwohl vorbei",
+            "en": "Week 36 as progress although over"
+          },
+          "ziel": "zeit"
+        },
+        {
+          "begriff": {
+            "de": "Balken ohne x-Achse",
+            "en": "Bars without x axis"
+          },
+          "ziel": "beschriftung"
+        },
+        {
+          "begriff": {
+            "de": "„Einheiten“ zweimal mit anderem Bezug",
+            "en": "Units twice with different scope"
+          },
+          "ziel": "beschriftung"
+        },
+        {
+          "begriff": {
+            "de": "Umschalter ohne aria-pressed, Schrift 12 px",
+            "en": "Toggles without aria-pressed, 12 px text"
+          },
+          "ziel": "bedienung"
+        },
+        {
+          "begriff": {
+            "de": "„Alles“ zeigt 105 dünne Balken",
+            "en": "All shows 105 thin bars"
+          },
+          "ziel": "zustand"
+        },
+        {
+          "begriff": {
+            "de": "Kürzel „8 W“, „Sc“, „Ra“",
+            "en": "Abbreviations 8 W, Sc, Ra"
+          },
+          "ziel": "beschriftung"
+        }
+      ],
+      "rueckmeldung": {
+        "de": "Jeder Befund hat einen Prüfpunkt, der ihn in zehn Sekunden gefunden hätte. Die Liste ersetzt den Blick nicht, sie ordnet ihn.",
+        "en": "Each finding has a check that would have caught it in ten seconds."
+      }
+    },
+    {
+      "id": "P10-03",
+      "typ": "checkliste",
+      "titel": {
+        "de": "Semantik-Review am eigenen Dashboard",
+        "en": "Semantic review of your own dashboard"
+      },
+      "aufgabe": {
+        "de": "<p>Öffnen Sie Ihr Dashboard auf dem Smartphone und gehen Sie die Liste durch. Jeder Punkt ist erfüllt oder bewusst zurückgestellt, nichts dazwischen.</p>",
+        "en": "<p>Open your dashboard on the phone and go through the list.</p>"
+      },
+      "schritte": [
+        {
+          "text": {
+            "de": "Zu jeder Zahl kann ich Einheit und Zeitraum nennen, und beides steht dran",
+            "en": "Every number has unit and period, and both are shown"
+          }
+        },
+        {
+          "text": {
+            "de": "Eine Zahl aus der Datenbank nachgerechnet, zum Beispiel die Kilometer je Sportart der letzten Woche per <code>SELECT</code> auf <code>v_workout</code>",
+            "en": "One number recomputed from the database"
+          }
+        },
+        {
+          "text": {
+            "de": "Der Ring bei 0 %, 100 % und über 100 % angeschaut: Sagt er jedes Mal etwas Wahres?",
+            "en": "Ring checked at 0, 100 and above 100 %"
+          }
+        },
+        {
+          "text": {
+            "de": "Abgeschlossene Zeiträume heißen Ergebnis, laufende heißen Fortschritt mit Stand",
+            "en": "Finished periods are results, running periods progress with a date"
+          }
+        },
+        {
+          "text": {
+            "de": "Jede Achse hat Titel und Einheit, jede Farbe steht in der Legende",
+            "en": "Every axis has title and unit, every colour in the legend"
+          }
+        },
+        {
+          "text": {
+            "de": "Kein Wort bedeutet an zwei Stellen etwas Verschiedenes",
+            "en": "No word means two things"
+          }
+        },
+        {
+          "text": {
+            "de": "„Alles“ angeklickt: lesbar?",
+            "en": "Clicked All: readable?"
+          }
+        },
+        {
+          "text": {
+            "de": "Tab-Taste gedrückt: Fokusring sichtbar, Umschalter mit <code>aria-pressed</code>",
+            "en": "Tab key: focus ring visible, toggles with aria-pressed"
+          }
+        },
+        {
+          "text": {
+            "de": "Systemeinstellung auf hell gestellt: lesbar?",
+            "en": "Light system theme: readable?"
+          }
+        },
+        {
+          "text": {
+            "de": "Jemandem zehn Sekunden gezeigt und erklären lassen",
+            "en": "Shown to someone for ten seconds"
+          }
+        }
+      ],
+      "rueckmeldung": {
+        "de": "Das ist die Abnahme, die kein Test übernimmt. Sie dauert fünf Minuten und findet die Fehler, die am teuersten sind: die, die niemand bemerkt.",
+        "en": "This is the acceptance no test performs."
+      }
+    }
+  ]
+}

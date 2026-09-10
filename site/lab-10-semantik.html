@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 10 · Schön, aber falsch · FitTrack-Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fittrack.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%237A1E32'/><text x='16' y='23' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' fill='%23E0B15A'>F</text></svg>" />
+</head>
+<body class="lab-page" data-lab="lab-10">
+
+<header class="header">
+  <div class="header-left">
+    <a class="header-logo" href="index.html" data-lab-link><span class="mark">FitTrack</span>-Lab</a>
+    <a class="header-back" href="index.html" data-lab-link>← Zur Übersicht</a>
+  </div>
+  <div class="header-right">
+    <a class="btn-mini" href="https://fittrack-k7gg.onrender.com" target="_blank" rel="noopener">Live-App</a>
+  </div>
+</header>
+
+<nav class="sidebar" aria-label="Lab-Navigation">
+  <div class="sidebar-title">Abschnitte</div>
+  <a class="sidebar-link" href="#botschaft">Die Botschaft</a>
+  <a class="sidebar-link" href="#moment">Der Moment im Sprint Review</a>
+  <a class="sidebar-link" href="#befunde">Acht Befunde</a>
+  <a class="sidebar-link" href="#vergleich">Vorher und nachher</a>
+  <a class="sidebar-link" href="#checkliste">Der Semantik-Review</a>
+  <a class="sidebar-link" href="#prompts">Zwei Prompts</a>
+  <a class="sidebar-link" href="#story">US-7 und ihr Test</a>
+  <a class="sidebar-link" href="#uebungen">Übungen</a>
+  <a class="sidebar-link" href="#zusammenfassung">Zusammenfassung</a>
+</nav>
+
+<div class="lab-header">
+  <div class="lab-num-big">10</div>
+  <h1 class="lab-title">US-7: Schön, aber falsch</h1>
+  <p class="lab-intro">Nach Lab 04 sind alle Tests grün und das Dashboard sieht aus wie eine Sport-App. Genau dann zeigte
+    der erste Entwurf einen geschlossenen Ring mit „161 % vom Ziel“ über einer Woche, die längst vorbei war. Kein Test
+    hat das bemerkt. Dieses Lab zeigt, warum generierte Oberflächen besonders viel Misstrauen verdienen, wenn sie gut
+    aussehen, und wie man solche Fehler findet und mit dem richtigen Prompt verhindert.</p>
+  <div class="lernziele">
+    <span class="lernziel-chip">Semantik-Review</span>
+    <span class="lernziel-chip">Vorher-Nachher</span>
+    <span class="lernziel-chip">Bedeutung vor Code</span>
+    <span class="lernziel-chip">Selbstprüfungs-Prompt</span>
+  </div>
+  <div data-einordnung></div>
+</div>
+
+<main class="main-content">
+
+  <section class="section-block" id="botschaft">
+    <h2>Die Botschaft</h2>
+    <div class="concept-box">
+      <h3>Tests sichern die Daten, nicht die Aussage.</h3>
+      <p>Die 14 Tests aus Lab 01 bis 04 prüfen Status, Felder, Summen und Lückenwochen. Alles davon war richtig. Was
+        die Oberfläche aus diesen richtigen Zahlen macht, prüft kein Test. Das prüft nur ein Mensch mit einer Frage an
+        jedes sichtbare Element: <strong>Was bedeutet das, und stimmt es?</strong> Ein Modell kennt die Form eines
+        Fitness-Dashboards und füllt sie. Ob ein voller Ring, ein fehlendes Achsenlabel oder ein doppelt verwendetes
+        Wort etwas Wahres behauptet, fragt es nicht, solange niemand es dazu zwingt.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="moment">
+    <h2>Der Moment im Sprint Review</h2>
+    <p>Das Dashboard liegt auf dem Beamer. Die Gruppe hat Sprint 2 abgeschlossen, das Diagramm zeigt echte Daten aus
+      der API, die Buttons sind 44 Pixel hoch. Die Frage der Dozentin oder des Dozenten lautet nicht „Gefällt es
+      euch?“, sondern:</p>
+    <div class="warn-box">
+      <h3>„Was bedeutet 161 %?“</h3>
+      <p>Der Ring ist geschlossen. Bei 100 % wäre er auch geschlossen, bei 300 % ebenso. Die Grafik trägt oberhalb
+        des Ziels keine Information mehr. Die Zahl hat keine Einheit. Und die Karte heißt „Kalenderwoche 36“, obwohl
+        heute Donnerstag in KW 37 ist: Eine abgeschlossene Woche ist ein Ergebnis, kein Fortschritt. Drei falsche
+        Aussagen in einem Element, das alle Tests bestanden hat.</p>
+    </div>
+    <p>Die Gruppe soll die weiteren Befunde selbst finden, bevor die Tabelle unten eingeblendet wird. Fünf Minuten,
+      jede Person eine Zahl oder Grafik, dieselbe Frage.</p>
+  </section>
+
+  <section class="section-block" id="befunde">
+    <h2>Acht Befunde, keiner ein Rechenfehler</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Befund im ersten Entwurf</th><th>Warum es täuscht</th><th>Korrektur</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ring geschlossen, „161 % vom Ziel“</strong></td><td>Ein voller Ring sagt „erreicht“, die Zahl sagt „übererfüllt“, beides ohne Kilometer. Ab 100 % sieht der Ring immer gleich aus.</td><td>Ring bei 100 % gedeckelt und grün, im Ring die Kilometer, daneben „Ziel erreicht, 24,4 km darüber“.</td></tr>
+          <tr><td><strong>„Kalenderwoche 36“ als Fortschritt, obwohl vorbei</strong></td><td>Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis.</td><td>Titel „Letzte Trainingswoche“ mit Datumsspanne. Nur bei Daten in der laufenden Woche „Diese Woche“ mit „Stand Do“.</td></tr>
+          <tr><td><strong>Wochenziel 40 km ohne Bezug</strong></td><td>2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, aber es muss dastehen.</td><td>„Ziel 40 km über alle Sportarten“, darunter die Kilometer je Sportart.</td></tr>
+          <tr><td><strong>Balken ohne x-Achse</strong></td><td>Welcher Balken ist welche Woche? Raten.</td><td>Achse „Kalenderwoche“, Legende, Ziellinie bei 40 km, Klick auf einen Balken beschreibt ihn unter dem Diagramm.</td></tr>
+          <tr><td><strong>„Alles“ zeigt 105 dünne Balken</strong></td><td>Funktioniert und ist unlesbar.</td><td>Monatssummen mit Achse „Monat“, Titel „Kilometer pro Monat“.</td></tr>
+          <tr><td><strong>Kürzel „8 W / 6 M / 1 J“, „Sc / Wa / Ra“</strong></td><td>Versteht niemand ohne Einweisung.</td><td>„8 Wochen“, „6 Monate“, „1 Jahr“; Symbole je Sportart in der Liste.</td></tr>
+          <tr><td><strong>„Einheiten“ zweimal, einmal je Woche, einmal gesamt</strong></td><td>Gleiches Wort, andere Bedeutung. „Gesamt“ und „Pro Woche“ ohne Zeitraum.</td><td>„Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Meiste km“ statt „Lieblingssport“.</td></tr>
+          <tr><td><strong>Schrift 12 px, kein <code>aria-pressed</code>, nur dunkel</strong></td><td>Auf dem Handy in der Sonne unlesbar, für Screenreader stumm.</td><td>Mindestens 13 px, <code>aria-pressed</code>, sprechendes <code>aria-label</code> am Ring, Tabelle für Screenreader, helles Thema per <code>prefers-color-scheme</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tip-box">
+      <h3>Das Muster</h3>
+      <p>Alle acht Befunde sind Aussagefehler, kein einziger ein Rechenfehler. Genau deshalb fällt sie kein Test, und
+        genau deshalb fallen sie beim ersten Blick nicht auf: Die Zahlen stimmen, das Bild ist vertraut, das Gehirn
+        nickt.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="vergleich">
+    <h2>Vorher und nachher</h2>
+    <p>Dieselben Daten, dieselbe API bis auf ein Feld. Der Umbau ist fast vollständig Beschriftung, Deckelung und
+      Bezug.</p>
+    <div style="display:flex; gap:1.5rem; flex-wrap:wrap; align-items:flex-start">
+      <div class="shot schmal" style="flex:1 1 300px">
+        <img src="assets/img/dashboard-vorher-mobile.png" alt="Erster Entwurf des Dashboards: geschlossener Ring mit 161 % vom Ziel über Kalenderwoche 36, Balken ohne Achsenbeschriftung, Kürzel Sc, Wa, Ra in der Liste" loading="lazy">
+        <div class="unterschrift">Vorher: Ring geschlossen bei 161 %, Karte „Kalenderwoche 36“, Balken ohne Achse, Kürzel.</div>
+      </div>
+      <div class="shot schmal" style="flex:1 1 300px">
+        <img src="assets/img/dashboard-mobile.png" alt="Dashboard nach dem Semantik-Review: Letzte Trainingswoche mit gedeckeltem grünem Ring 64,4 von 40 km, Ziel erreicht 24,4 km darüber, Kilometer je Sportart, gestapeltes Balkendiagramm mit Achse Kalenderwoche, Legende und Ziellinie, Liste mit Symbolen" loading="lazy">
+        <div class="unterschrift">Nachher: Ergebnis statt Fortschritt, Kilometer statt Prozent, Achse, Legende, Ziellinie, Symbole.</div>
+      </div>
+    </div>
+    <div class="shot">
+      <img src="assets/img/vergleich-desktop.png" alt="Desktop-Ansicht vorher und nachher untereinander" loading="lazy">
+      <div class="unterschrift">Desktop, zwei Spalten: oben der erste Entwurf, unten der Stand nach US-7.</div>
+    </div>
+    <h3>Was besser wurde</h3>
+    <ul>
+      <li><strong>Wochenkarte:</strong> „Letzte Trainingswoche, KW 36, 31.08. bis 06.09.2026 · Ziel 40 km über alle Sportarten“. Ring voll und grün, im Ring „64,4 von 40 km“, daneben „Ziel erreicht, 24,4 km darüber“, darunter Radfahren 52,6 km, Wandern 9,8 km, Schwimmen 2,0 km.</li>
+      <li><strong>Diagramm:</strong> Gestapelt je Sportart in den Sportfarben, Achse „Kalenderwoche“ mit Einheit „km“, gestrichelte Ziellinie, Legende. Die jüngste Woche ist umrandet und unter dem Diagramm beschrieben; ein Klick auf einen anderen Balken wechselt die Beschreibung. „Alles“ zeigt Monate.</li>
+      <li><strong>Kacheln:</strong> „Gesamt seit Sep 2024“, „Ø pro Woche“, „Meiste km“, „Einheiten gesamt“. Jeder Bezug steht dran, kein Wort bedeutet zweimal etwas anderes.</li>
+      <li><strong>Liste:</strong> Wochentag im Datum, Symbol je Sportart statt „Sc“, „20 weitere anzeigen“ und „Alle anzeigen“.</li>
+      <li><strong>Bedienung:</strong> Mindestschrift 13 px, Bedienelemente 44 px, Fokusring per Tastatur, <code>aria-pressed</code> an den Umschaltern, sprechendes <code>aria-label</code> am Ring, eine für Screenreader sichtbare Tabelle mit den Diagrammwerten, helles und dunkles Thema.</li>
+    </ul>
+  </section>
+
+  <section class="section-block" id="checkliste">
+    <h2>Der Semantik-Review</h2>
+    <p>Vor jeder Abnahme einer Oberfläche, einmal über jedes sichtbare Element. Fünf Minuten. Jeder Punkt ist erfüllt
+      oder bewusst zurückgestellt, nichts dazwischen. Die Liste steht auch in <code>docs/checklisten.md</code>.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Prüfpunkt</th><th>Frage</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Bedeutung</strong></td><td>Kann ich zu jeder Zahl sagen, was sie zeigt, in welcher Einheit und für welchen Zeitraum? Steht das auch dran?</td></tr>
+          <tr><td><strong>Nachrechnen</strong></td><td>Kann ich die Zahl aus den Rohdaten selbst herleiten? Eine Stichprobe per SQL oder aus der API-Antwort.</td></tr>
+          <tr><td><strong>Zustände</strong></td><td>Was bedeutet das Element bei 0 %, bei 100 %, bei mehr als 100 %, ohne Daten? Was zeigt es, wenn es „voll“ ist? Ist die Aussage dann noch wahr?</td></tr>
+          <tr><td><strong>Zeitbezug</strong></td><td>Ist der Zeitraum abgeschlossen oder laufend? Ein Fortschrittsbalken für eine vergangene Woche ist ein Ergebnis, kein Fortschritt.</td></tr>
+          <tr><td><strong>Achsen und Legende</strong></td><td>Hat jede Achse Titel und Einheit? Ist jede Farbe erklärt? Weiß ich, welcher Balken welche Woche ist?</td></tr>
+          <tr><td><strong>Gleiche Wörter</strong></td><td>Kommt ein Begriff zweimal vor, meint er beide Male dasselbe? Sonst Bezug ergänzen.</td></tr>
+          <tr><td><strong>Abkürzungen</strong></td><td>Versteht jemand ohne Einweisung „8 W“, „Sc“, „Ø“? Ausschreiben oder erklären.</td></tr>
+          <tr><td><strong>Extremfälle</strong></td><td>Sieht die Ansicht mit 0, 1 und 105 Datenpunkten noch sinnvoll aus? „Alles“ ausprobieren.</td></tr>
+          <tr><td><strong>Bedienbarkeit</strong></td><td>Schrift mindestens 13 px, Bedienelemente 44 px, Tastatur mit Fokusring, <code>aria-pressed</code>, sprechende <code>aria-label</code>, Kontrast, helles und dunkles Thema.</td></tr>
+          <tr><td><strong>Zehn Sekunden</strong></td><td>Die Ansicht jemandem zehn Sekunden zeigen und erklären lassen. Was falsch erklärt wird, ist falsch dargestellt.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Nachrechnen am Beispiel: Die Chips der Wochenkarte müssen dieser Abfrage entsprechen. Sie können sie im Lab
+      <a href="index.html#datenbank" data-lab-link>auf der Startseite</a> gegen die echte Datenbank laufen lassen.</p>
+    <pre class="prompt" data-kopieren="SQL-Probe">SELECT sportart, ROUND(SUM(distanz_km), 1) AS km
+FROM v_workout
+WHERE datum BETWEEN '2026-08-31' AND '2026-09-06'
+GROUP BY sportart
+ORDER BY km DESC;</pre>
+  </section>
+
+  <section class="section-block" id="prompts">
+    <h2>Zwei Prompts, die solche Fehler verhindern</h2>
+    <h3>1. Bedeutung vor Code</h3>
+    <p>Der wirksamste Schutz ist eine Tabelle vor dem Code: Für jedes Element Aussage, Einheit, Zeitbezug und Zustände,
+      vom Modell vorgeschlagen, von der Gruppe bestätigt. Erst danach darf es bauen. Die sieben Regeln sind die acht
+      Befunde, in Anforderungen übersetzt. Sie passen in jeden Frontend-Prompt des Kurses.</p>
+    <pre class="prompt" data-kopieren="Prompt: Bedeutung vor Code">Wir bauen das Dashboard von FitTrack (Vanilla JS, Chart.js 4, API-Antworten
+siehe unten). Bevor du Code schreibst, lege die Bedeutung jedes Elements
+fest. Gib eine Tabelle mit den Spalten
+Element | zeigt | Einheit | Zeitbezug | Zustände (0 %, 100 %, über 100 %,
+keine Daten) | Beschriftung im Bild.
+Regeln, die die Tabelle erfüllen muss:
+1. Jede Zahl trägt Einheit und Bezug, z. B. "64,4 km, KW 36, 31.08. bis 06.09.".
+2. Ein Fortschrittselement zeigt nur laufende Zeiträume. Abgeschlossene
+   Zeiträume heißen Ergebnis. Werte über 100 % werden gedeckelt und als
+   "Ziel erreicht, +x km" beschriftet.
+3. Jede Achse hat Titel und Einheit, jede Farbe steht in einer Legende.
+4. Kein Begriff bedeutet an zwei Stellen etwas Verschiedenes.
+5. Keine Abkürzungen, die nicht im Bild erklärt sind.
+6. Beschreibe, wie die Ansicht bei 0, 1 und 105 Datenpunkten aussieht.
+7. Schrift mindestens 13 px, Bedienelemente 44 px, aria-pressed an
+   Umschaltern, sprechende aria-label, helles und dunkles Thema.
+Erst wenn ich die Tabelle bestätigt habe, schreibst du den Code.
+API-Antworten: [Beispiel von /api/stats und /api/stats/wochen einfügen]</pre>
+    <h3>2. Selbstprüfung nach jedem Vorschlag</h3>
+    <p>Bevor jemand den Code anfasst. Das findet die offensichtlichen Fälle: den Ring, die fehlende Achse, das
+      doppelte Wort. Es ersetzt den Blick der Gruppe nicht, weil das Modell dieselben Formen für richtig hält, die
+      es gerade gebaut hat.</p>
+    <pre class="prompt" data-kopieren="Prompt: Selbstprüfung">Prüfe deinen Vorschlag wie ein kritischer Designer, der ihn zum ersten
+Mal sieht. Gehe jedes sichtbare Element durch und beantworte: Was
+bedeutet es? Woher kommt der Wert? Was zeigt es bei 0, bei mehr als
+100 %, bei 105 Datenpunkten? Nenne jede Stelle, an der die Darstellung
+mehr behauptet als die Daten hergeben, und schlage die Korrektur vor.
+Lobe nichts. Wenn du nichts findest, sage das und begründe es je Element.</pre>
+    <div class="info-box">
+      <h3>Was der zweite Prompt findet, und was nicht</h3>
+      <p>Er findet den geschlossenen Ring, die Zahl ohne Einheit, die fehlende Achse, das doppelte Wort. Er findet
+        nicht, ob 40 km über alle Sportarten ein sinnvolles Ziel ist, ob die Woche wirklich vorbei ist oder ob jemand
+        die Ansicht in zehn Sekunden erklären kann. Das bleibt bei der Gruppe.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="story">
+    <h2>US-7 und ihr Test</h2>
+    <p>Aus dem Review wird eine Story, damit der Umbau denselben Weg geht wie jede andere Änderung: Test rot, Prompt,
+      Prüfen, Code, Test grün, Commit mit Story-Bezug, Tag <code>us-7</code>.</p>
+    <pre class="prompt" data-kopieren="US-7">US-7: Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard
+      genau das aussagt, was die Daten hergeben, damit ich mich nicht
+      auf ein schönes, aber falsches Bild verlasse.
+      Akzeptanz: Der Ring geht nie über 100 %; eine abgeschlossene Woche
+      heißt Ergebnis, nicht Fortschritt; jede Achse und jede Farbe ist
+      beschriftet; GET /api/stats/wochen liefert je Woche je_sportart;
+      Schrift mindestens 13 px, Umschalter mit aria-pressed, helles und
+      dunkles Thema.</pre>
+    <p>Das Backend liefert die Kilometer je Sportart und Woche, damit das Frontend nichts selbst zusammenrechnet.
+      Erwartungswerte aus dem Fixture, von Hand: KW 23 hat Laufen 13,0, Radfahren 20,0, Schwimmen 1,5; Probe
+      13,0 + 20,0 + 1,5 = 34,5, die bekannte Wochensumme.</p>
+    <pre class="prompt" data-kopieren="Test US-7">def test_wochen_je_sportart():
+    wochen = client.get("/api/stats/wochen").json()
+    assert wochen[0]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 20.0, "Schwimmen": 1.5}
+    assert wochen[1]["je_sportart"] == {}
+    assert wochen[2]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 30.0, "Wandern": 10.0}</pre>
+    <div class="warn-box">
+      <h3>Ein bestehender Test ändert sich</h3>
+      <p><code>test_wochen_anzahl_und_luecken</code> vergleicht KW 24 als ganzes Dictionary und bekommt nun
+        <code>"je_sportart": {}</code> dazu. Das ist eine bewusste Änderung der Spezifikation durch die Story, kein
+        „Test passend machen“. Der Unterschied: Die Story kam zuerst, der Test folgt ihr. Anders herum wäre es
+        Betrug am eigenen Prüfsystem.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="uebungen">
+    <h2>Übungen</h2>
+    <p>Drei Übungen: die Fehler verstehen, sie den Prüfpunkten zuordnen, den Review am eigenen Dashboard durchführen.</p>
+    <div data-uebung="P10-01"></div>
+    <div data-uebung="P10-02"></div>
+    <div data-uebung="P10-03"></div>
+    <div data-fortschritt></div>
+  </section>
+
+  <section class="section-block" id="zusammenfassung">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>Tests sichern die Daten, nicht die Aussage. Grüne Tests sagen nichts darüber, ob eine Grafik die Wahrheit zeigt.</li>
+      <li>Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen.</li>
+      <li>Acht Befunde im ersten Entwurf, keiner ein Rechenfehler: Ring, Zeitbezug, Achse, Kürzel, doppelte Wörter, Bedienbarkeit.</li>
+      <li>Der Semantik-Review stellt an jedes Element dieselbe Frage: Was bedeutet das, und stimmt es?</li>
+      <li>Bedeutung vor Code: Der Prompt lässt das Modell erst eine Tabelle vorlegen, dann bauen. Ein zweiter Prompt lässt es den eigenen Vorschlag zerlegen.</li>
+      <li>Aus dem Review wird eine Story mit Test und Tag, kein stilles Nachbessern.</li>
+    </ul>
+    <div data-lab-nav></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>FitTrack-Lab · Lab 10 · THWS Business School · Stand 09/2026</p>
+</footer>
+
+<script type="module" src="assets/fittrack.js"></script>
+</body>
+</html>

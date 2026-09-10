@@ -234,7 +234,11 @@ const LABS = [
   { id: 'lab-09', nr: '09', datei: 'lab-09-lokal.html', uebungen: 3,
     titel: { de: 'Lokale Modelle mit LM Studio', en: 'Local models with LM Studio' }, voraussetzung: { de: 'Lab 08', en: 'Lab 08' },
     zeit: { de: '30 Minuten', en: '30 minutes' },
-    ziel: { de: 'Denselben Prompt lokal laufen lassen und Ergebnisse gegen die Tests statt gegen den Eindruck bewerten.', en: 'Run the same prompt locally and judge results against the tests, not the impression.' } }
+    ziel: { de: 'Denselben Prompt lokal laufen lassen und Ergebnisse gegen die Tests statt gegen den Eindruck bewerten.', en: 'Run the same prompt locally and judge results against the tests, not the impression.' } },
+  { id: 'lab-10', nr: '10', datei: 'lab-10-semantik.html', uebungen: 3,
+    titel: { de: 'US-7: Schön, aber falsch', en: 'US-7: pretty but wrong' }, voraussetzung: { de: 'Lab 04', en: 'Lab 04' },
+    zeit: { de: '45 Minuten', en: '45 minutes' },
+    ziel: { de: 'KI-Ergebnissen misstrauen, die gut aussehen: die Aussage jeder Zahl und Grafik prüfen, bevor sie abgenommen wird.', en: 'Distrust AI output that looks good: check what every number and chart claims before accepting it.' } }
 ]
 
 const labVon = (id) => LABS.find(l => l.id === id)
