@@ -215,6 +215,7 @@ Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: elf Labs ent
 
 - `docs/dozent/prompt-skript.md`: alle Prompts in Schrittreihenfolge mit Prüfpunkten und Befehlen
 - `docs/dozent/erwartungswerte.md`: Handrechnung für das Fixture
+- `docs/dozent/tests.md`: alle 15 Tests, ihr Aufbau, Ausführung und typische Fehlerbilder
 - `docs/dozent/render-deploy.md` und `docs/dozent/lmstudio-demo.md`
 - `docs/dozent/2026-09-10-fittrack-design.md`: Design der Referenzlösung, fortgeschrieben bis US-7; `docs/dozent/archiv/`: der ursprüngliche Plan
 - `docs/kurs/`: das Kurskonzept, auf den Stand der Referenzlösung fortgeschrieben

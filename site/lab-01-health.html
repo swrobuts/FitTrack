@@ -26,6 +26,7 @@
   <div class="sidebar-title">Abschnitte</div>
   <a class="sidebar-link" href="#story">Die Story</a>
   <a class="sidebar-link" href="#schleife">Die Schleife</a>
+  <a class="sidebar-link" href="#konkret">So testen Sie konkret</a>
   <a class="sidebar-link" href="#test">Test zuerst</a>
   <a class="sidebar-link" href="#prompt">Der Prompt</a>
   <a class="sidebar-link" href="#pruefen">Prüfpunkte</a>
@@ -80,6 +81,81 @@ flowchart TD
     H --> I["Commit mit Story-Bezug, Push"]
       </pre>
       <div class="unterschrift">Die Schleife hat genau eine Rückführung: Ist der Test nach der Übernahme rot, geht die Fehlermeldung wörtlich zurück in den Chat, nicht sinngemäß.</div>
+    </div>
+  </section>
+
+  <section class="section-block" id="konkret">
+    <h2>So testen Sie konkret</h2>
+    <p>Ein Test ist eine kleine Python-Funktion, die die App aufruft und das Ergebnis mit einem Wert vergleicht, den
+      Sie vorher selbst kennen. Ausgeführt wird sie mit einem Befehl im Terminal, nie im Chat. Der Chat bekommt den
+      Test nur als Text mitgeliefert. Am Beispiel der Kennzahl „Gesamtkilometer“ aus Lab 03, weil dort ein echter
+      Rechenwert geprüft wird:</p>
+    <h3>1. Erwartungswert von Hand rechnen</h3>
+    <p>Die Testdaten sind acht Einheiten in <code>backend/tests/fixtures/workouts_klein.sql</code>. Kilometer
+      addieren: 5,0 + 20,0 + 8,0 + 1,5 + 30,0 + 9,0 + 10,0 + 4,0 = <strong>87,5</strong>. Das ist die Zahl, die die
+      App liefern muss. Sie kommt aus Ihrem Taschenrechner, nicht aus dem Chat.</p>
+    <h3>2. Den Test in die Datei schreiben</h3>
+    <p>In WebStorm <code>backend/tests/test_api.py</code> öffnen und ergänzen:</p>
+    <pre class="code-block">def test_stats_gesamt_km():
+    stats = client.get("/api/stats").json()
+    assert stats["gesamt_km"] == 87.5</pre>
+    <p>Zeile 1 benennt den Test; der Name muss mit <code>test_</code> beginnen, sonst findet pytest ihn nicht. Zeile 2
+      ruft die App auf wie ein Browser. Zeile 3 behauptet: Das Feld <code>gesamt_km</code> ist 87,5. Stimmt das
+      nicht, schlägt der Test fehl.</p>
+    <h3>3. Tests laufen lassen</h3>
+    <p>Im Terminal von WebStorm, im Projektordner:</p>
+    <pre class="code-block">pytest</pre>
+    <p>pytest sucht alle Funktionen, die mit <code>test_</code> beginnen, führt sie aus und meldet je Test PASSED oder
+      FAILED. Solange der Endpunkt noch fehlt, sieht das so aus:</p>
+    <pre class="code-block">FAILED backend/tests/test_api.py::test_stats_gesamt_km - ... 404
+1 failed in 0.16s</pre>
+    <div class="tip-box">
+      <h3>Rot ist hier richtig</h3>
+      <p>Es beweist, dass der Test etwas prüft, was noch fehlt. Ein Test, der von Anfang an grün ist, hat nichts
+        belegt.</p>
+    </div>
+    <h3>4. Prompt in den Chat</h3>
+    <p>Der Chat führt nichts aus und sieht Ihr Repository nicht. Deshalb steht der Test wörtlich im Prompt, als
+      Auftrag: „Der Code muss diesen Test bestehen: …“. Die Antwort lesen, die Prüfpunkte abhaken, den Code in die
+      Zieldateien übernehmen.</p>
+    <h3>5. Wieder pytest</h3>
+    <p>Entweder grün:</p>
+    <pre class="code-block">15 passed in 0.16s</pre>
+    <p>oder rot mit genauer Angabe. Ein Lauf mit falschem Ergebnis sieht so aus:</p>
+    <pre class="code-block">>       assert stats["gesamt_km"] == 87.5
+E       assert 90.0 == 87.5
+backend/tests/test_api.py:52: AssertionError</pre>
+    <p>Die Zeile mit <code>E</code> sagt: Die App liefert 90,0, der Test erwartete 87,5. Genau diesen Block wörtlich in
+      den Chat zurück („Der Test schlägt so fehl: …“), korrigierten Code übernehmen, wieder <code>pytest</code>. Bis
+      grün.</p>
+    <h3>6. Committen</h3>
+    <p>Erst wenn <code>pytest</code> grün ist: <code>Git → Commit</code> in WebStorm, Nachricht mit Story-Bezug, Push.
+      Ab Lab 07 wiederholt GitHub Actions denselben Lauf bei jedem Push auf einem frischen Rechner.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Sie wollen</th><th>Befehl oder Klick</th></tr></thead>
+        <tbody>
+          <tr><td>Alle Tests</td><td><code>pytest</code></td></tr>
+          <tr><td>Alle Tests mit Namen und Ergebnis je Test</td><td><code>pytest -v</code></td></tr>
+          <tr><td>Nur einen Test</td><td><code>pytest -k test_stats_gesamt_km</code></td></tr>
+          <tr><td>Ohne Terminal</td><td>Rechtsklick auf <code>test_api.py</code> → „Run pytest in test_api.py“; danach der grüne Pfeil oben rechts</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="info-box">
+      <h3>Was dahinter passiert</h3>
+      <p><code>conftest.py</code> baut vor jedem Lauf aus <code>schema.sql</code> und dem Fixture eine temporäre
+        Testdatenbank und setzt <code>FITTRACK_DATA</code> darauf. Die Tests laufen nie gegen die 311 Echtdaten.
+        <code>TestClient</code> ruft die App im selben Prozess auf, ein Server wird nicht gestartet; deshalb dauern
+        alle 15 Tests unter einer Sekunde. Für den Randfall „keine Daten“ tauscht <code>monkeypatch</code> die
+        Ladefunktion vorübergehend gegen eine leere Liste aus.</p>
+    </div>
+    <div class="warn-box">
+      <h3>Zwei Regeln</h3>
+      <p>Der Erwartungswert kommt nie vom Modell, sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt.
+        Und der Test wird nie geändert, damit er zum Code passt; der Code muss sich dem Test anpassen. Einzige
+        Ausnahme: Eine Story erweitert bewusst die Spezifikation, wie US-7 in Lab 10. Dann ändert sich der Test vor
+        dem Code, mit Begründung im Commit.</p>
     </div>
   </section>
 

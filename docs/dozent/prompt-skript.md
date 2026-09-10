@@ -38,6 +38,65 @@ Die Prompts sind in sich geschlossen. Der Chat sieht das Repo nicht, deshalb ste
 
 Konventionen, die in jedem Prompt stehen: deutsche Feldnamen, deutsche Bezeichner und Kommentare, nur die Pakete aus `requirements.txt`, Erklärung in drei Sätzen.
 
+## So testen Sie konkret
+
+Ein Test ist eine kleine Python-Funktion, die die App aufruft und das Ergebnis mit einem Wert vergleicht, den die Gruppe vorher selbst kennt. Ausgeführt wird sie mit einem Befehl im Terminal, nie im Chat. Der Chat bekommt den Test nur als Text mitgeliefert. Am Beispiel der Kennzahl „Gesamtkilometer“ (US-2):
+
+**1. Erwartungswert von Hand rechnen.** Die Testdaten sind acht Einheiten in `backend/tests/fixtures/workouts_klein.sql`. Kilometer addieren: 5,0 + 20,0 + 8,0 + 1,5 + 30,0 + 9,0 + 10,0 + 4,0 = 87,5. Das ist die Zahl, die die App liefern muss. Lösung für den Dozenten in `erwartungswerte.md`.
+
+**2. Den Test in die Datei schreiben.** In WebStorm `backend/tests/test_api.py` öffnen und ergänzen:
+
+```python
+def test_stats_gesamt_km():
+    stats = client.get("/api/stats").json()
+    assert stats["gesamt_km"] == 87.5
+```
+
+Zeile 1 benennt den Test (Name beginnt mit `test_`, sonst findet pytest ihn nicht). Zeile 2 ruft die App auf wie ein Browser. Zeile 3 behauptet: Das Feld `gesamt_km` ist 87,5. Stimmt das nicht, schlägt der Test fehl.
+
+**3. Tests laufen lassen.** Im Terminal von WebStorm, im Projektordner:
+
+```bash
+pytest
+```
+
+pytest sucht alle Funktionen, die mit `test_` beginnen, führt sie aus und meldet je Test PASSED oder FAILED. Solange der Endpunkt fehlt, sieht das so aus:
+
+```text
+FAILED backend/tests/test_api.py::test_stats_gesamt_km - ... 404
+1 failed in 0.16s
+```
+
+Rot ist hier richtig. Es beweist, dass der Test etwas prüft, was noch fehlt. Ein Test, der von Anfang an grün ist, hat nichts belegt.
+
+**4. Prompt in den Chat.** Der Chat führt nichts aus und sieht das Repository nicht. Deshalb steht der Test wörtlich im Prompt, als Auftrag: „Der Code muss diesen Test bestehen: …“. Die Antwort lesen, Prüfpunkte abhaken, Code in `statistik.py` und `main.py` übernehmen.
+
+**5. Wieder `pytest`.** Entweder grün:
+
+```text
+15 passed in 0.16s
+```
+
+oder rot mit genauer Angabe. Ein Lauf mit falschem Ergebnis sieht so aus:
+
+```text
+>       assert stats["gesamt_km"] == 87.5
+E       assert 90.0 == 87.5
+backend/tests/test_api.py:52: AssertionError
+```
+
+Die Zeile mit `E` sagt: Die App liefert 90,0, der Test erwartete 87,5. Genau diesen Block wörtlich in den Chat zurück („Der Test schlägt so fehl: …“), korrigierten Code übernehmen, wieder `pytest`. Bis grün.
+
+**6. Committen.** Erst wenn `pytest` grün ist: `Git → Commit` in WebStorm, Nachricht `feat(US-2): Kennzahlen-Endpunkt`, Push. Ab Schritt 9 wiederholt GitHub Actions denselben Lauf bei jedem Push auf einem frischen Rechner.
+
+**Alternative zum Terminal:** Rechtsklick auf `test_api.py` in WebStorm, „Run pytest in test_api.py“. Unten erscheint eine Liste mit grünen Haken und roten Kreuzen je Test, oben rechts ein grüner Pfeil zum Wiederholen. Ein einzelner Test: `pytest -k test_stats_gesamt_km`. Mehr Ausgabe: `pytest -v`.
+
+**Was dahinter passiert:** `conftest.py` baut vor jedem Lauf aus `schema.sql` und dem Fixture eine temporäre Testdatenbank und setzt `FITTRACK_DATA` darauf. Die Tests laufen also nie gegen die 311 Echtdaten. `TestClient` ruft die App im selben Prozess auf, ein Server wird nicht gestartet; deshalb dauern alle 15 Tests unter einer Sekunde. Für den Randfall „keine Daten“ tauscht `monkeypatch` die Ladefunktion vorübergehend gegen eine leere Liste aus.
+
+**Zwei Regeln:** Der Erwartungswert kommt nie vom Modell, sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt. Und der Test wird nie geändert, damit er zum Code passt; der Code muss sich dem Test anpassen. Ausnahme: Eine Story erweitert bewusst die Spezifikation, wie US-7 mit `je_sportart`. Dann ändert sich der Test vor dem Code, mit Begründung im Commit.
+
+Beschreibung aller 15 Tests: `docs/dozent/tests.md`.
+
 ---
 
 ## Schritt 0: Starter (Termin 1, ab 0:10)
