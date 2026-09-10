@@ -657,6 +657,8 @@ nicht neu erzeugt wird.
 - **Sportarten-Kacheln:** Kilometer, Anteil als Balken, Einheiten je Sportart; Tippen filtert die Aktivitätenliste.
 - **Status-Badge:** ein Wort für den Stand, dazu die Serie erreichter Wochen.
 - **Ø je Einheit** in der Wochenkarte, **Beste Woche** in den Kennzahlen.
+- **Sheet statt Tooltip:** Jedes Objekt öffnet beim Antippen einen Dialog mit Details, auf dem Handy von unten. Die Woche mit Balken je Sportart und ihren Einheiten, der Kalendertag mit seiner Einheit, die Kennzahl mit ihrer Rechnung, die Sportart mit Filterknopf, die Einheit mit Tempo. Die Seite selbst bleibt dadurch ruhig: keine Detailzeilen unter den Grafiken.
+- **Thema-Umschalter:** hell oder dunkel per Knopf im Kopf, gespeichert im Browser; ohne Wahl gilt das Gerät.
 
 **Story:** Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard genau das aussagt, was die Daten hergeben. Akzeptanz siehe README (US-7).
 
@@ -713,7 +715,7 @@ die Daten hergeben, und schlage die Korrektur vor. Lobe nichts. Wenn du
 nichts findest, sage das und begründe es je Element.
 ```
 
-**Prüfpunkte:** Die Gruppe geht die Liste „Semantik-Review: Schön, aber falsch“ aus `docs/checklisten.md` am Beamer durch. Eine Zahl wird nachgerechnet: `SELECT sportart, ROUND(SUM(distanz_km),1) FROM v_workout WHERE datum BETWEEN '2026-08-31' AND '2026-09-06' GROUP BY sportart;` muss die Aufteilung der Wochenkarte ergeben. Am Handy: einen Balken antippen, ein Kalenderfeld antippen, eine Sportart-Kachel antippen. „Alles“ anklicken. Tab-Taste drücken: Fokusring sichtbar? Systemeinstellung auf hell stellen: lesbar?
+**Prüfpunkte:** Die Gruppe geht die Liste „Semantik-Review: Schön, aber falsch“ aus `docs/checklisten.md` am Beamer durch. Eine Zahl wird nachgerechnet: `SELECT sportart, ROUND(SUM(distanz_km),1) FROM v_workout WHERE datum BETWEEN '2026-08-31' AND '2026-09-06' GROUP BY sportart;` muss die Aufteilung der Wochenkarte ergeben. Am Handy: einen Balken, ein Kalenderfeld, eine Kennzahl, eine Sportart-Kachel und eine Einheit antippen, jedes Mal öffnet ein Sheet; Tippen daneben schließt es. Den Thema-Knopf drücken, Seite neu laden: Die Wahl bleibt. „Alles“ anklicken. Tab-Taste drücken: Fokusring sichtbar? Systemeinstellung auf hell stellen: lesbar?
 
 **Botschaft für die Gruppe:** Tests sichern die Daten, nicht die Aussage. Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen. Der Erstentwurf der KI war ein brauchbarer Schritt; gut wurde er erst durch die Kritik eines Menschen, der wusste, was ein Kreis bedeutet und was ein Ziel braucht. Deshalb legt der Prompt Bedeutung und Form vor dem Code fest, und deshalb prüft die QA-Rolle die Oberfläche mit derselben Strenge wie den Code.
 

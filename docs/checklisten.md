@@ -31,7 +31,7 @@ Ein Vorschlag, der gut aussieht, ist noch nicht richtig. Der Erstentwurf des Fit
 - [ ] **Abkürzungen:** Versteht jemand ohne Einweisung „8 W“, „Sc“, „Ø“? Ausschreiben oder erklären.
 - [ ] **Extremfälle:** Sieht die Ansicht mit 0, 1 und 105 Datenpunkten noch sinnvoll aus? „Alles“ ausprobieren.
 - [ ] **Bedienbarkeit:** Schrift mindestens 13 px, Bedienelemente 44 px, Tastatur (Tab, Fokusring), Screenreader (`aria-pressed`, sprechende `aria-label`), Kontrast, helles und dunkles Thema.
-- [ ] **Touch:** Jede Grafik ist antippbar und nennt dann ihre Zahl im Klartext (Balken, Kalenderfeld, Kachel). Kein Tooltip, der nur mit der Maus erscheint.
+- [ ] **Touch:** Jedes Objekt ist antippbar und öffnet dann seine Details im Klartext, etwa in einem Sheet (Balken, Kalenderfeld, Kennzahl, Kachel, Einheit). Kein Tooltip, der nur mit der Maus erscheint. Hell und dunkel per Knopf, nicht nur per Systemeinstellung.
 - [ ] **Zehn-Sekunden-Test:** Die Ansicht jemandem zehn Sekunden zeigen und erklären lassen. Was falsch erklärt wird, ist falsch dargestellt.
 
 Eine Story gilt erst als abgenommen, wenn jeder Punkt entweder erfüllt ist oder bewusst zurückgestellt wurde.

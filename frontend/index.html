@@ -10,26 +10,38 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <!-- Gespeichertes Design sofort setzen, sonst blitzt beim Laden die falsche Farbe auf -->
+  <script>
+    try { const t = localStorage.getItem("fittrack-thema"); if (t) document.documentElement.dataset.thema = t; } catch (e) {}
+  </script>
 </head>
 <body>
 
-<!-- Symbole der vier Sportarten, einmal definiert, überall per <use> verwendet -->
+<!-- Symbole, einmal definiert, überall per <use> verwendet -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="icon-laufen" viewBox="0 0 24 24"><circle cx="16" cy="4.5" r="2"/><path d="M11 20l2-5-3-2 3-4 3 3 3 1M7 16l3-1M13 15l3 5"/></symbol>
   <symbol id="icon-radfahren" viewBox="0 0 24 24"><circle cx="6" cy="17" r="4"/><circle cx="18" cy="17" r="4"/><path d="M6 17l5-7h4l3 7M11 10l-1-3h3"/></symbol>
   <symbol id="icon-schwimmen" viewBox="0 0 24 24"><circle cx="16" cy="7" r="2"/><path d="M4 11l6-5 3 3M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></symbol>
   <symbol id="icon-wandern" viewBox="0 0 24 24"><path d="M2 20l6-10 4 6 3-4 7 8z"/><circle cx="18" cy="6" r="2"/></symbol>
+  <symbol id="icon-sonne" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+  <symbol id="icon-mond" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
 </svg>
 
 <main class="seite">
 
   <header class="kopf">
-    <h1>FitTrack</h1>
-    <p id="zeitraum" class="kopf-untertitel">…</p>
+    <div>
+      <h1>FitTrack</h1>
+      <p id="zeitraum" class="kopf-untertitel">…</p>
+    </div>
+    <button id="thema-wechsel" type="button" class="knopf-icon" aria-label="Helles Design einschalten">
+      <svg class="nur-dunkel"><use href="#icon-sonne"></use></svg>
+      <svg class="nur-hell"><use href="#icon-mond"></use></svg>
+    </button>
   </header>
 
-  <!-- 1. Wochenkarte: Bullet-Graph mit Zielmarke, Status-Badge, Kilometer je Sportart -->
-  <section id="woche" class="karte karte-woche" aria-labelledby="woche-titel">
+  <!-- 1. Wochenkarte: Bullet-Graph mit Zielmarke und Status-Badge. Tippen öffnet die Woche. -->
+  <section id="woche" class="karte" aria-labelledby="woche-titel">
     <div class="karte-kopf">
       <div>
         <h2 id="woche-titel" class="karte-titel">…</h2>
@@ -40,38 +52,39 @@
         <span id="badge-serie" class="badge badge-leise" hidden>…</span>
       </div>
     </div>
-    <p class="woche-km">
-      <span id="woche-km" class="zahl-gross">…</span><span class="einheit">km</span>
-      <span id="woche-status" class="woche-status">…</span>
-    </p>
-    <figure id="bullet" class="bullet" role="img" aria-label="Wochenziel">
-      <div class="bullet-spur">
-        <div id="bullet-zielbereich" class="bullet-zielbereich"></div>
-        <div id="bullet-balken" class="bullet-balken"></div>
-        <div id="bullet-ziel" class="bullet-ziel"><span>Ziel</span></div>
-      </div>
-      <div id="bullet-achse" class="bullet-achse"></div>
-    </figure>
-    <ul id="woche-sportarten" class="sport-chips" aria-label="Kilometer je Sportart"></ul>
-    <dl class="woche-zahlen">
-      <div><dt>Einheiten</dt><dd id="woche-anzahl">…</dd></div>
-      <div><dt>Minuten</dt><dd id="woche-minuten">…</dd></div>
-      <div><dt>Ø je Einheit</dt><dd id="woche-schnitt">…</dd></div>
-    </dl>
+    <button id="woche-knopf" type="button" class="tippbar bullet-knopf" aria-label="Woche im Detail öffnen">
+      <span class="woche-km">
+        <span id="woche-km" class="zahl-gross">…</span><span class="einheit">km</span>
+        <span id="woche-status" class="woche-status">…</span>
+      </span>
+      <span id="bullet" class="bullet" role="img" aria-label="Wochenziel">
+        <span class="bullet-spur">
+          <span id="bullet-zielbereich" class="bullet-zielbereich"></span>
+          <span id="bullet-balken" class="bullet-balken"></span>
+          <span id="bullet-ziel" class="bullet-ziel"><span>Ziel</span></span>
+        </span>
+        <span id="bullet-achse" class="bullet-achse"></span>
+      </span>
+      <span id="woche-sportarten" class="sport-chips"></span>
+      <span id="woche-zahlen" class="woche-zahlen">…</span>
+    </button>
   </section>
 
-  <!-- 2. Kennzahlen über den gesamten Zeitraum -->
-  <dl id="kennzahlen" class="kennzahlen" aria-label="Kennzahlen">
-    <div class="kachel"><dt id="stat-gesamt-label">Gesamt</dt><dd><span id="stat-gesamt">…</span><small>km</small></dd></div>
-    <div class="kachel"><dt>Ø pro Woche</dt><dd><span id="stat-woche">…</span><small>km</small></dd></div>
-    <div class="kachel"><dt id="stat-beste-label">Beste Woche</dt><dd><span id="stat-beste">…</span><small>km</small></dd></div>
-    <div class="kachel"><dt>Einheiten gesamt</dt><dd><span id="stat-anzahl">…</span></dd></div>
-  </dl>
+  <!-- 2. Kennzahlen über den gesamten Zeitraum. Tippen zeigt die Rechnung. -->
+  <div id="kennzahlen" class="kennzahlen" role="list" aria-label="Kennzahlen">
+    <button type="button" class="kachel tippbar" data-kennzahl="gesamt" role="listitem"><span id="stat-gesamt-label" class="kachel-label">Gesamt</span><span class="kachel-wert"><span id="stat-gesamt">…</span><small>km</small></span></button>
+    <button type="button" class="kachel tippbar" data-kennzahl="woche" role="listitem"><span class="kachel-label">Ø pro Woche</span><span class="kachel-wert"><span id="stat-woche">…</span><small>km</small></span></button>
+    <button type="button" class="kachel tippbar" data-kennzahl="beste" role="listitem"><span id="stat-beste-label" class="kachel-label">Beste Woche</span><span class="kachel-wert"><span id="stat-beste">…</span><small>km</small></span></button>
+    <button type="button" class="kachel tippbar" data-kennzahl="anzahl" role="listitem"><span class="kachel-label">Einheiten gesamt</span><span class="kachel-wert"><span id="stat-anzahl">…</span></span></button>
+  </div>
 
-  <!-- 3. Verlauf: ein Balken je Woche, Ziel als Linie, Tippen zeigt die Woche im Detail -->
+  <!-- 3. Verlauf: ein Balken je Woche, Ziel als Linie. Tippen auf einen Balken öffnet die Woche. -->
   <section id="verlauf" class="karte" aria-labelledby="verlauf-titel">
     <div class="karte-kopf">
-      <h2 id="verlauf-titel" class="karte-titel">Kilometer pro Woche</h2>
+      <div>
+        <h2 id="verlauf-titel" class="karte-titel">Kilometer pro Woche</h2>
+        <p class="karte-untertitel">Balken antippen öffnet die Woche.</p>
+      </div>
       <div class="zeitraum-wahl" role="group" aria-label="Zeitraum">
         <button type="button" data-wochen="8" aria-pressed="true">8 Wochen</button>
         <button type="button" data-wochen="26" aria-pressed="false">6 Monate</button>
@@ -79,18 +92,14 @@
         <button type="button" data-wochen="0" aria-pressed="false">Alles</button>
       </div>
     </div>
+    <div class="diagramm-flaeche">
+      <canvas id="wochen-chart" role="img" aria-label="Balkendiagramm, Werte stehen in der Tabelle darunter"></canvas>
+    </div>
     <ul class="legende" aria-label="Legende">
       <li class="erreicht">Ziel erreicht</li>
       <li class="offen">Unter dem Ziel</li>
       <li id="legende-ziel" class="ziel">Wochenziel 40 km</li>
     </ul>
-    <div class="diagramm-flaeche">
-      <canvas id="wochen-chart" role="img" aria-label="Balkendiagramm, Werte stehen in der Tabelle darunter"></canvas>
-    </div>
-    <div id="verlauf-detail" class="detail" aria-live="polite">
-      <p id="detail-titel" class="detail-titel">…</p>
-      <ul id="detail-sportarten" class="detail-sportarten"></ul>
-    </div>
     <table id="diagramm-tabelle" class="nur-vorlesen">
       <caption>Kilometer je Zeitabschnitt</caption>
       <thead><tr><th>Zeitraum</th><th>Kilometer</th><th>Einheiten</th></tr></thead>
@@ -98,25 +107,32 @@
     </table>
   </section>
 
-  <!-- 4. Trainingskalender: ein Feld je Tag, Farbe nach Kilometern, Tippen zeigt die Einheit -->
+  <!-- 4. Trainingskalender: ein Feld je Tag, Farbe nach Kilometern. Tippen öffnet den Tag. -->
   <section id="kalender" class="karte" aria-labelledby="kalender-titel">
-    <h2 id="kalender-titel" class="karte-titel">Trainingskalender</h2>
-    <p id="kalender-untertitel" class="karte-untertitel">Letzte 8 Wochen, ein Feld je Tag. Tippen zeigt die Einheit.</p>
+    <div class="karte-kopf">
+      <div>
+        <h2 id="kalender-titel" class="karte-titel">Trainingskalender</h2>
+        <p id="kalender-untertitel" class="karte-untertitel">Letzte 8 Wochen. Tag antippen öffnet die Einheit.</p>
+      </div>
+    </div>
     <div class="kalender-kopf" aria-hidden="true">
       <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
     </div>
     <div id="kalender-raster" class="kalender-raster" role="grid" aria-label="Tage mit Training"></div>
-    <p id="kalender-detail" class="detail-titel" aria-live="polite">…</p>
   </section>
 
-  <!-- 5. Sportarten: eine Kachel je Sportart, Tippen filtert die Aktivitäten -->
+  <!-- 5. Sportarten: eine Kachel je Sportart. Tippen öffnet die Sportart mit Filter für die Liste. -->
   <section id="sportarten" class="karte" aria-labelledby="sportarten-titel">
-    <h2 id="sportarten-titel" class="karte-titel">Sportarten</h2>
-    <p class="karte-untertitel">Anteil an allen Kilometern. Tippen filtert die Liste darunter.</p>
+    <div class="karte-kopf">
+      <div>
+        <h2 id="sportarten-titel" class="karte-titel">Sportarten</h2>
+        <p class="karte-untertitel">Anteil an allen Kilometern.</p>
+      </div>
+    </div>
     <div id="sport-kacheln" class="sport-kacheln"></div>
   </section>
 
-  <!-- 6. Die letzten Trainingseinheiten -->
+  <!-- 6. Die letzten Trainingseinheiten. Tippen öffnet die Einheit. -->
   <section id="aktivitaeten" class="karte" aria-labelledby="aktivitaeten-titel">
     <div class="karte-kopf">
       <h2 id="aktivitaeten-titel" class="karte-titel">Letzte Aktivitäten</h2>
@@ -132,6 +148,22 @@
   </section>
 
 </main>
+
+<!-- Bottom-Sheet: ein Dialog für alle Details. Auf dem Handy von unten, auf dem Desktop mittig. -->
+<dialog id="sheet" class="sheet" aria-labelledby="sheet-titel">
+  <div class="sheet-griff" aria-hidden="true"></div>
+  <div class="sheet-kopf">
+    <div>
+      <h2 id="sheet-titel" class="sheet-titel">…</h2>
+      <p id="sheet-untertitel" class="karte-untertitel">…</p>
+    </div>
+    <button id="sheet-schliessen" type="button" class="knopf-icon" aria-label="Schließen">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div id="sheet-inhalt" class="sheet-inhalt"></div>
+</dialog>
+
 <!-- Chart.js zeichnet das Balkendiagramm; Version festgelegt, damit alle dasselbe Verhalten haben -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script src="app.js"></script>

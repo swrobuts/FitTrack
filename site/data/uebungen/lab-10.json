@@ -276,8 +276,8 @@
         },
         {
           "text": {
-            "de": "Am Handy einen Balken, ein Kalenderfeld und eine Sportart-Kachel angetippt: Jede Grafik nennt ihre Zahl im Klartext",
-            "en": "On the phone tapped a bar, a calendar cell and a sport tile: every chart states its number"
+            "de": "Am Handy einen Balken, ein Kalenderfeld, eine Kennzahl, eine Sportart-Kachel und eine Einheit angetippt: Jedes Mal öffnet ein Sheet mit den Details, Tippen daneben schließt es",
+            "en": "On the phone tapped a bar, a calendar cell, a metric, a sport tile and a workout: each opens a sheet with details"
           }
         },
         {
@@ -288,8 +288,8 @@
         },
         {
           "text": {
-            "de": "Systemeinstellung auf hell gestellt: lesbar?",
-            "en": "Light system theme: readable?"
+            "de": "Thema-Knopf gedrückt, Seite neu geladen: Die Wahl bleibt. Beide Themen lesbar?",
+            "en": "Theme button pressed, page reloaded: the choice persists. Both themes readable?"
           }
         },
         {
