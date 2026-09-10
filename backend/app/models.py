@@ -35,3 +35,4 @@ class WochenEintrag(BaseModel):
     distanz_km: float
     anzahl: int
     dauer_min: int
+    je_sportart: dict[str, float]   # z. B. {"Laufen": 13.0, "Radfahren": 20.0}

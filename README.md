@@ -137,6 +137,15 @@ US-6: Als Nutzer möchte ich meinen Wochenverlauf als Balkendiagramm sehen
       Akzeptanz: GET /api/stats/wochen liefert pro Kalenderwoche distanz_km
       und anzahl, auch für Wochen ohne Training; das Diagramm zeigt diese
       Daten; Umschalter 8 W / 6 M / 1 J / Alles.
+
+US-7: Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard
+      genau das aussagt, was die Daten hergeben, damit ich mich nicht
+      auf ein schönes, aber falsches Bild verlasse.
+      Akzeptanz: Der Ring geht nie über 100 %; eine abgeschlossene Woche
+      heißt Ergebnis, nicht Fortschritt; jede Achse und jede Farbe ist
+      beschriftet; GET /api/stats/wochen liefert je Woche je_sportart;
+      Schrift mindestens 13 px, Umschalter mit aria-pressed, helles und
+      dunkles Thema. Siehe docs/checklisten.md, Abschnitt „Schön, aber falsch“.
 ```
 
 ### Sprint 3 – Docker und Abnahme
@@ -184,12 +193,14 @@ Die Referenzlösung läuft unter <https://fittrack-k7gg.onrender.com>. Der Free-
 - `lieblingssportart`: Sportart mit der größten Summe `distanz_km`. Bei Gleichstand die alphabetisch erste.
 - `anzahl`: Anzahl der Einheiten.
 - Leere Datenliste: 0.0, 0.0, `null`, 0.
+- `je_sportart` (pro Woche in `/api/stats/wochen`): Summe `distanz_km` je Sportart, gerundet auf 1 Nachkommastelle; Wochen ohne Training liefern `{}`.
+- Wochenziel 40 km: einzige Konstante im Frontend (`WOCHENZIEL_KM` in `app.js`), gilt über alle Sportarten und steht so auch in der Wochenkarte.
 
 Rechnet die Erwartungswerte für das Fixture selbst aus, bevor ihr die KI nach Code fragt. Sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt.
 
 ## Lernumgebung FitTrack-Lab
 
-Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: zehn Labs entlang der neun Schritte, mit den Prompts zum Kopieren, Mermaid-Diagrammen, einer nachgebildeten Konsole für `git` und `docker`, SQLite im Browser mit dem Schema der App und 38 Übungen. Sie wird per GitHub Actions auf GitHub Pages veröffentlicht: <https://swrobuts.github.io/FitTrack/>. Lokal ansehen: `python3 -m http.server 8080 -d site` und <http://localhost:8080> öffnen.
+Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: elf Labs entlang der Schritte, mit den Prompts zum Kopieren, Mermaid-Diagrammen, einer nachgebildeten Konsole für `git` und `docker`, SQLite im Browser mit dem Schema der App und 41 Übungen. Sie wird per GitHub Actions auf GitHub Pages veröffentlicht: <https://swrobuts.github.io/FitTrack/>. Lokal ansehen: `python3 -m http.server 8080 -d site` und <http://localhost:8080> öffnen.
 
 ## Für Dozierende
 
@@ -197,4 +208,4 @@ Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: zehn Labs en
 - `docs/dozent/erwartungswerte.md`: Handrechnung für das Fixture
 - `docs/dozent/render-deploy.md` und `docs/dozent/lmstudio-demo.md`
 - `docs/kurs/`: das Kurskonzept
-- Branch `starter` ist der Ausgangsstand für Studierende. Jeder Schritt ist ein Tag: `sprint-0`, `us-3`, `us-1`, `us-2`, `us-4`, `us-5`, `us-6`, `docker`, `render`, `ci`. Anzeigen mit `git checkout <tag>`, zurück mit `git checkout main`.
+- Branch `starter` ist der Ausgangsstand für Studierende. Jeder Schritt ist ein Tag: `sprint-0`, `us-3`, `us-1`, `us-2`, `us-4`, `us-5`, `us-6`, `us-7`, `docker`, `render`, `ci`. Anzeigen mit `git checkout <tag>`, zurück mit `git checkout main`.

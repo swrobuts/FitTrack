@@ -1,6 +1,6 @@
 # FitTrack – Prompt-Skript für die Vorführung
 
-Dieses Skript führt in 9 Schritten durch die Entwicklung der App. Jeder Schritt entspricht einem Git-Tag der Referenzlösung, sodass sich jeder Stand vorzeigen lässt:
+Dieses Skript führt in 10 Schritten durch die Entwicklung der App. Jeder Schritt entspricht einem Git-Tag der Referenzlösung, sodass sich jeder Stand vorzeigen lässt:
 
 ```bash
 git checkout us-2        # Stand nach Schritt 3 anzeigen
@@ -16,6 +16,7 @@ git checkout main        # zurück zum fertigen Stand
 | 4 | `us-4` | 2 | 0:05 | Frontend-Gerüst, mobile-first |
 | 5 | `us-5` | 2 | 0:25 | Kennzahlen und Liste per fetch |
 | 6 | `us-6` | 2 | 0:40 | Wochenverlauf, Ring, Diagramm |
+| 6b | `us-7` | 2 | 1:00 | Semantik-Review: schön, aber falsch |
 | 7 | `docker` | 2 | 1:10 | Dockerfile, Build, Handy-Test |
 | 8 | `render` | 2 | 1:25 | Deploy auf Render.com |
 | 9 | `ci` | optional | | GitHub Actions |
@@ -629,7 +630,80 @@ nicht neu erzeugt wird.
 
 **Commit:** `feat(US-6): Wochenverlauf mit Diagramm und Zeitraumwahl`
 
-**Sprint Review 2 (1:00):** Abnahme am Smartphone gegen US-4 bis US-6.
+**Sprint Review 2 (1:00):** Abnahme am Smartphone gegen US-4 bis US-6. Hier passiert der wichtigste Moment des Kurses, siehe Schritt 6b.
+
+---
+
+## Schritt 6b: US-7 Schön, aber falsch (Termin 2, ab 1:00)
+
+**Warum dieser Schritt:** Nach Schritt 6 sind alle Tests grün, das Dashboard sieht aus wie eine Sport-App, und die Gruppe ist zufrieden. Genau jetzt die Ansicht auf den Beamer legen und fragen: „Was bedeutet 161 %?“ Die Antwort im ersten Entwurf: Der Ring war geschlossen, zeigte „161 % vom Ziel“ und stand über einer Woche, die längst vorbei war. Nichts davon prüfte ein Test, weil die Tests die API prüfen und nicht die Aussage der Oberfläche. Das ist die Lerneinheit: **Der Eindruck ist kein Prüfkriterium.** Vorher-Nachher-Bilder liegen in `site/assets/img/vergleich-mobile.png` und `vergleich-desktop.png`.
+
+**Was der erste Entwurf falsch machte** (die Liste an die Wand, die Gruppe soll die Punkte selbst finden, bevor sie eingeblendet wird):
+
+| Befund im ersten Entwurf | Warum das täuscht | Korrektur |
+|---|---|---|
+| Ring geschlossen, „161 % vom Ziel“ | Ein voller Ring sagt „erreicht“, die Zahl sagt „übererfüllt“, beides ohne Kilometer. Was zeigt der Ring bei 161 %? Nichts anderes als bei 100 %. | Ring bei 100 % gedeckelt, im Ring die Kilometer, daneben „Ziel erreicht, 24,4 km darüber“ |
+| „Kalenderwoche 36“ als Fortschritt, obwohl die Woche vorbei ist | Fortschritt gibt es nur in laufenden Zeiträumen. Eine vergangene Woche ist ein Ergebnis. | Titel „Letzte Trainingswoche“ mit Datumsspanne; nur bei Daten in der laufenden Woche „Diese Woche, Stand Mi“ |
+| Wochenziel 40 km ohne Bezug | 2 km Schwimmen zählen wie 2 km Radfahren. Das ist vertretbar, muss aber dastehen. | „Ziel 40 km über alle Sportarten“ plus Kilometer je Sportart |
+| Balken ohne x-Achse | Welcher Balken ist welche Woche? Raten. | Achse „Kalenderwoche“, Legende, Ziellinie, Klick auf Balken beschreibt ihn |
+| „Alles“ zeigt 105 dünne Balken | Unlesbar, obwohl es „funktioniert“. | Monatssummen mit Achse „Monat“ |
+| Kürzel „8 W / 6 M / 1 J“, „Sc / Wa / Ra“ | Versteht niemand ohne Einweisung. | Ausgeschrieben, Symbole je Sportart |
+| „Einheiten“ zweimal, einmal je Woche, einmal gesamt | Gleiches Wort, andere Bedeutung. | „Einheiten gesamt“, „Gesamt seit Sep 2024“, „Ø pro Woche“, „Meiste km“ |
+| Schrift 12 px, keine `aria-pressed`, Ring ohne sprechendes Label, nur dunkel | Auf dem Handy in der Sonne unlesbar, für Screenreader stumm. | Mindestens 13 px, `aria-pressed`, dynamisches `aria-label`, Tabelle für Screenreader, helles Thema |
+
+**Story:** Als Nutzer möchte ich, dass jede Zahl und jede Grafik im Dashboard genau das aussagt, was die Daten hergeben. Akzeptanz siehe README (US-7).
+
+**Test zuerst** (`pytest`: 1 failed). Das Backend liefert die Kilometer je Sportart, damit das Frontend nichts selbst zusammenrechnen muss:
+
+```python
+def test_wochen_je_sportart():
+    wochen = client.get("/api/stats/wochen").json()
+    assert wochen[0]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 20.0, "Schwimmen": 1.5}
+    assert wochen[1]["je_sportart"] == {}
+    assert wochen[2]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 30.0, "Wandern": 10.0}
+```
+
+Der bestehende Test `test_wochen_anzahl_und_luecken` vergleicht KW 24 als ganzes Dictionary und muss um `"je_sportart": {}` ergänzt werden. Das ist eine bewusste Änderung der Spezifikation, kein „Test passend machen“: Die Story erweitert die Antwort.
+
+**Prompt, der solche Fehler verhindert** (vor dem Code, nicht danach):
+
+```text
+Wir bauen das Dashboard von FitTrack (Vanilla JS, Chart.js 4, API-Antworten
+siehe unten). Bevor du Code schreibst, lege die Bedeutung jedes Elements
+fest. Gib eine Tabelle mit den Spalten
+Element | zeigt | Einheit | Zeitbezug | Zustände (0 %, 100 %, über 100 %,
+keine Daten) | Beschriftung im Bild.
+Regeln, die die Tabelle erfüllen muss:
+1. Jede Zahl trägt Einheit und Bezug, z. B. "64,4 km, KW 36, 31.08. bis 06.09.".
+2. Ein Fortschrittselement zeigt nur laufende Zeiträume. Abgeschlossene
+   Zeiträume heißen Ergebnis. Werte über 100 % werden gedeckelt und als
+   "Ziel erreicht, +x km" beschriftet.
+3. Jede Achse hat Titel und Einheit, jede Farbe steht in einer Legende.
+4. Kein Begriff bedeutet an zwei Stellen etwas Verschiedenes.
+5. Keine Abkürzungen, die nicht im Bild erklärt sind.
+6. Beschreibe, wie die Ansicht bei 0, 1 und 105 Datenpunkten aussieht.
+7. Schrift mindestens 13 px, Bedienelemente 44 px, aria-pressed an
+   Umschaltern, sprechende aria-label, helles und dunkles Thema.
+Erst wenn ich die Tabelle bestätigt habe, schreibst du den Code.
+API-Antworten: [Beispiel von /api/stats und /api/stats/wochen einfügen]
+```
+
+**Prompt zur Selbstprüfung** (nach jedem Vorschlag, bevor jemand den Code anfasst):
+
+```text
+Prüfe deinen Vorschlag wie ein kritischer Designer, der ihn zum ersten
+Mal sieht. Gehe jedes sichtbare Element durch und beantworte: Was
+bedeutet es? Woher kommt der Wert? Was zeigt es bei 0, bei mehr als
+100 %, bei 105 Datenpunkten? Nenne jede Stelle, an der die Darstellung
+mehr behauptet als die Daten hergeben, und schlage die Korrektur vor.
+Lobe nichts. Wenn du nichts findest, sage das und begründe es je Element.
+```
+
+**Prüfpunkte:** Die Gruppe geht die Liste „Semantik-Review: Schön, aber falsch“ aus `docs/checklisten.md` am Beamer durch. Eine Zahl wird nachgerechnet: `SELECT sportart, ROUND(SUM(distanz_km),1) FROM v_workout WHERE datum BETWEEN '2026-08-31' AND '2026-09-06' GROUP BY sportart;` muss die Chips der Wochenkarte ergeben. „Alles“ anklicken. Tab-Taste drücken: Fokusring sichtbar? Systemeinstellung auf hell stellen: lesbar?
+
+**Botschaft für die Gruppe:** Tests sichern die Daten, nicht die Aussage. Schöne Ergebnisse verdienen mehr Misstrauen, nicht weniger, weil sie die Prüfung abkürzen. Deshalb legt der Prompt die Bedeutung vor dem Code fest, und deshalb prüft die QA-Rolle die Oberfläche mit derselben Strenge wie den Code.
+
+**Commit:** `feat(US-7): Dashboard nach Semantik-Review, je_sportart im Wochenverlauf`
 
 ---
 

@@ -4,12 +4,23 @@
   <meta charset="utf-8">
   <!-- Ohne diese Zeile zeigt das Smartphone die Seite verkleinert wie eine Desktop-Seite -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
   <title>FitTrack</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230f1419'/><circle cx='16' cy='16' r='9' fill='none' stroke='%23f5b841' stroke-width='5'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Symbole der vier Sportarten, einmal definiert, überall per <use> verwendet -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="icon-laufen" viewBox="0 0 24 24"><circle cx="16" cy="4.5" r="2"/><path d="M11 20l2-5-3-2 3-4 3 3 3 1M7 16l3-1M13 15l3 5"/></symbol>
+  <symbol id="icon-radfahren" viewBox="0 0 24 24"><circle cx="6" cy="17" r="4"/><circle cx="18" cy="17" r="4"/><path d="M6 17l5-7h4l3 7M11 10l-1-3h3"/></symbol>
+  <symbol id="icon-schwimmen" viewBox="0 0 24 24"><circle cx="16" cy="7" r="2"/><path d="M4 11l6-5 3 3M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></symbol>
+  <symbol id="icon-wandern" viewBox="0 0 24 24"><path d="M2 20l6-10 4 6 3-4 7 8z"/><circle cx="18" cy="6" r="2"/></symbol>
+</svg>
+
 <main class="seite">
 
   <header class="kopf">
@@ -17,51 +28,61 @@
     <p id="zeitraum" class="kopf-untertitel">…</p>
   </header>
 
-  <!-- 1. Wochenziel-Ring: die jüngste Trainingswoche gegen das Wochenziel -->
+  <!-- 1. Wochenkarte: laufende Woche als Fortschritt, sonst die letzte Trainingswoche als Ergebnis -->
   <section id="woche" class="karte karte-woche" aria-labelledby="woche-titel">
     <h2 id="woche-titel" class="karte-titel">…</h2>
     <p id="woche-untertitel" class="karte-untertitel">…</p>
     <div class="woche-inhalt">
-      <div class="ring" role="img" aria-label="Fortschritt zum Wochenziel">
+      <div class="ring" role="img" id="ring" aria-label="Wochenziel">
         <svg viewBox="0 0 120 120" width="120" height="120">
           <circle class="ring-spur" cx="60" cy="60" r="52"></circle>
           <circle id="ring-balken" class="ring-balken" cx="60" cy="60" r="52"></circle>
         </svg>
         <div class="ring-text">
-          <span id="ring-prozent" class="ring-zahl">…</span>
-          <span class="ring-label">vom Ziel</span>
+          <span id="ring-zahl" class="ring-zahl">…</span>
+          <span id="ring-label" class="ring-label">von 40 km</span>
         </div>
       </div>
-      <dl class="woche-werte">
-        <div><dt>Kilometer</dt><dd id="woche-km">…</dd></div>
-        <div><dt>Einheiten</dt><dd id="woche-anzahl">…</dd></div>
-        <div><dt>Minuten</dt><dd id="woche-minuten">…</dd></div>
-      </dl>
+      <div class="woche-werte">
+        <p id="woche-status" class="woche-status">…</p>
+        <dl class="woche-zahlen">
+          <div><dt>Einheiten</dt><dd id="woche-anzahl">…</dd></div>
+          <div><dt>Minuten</dt><dd id="woche-minuten">…</dd></div>
+        </dl>
+        <ul id="woche-sportarten" class="sport-chips" aria-label="Kilometer je Sportart"></ul>
+      </div>
     </div>
   </section>
 
   <!-- 2. Kennzahlen über den gesamten Zeitraum -->
-  <section id="kennzahlen" class="kennzahlen" aria-label="Kennzahlen">
-    <div class="kachel"><dt>Gesamt</dt><dd><span id="stat-gesamt">…</span><small>km</small></dd></div>
-    <div class="kachel"><dt>Pro Woche</dt><dd><span id="stat-woche">…</span><small>km</small></dd></div>
-    <div class="kachel"><dt>Lieblingssport</dt><dd><span id="stat-sport">…</span></dd></div>
-    <div class="kachel"><dt>Einheiten</dt><dd><span id="stat-anzahl">…</span></dd></div>
-  </section>
+  <dl id="kennzahlen" class="kennzahlen" aria-label="Kennzahlen">
+    <div class="kachel"><dt id="stat-gesamt-label">Gesamt</dt><dd><span id="stat-gesamt">…</span><small>km</small></dd></div>
+    <div class="kachel"><dt>Ø pro Woche</dt><dd><span id="stat-woche">…</span><small>km</small></dd></div>
+    <div class="kachel"><dt>Meiste km</dt><dd><span id="stat-sport">…</span></dd></div>
+    <div class="kachel"><dt>Einheiten gesamt</dt><dd><span id="stat-anzahl">…</span></dd></div>
+  </dl>
 
-  <!-- 3. Wochenverlauf als Balkendiagramm mit Zeitraumwahl -->
+  <!-- 3. Wochenverlauf: gestapelte Balken je Sportart, Zeitraumwahl, Ziel als Linie -->
   <section id="diagramm" class="karte" aria-labelledby="diagramm-titel">
     <div class="karte-kopf">
       <h2 id="diagramm-titel" class="karte-titel">Kilometer pro Woche</h2>
       <div class="zeitraum-wahl" role="group" aria-label="Zeitraum">
-        <button type="button" data-wochen="8" class="aktiv">8 W</button>
-        <button type="button" data-wochen="26">6 M</button>
-        <button type="button" data-wochen="52">1 J</button>
-        <button type="button" data-wochen="0">Alles</button>
+        <button type="button" data-wochen="8" aria-pressed="true">8 Wochen</button>
+        <button type="button" data-wochen="26" aria-pressed="false">6 Monate</button>
+        <button type="button" data-wochen="52" aria-pressed="false">1 Jahr</button>
+        <button type="button" data-wochen="0" aria-pressed="false">Alles</button>
       </div>
     </div>
+    <ul id="diagramm-legende" class="legende" aria-label="Legende"></ul>
     <div class="diagramm-flaeche">
-      <canvas id="wochen-chart" aria-label="Balkendiagramm Kilometer pro Woche"></canvas>
+      <canvas id="wochen-chart" role="img" aria-label="Balkendiagramm, Werte stehen in der Tabelle darunter"></canvas>
     </div>
+    <p id="diagramm-auswahl" class="diagramm-auswahl" aria-live="polite">…</p>
+    <table id="diagramm-tabelle" class="nur-vorlesen">
+      <caption>Kilometer je Zeitabschnitt</caption>
+      <thead><tr><th>Zeitraum</th><th>Kilometer</th><th>Einheiten</th></tr></thead>
+      <tbody></tbody>
+    </table>
   </section>
 
   <!-- 4. Die letzten Trainingseinheiten -->
@@ -70,7 +91,10 @@
     <ol id="aktivitaeten-liste" class="aktivitaeten-liste">
       <li class="hinweis">…</li>
     </ol>
-    <button id="mehr-anzeigen" type="button" class="knopf-breit" hidden>Mehr anzeigen</button>
+    <div class="liste-aktionen">
+      <button id="mehr-anzeigen" type="button" class="knopf" hidden>20 weitere anzeigen</button>
+      <button id="alle-anzeigen" type="button" class="knopf knopf-leise" hidden>Alle anzeigen</button>
+    </div>
   </section>
 
 </main>

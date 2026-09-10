@@ -101,7 +101,7 @@ def test_wochen_anzahl_und_luecken():
     assert len(wochen) == 3
     assert [w["kw"] for w in wochen] == ["2026-W23", "2026-W24", "2026-W25"]
     assert wochen[1] == {"kw": "2026-W24", "wochenstart": "2026-06-08",
-                         "distanz_km": 0.0, "anzahl": 0, "dauer_min": 0}
+                         "distanz_km": 0.0, "anzahl": 0, "dauer_min": 0, "je_sportart": {}}
 
 
 def test_wochen_summen():
@@ -119,3 +119,13 @@ def test_wochen_leer(monkeypatch):
     from app import main
     monkeypatch.setattr(main, "lade_workouts", lambda: [])
     assert client.get("/api/stats/wochen").json() == []
+
+
+# US-7: Dashboard-Überarbeitung, Kilometer je Sportart und Woche
+# Fixture KW 23: Laufen 5.0 + 8.0 = 13.0, Radfahren 20.0, Schwimmen 1.5
+#         KW 25: Radfahren 30.0, Laufen 9.0 + 4.0 = 13.0, Wandern 10.0
+def test_wochen_je_sportart():
+    wochen = client.get("/api/stats/wochen").json()
+    assert wochen[0]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 20.0, "Schwimmen": 1.5}
+    assert wochen[1]["je_sportart"] == {}
+    assert wochen[2]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 30.0, "Wandern": 10.0}

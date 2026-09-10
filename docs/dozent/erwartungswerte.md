@@ -52,6 +52,18 @@ Häufiger Fehler: Nur Wochen mit Training zählen (2) ergibt 43,75. Die Definiti
 
 Sortiert nach Datum absteigend: erstes Element hat `id` 8 (21.06.), letztes Element `id` 1 (01.06.).
 
+## US-7: Kilometer je Sportart und Woche
+
+Aus demselben Fixture, je Woche die Summe `distanz_km` je Sportart, gerundet auf 1 Nachkommastelle:
+
+| Woche | je_sportart |
+|---|---|
+| 2026-W23 | Laufen 13.0, Radfahren 20.0, Schwimmen 1.5 |
+| 2026-W24 | leer: `{}` |
+| 2026-W25 | Laufen 13.0, Radfahren 30.0, Wandern 10.0 |
+
+Probe: 13.0 + 20.0 + 1.5 = 34.5 = `distanz_km` der KW 23.
+
 ## Kontrolle mit Python (für den Dozenten)
 
 ```bash

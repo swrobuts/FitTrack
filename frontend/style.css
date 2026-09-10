@@ -1,23 +1,44 @@
 /* FitTrack – mobile-first Stylesheet
-   Reihenfolge: 1. Variablen  2. Grundlagen  3. Bausteine  4. Breakpoint ab 768 px */
+   Reihenfolge: 1. Variablen (dunkel und hell)  2. Grundlagen  3. Bausteine  4. Breakpoint ab 768 px */
 
-/* 1. Variablen: alle Farben und Abstände an einer Stelle */
+/* 1. Variablen: alle Farben und Abstände an einer Stelle. Dunkel ist der Standard. */
 :root {
   --bg: #0f1419;
   --karte: #1a2129;
   --karte-hell: #232c36;
   --linie: #2c3641;
   --text: #f2f5f7;
-  --text-2: #8c98a4;
-  --akzent: #f5b841;       /* Wochenziel-Ring und Balken */
+  --text-2: #98a3ae;
+  --akzent: #f5b841;       /* Wochenziel-Ring und Ziellinie */
+  --erreicht: #6fd39a;     /* Ziel erreicht */
   --laufen: #ff6b4a;
   --radfahren: #4cc9f0;
-  --schwimmen: #7b8cff;
+  --schwimmen: #8a96ff;
   --wandern: #8bd450;
   --radius: 20px;
   --abstand: 16px;
   --touch: 44px;           /* Mindesthöhe für Bedienelemente */
+  --zahl-gross: 34px;      /* eine Zahl je Seite: die Woche im Ring */
+  --zahl: 24px;            /* alle anderen Kennzahlen */
   --schrift: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Helles Thema, wenn das Gerät es wünscht: bei Sonne auf dem Handy besser lesbar */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f1f3f6;
+    --karte: #ffffff;
+    --karte-hell: #e8ecf1;
+    --linie: #d7dde4;
+    --text: #14181c;
+    --text-2: #5a6570;
+    --akzent: #b8800f;
+    --erreicht: #1f8a4c;
+    --laufen: #d64a2b;
+    --radfahren: #1a8bb5;
+    --schwimmen: #4b57cf;
+    --wandern: #4a9424;
+  }
 }
 
 /* 2. Grundlagen */
@@ -42,9 +63,17 @@ body {
   gap: var(--abstand);
 }
 
-h1, h2, p, dl, dd, dt, ol { margin: 0; }
-ol { padding: 0; list-style: none; }
+h1, h2, p, dl, dd, dt, ol, ul { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
 button { font: inherit; color: inherit; }
+svg { display: block; }
+[hidden] { display: none !important; }   /* hidden gewinnt auch gegen display: flex */
+
+/* Nur für Screenreader: die Tabelle zum Diagramm bleibt für sie lesbar, für alle anderen unsichtbar */
+.nur-vorlesen {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
 
 /* 3. Bausteine */
 .kopf { padding: 8px 4px 0; }
@@ -58,14 +87,14 @@ button { font: inherit; color: inherit; }
 }
 
 .karte-titel { font-size: 15px; font-weight: 600; color: var(--text-2); }
-.karte-untertitel { font-size: 13px; color: var(--text-2); }
+.karte-untertitel { font-size: 14px; color: var(--text-2); margin-top: 2px; }
 .karte-kopf { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
 
-/* Wochenziel-Ring */
-.karte-woche { padding-top: 16px; }
-.woche-inhalt { display: flex; align-items: center; gap: 20px; margin-top: 12px; }
+/* Wochenkarte mit Ring */
+.karte-woche .karte-titel { color: var(--text); font-size: 17px; }
+.woche-inhalt { display: flex; align-items: center; gap: 20px; margin-top: 16px; }
 .ring { position: relative; flex: 0 0 120px; }
-.ring svg { display: block; transform: rotate(-90deg); }  /* Balken startet oben statt rechts */
+.ring svg { transform: rotate(-90deg); }  /* Balken startet oben statt rechts */
 .ring-spur, .ring-balken { fill: none; stroke-width: 12; stroke-linecap: round; }
 .ring-spur { stroke: var(--karte-hell); }
 .ring-balken {
@@ -74,28 +103,41 @@ button { font: inherit; color: inherit; }
   stroke-dashoffset: 327;       /* 327 = leer, 0 = voll; setzt app.js */
   transition: stroke-dashoffset 0.8s ease-out;
 }
+.ring.erreicht .ring-balken { stroke: var(--erreicht); }
 .ring-text {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.ring-zahl { font-size: 26px; font-weight: 800; line-height: 1; }
-.ring-label { font-size: 12px; color: var(--text-2); }
+.ring-zahl { font-size: var(--zahl-gross); font-weight: 800; line-height: 1; }
+.ring-label { font-size: 13px; color: var(--text-2); margin-top: 2px; }
 
-.woche-werte { display: grid; gap: 10px; flex: 1; }
-.woche-werte dt { font-size: 13px; color: var(--text-2); }
-.woche-werte dd { font-size: 22px; font-weight: 800; line-height: 1.1; }
+.woche-werte { flex: 1; display: grid; gap: 10px; min-width: 0; }
+.woche-status { font-size: 16px; font-weight: 600; line-height: 1.3; }
+.woche-status.erreicht { color: var(--erreicht); }
+.woche-zahlen { display: flex; gap: 20px; }
+.woche-zahlen dt { font-size: 13px; color: var(--text-2); }
+.woche-zahlen dd { font-size: var(--zahl); font-weight: 800; line-height: 1.1; }
 
-/* Kennzahlen: 2 Spalten auf dem Handy */
+/* Sportart-Chips: Farbe und Name gemeinsam, nie Farbe allein */
+.sport-chips { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.sport-chips li { font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+.sport-chips li::before {
+  content: ""; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--sport-farbe, var(--text-2));
+}
+.sport-chips strong { color: var(--text); font-weight: 600; }
+
+/* Kennzahlen: 2 Spalten auf dem Handy, bewusst leichter als die Wochenkarte */
 .kennzahlen { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .kachel {
-  background: var(--karte);
+  border: 1px solid var(--linie);
   border-radius: var(--radius);
-  padding: 16px;
-  min-height: 96px;
-  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 14px 16px;
+  min-height: 92px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
 }
 .kachel dt { font-size: 13px; color: var(--text-2); }
-.kachel dd { font-size: 28px; font-weight: 800; line-height: 1; display: flex; align-items: baseline; gap: 4px; }
+.kachel dd { font-size: var(--zahl); font-weight: 800; line-height: 1; display: flex; align-items: baseline; gap: 4px; overflow-wrap: anywhere; }
 .kachel dd small { font-size: 14px; font-weight: 500; color: var(--text-2); }
 
 /* Zeitraumwahl: segmentierte Buttons, jeder mindestens 44 px hoch */
@@ -103,14 +145,22 @@ button { font: inherit; color: inherit; }
 .zeitraum-wahl button {
   flex: 1; min-height: var(--touch);
   border: 0; border-radius: 9px; background: transparent;
-  color: var(--text-2); font-weight: 600; cursor: pointer;
+  padding: 0 4px;
+  color: var(--text-2); font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer;
 }
-.zeitraum-wahl button.aktiv { background: var(--karte); color: var(--text); }
+.zeitraum-wahl button[aria-pressed="true"] { background: var(--karte); color: var(--text); }
 .zeitraum-wahl button:focus-visible { outline: 2px solid var(--akzent); outline-offset: 1px; }
 
-.diagramm-flaeche { position: relative; height: 200px; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 10px; }
+.legende li { font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+.legende li::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--sport-farbe); }
+.legende li.ziel::before { width: 14px; height: 0; border-top: 2px dashed var(--akzent); border-radius: 0; background: none; }
 
-/* Aktivitätenliste: Zeilen mit Trennlinie */
+.diagramm-flaeche { position: relative; height: 220px; }
+.diagramm-auswahl { margin-top: 10px; font-size: 14px; color: var(--text-2); min-height: 20px; }
+.diagramm-auswahl strong { color: var(--text); font-weight: 600; }
+
+/* Aktivitätenliste: Zeilen mit Trennlinie, Symbol in der Sportfarbe */
 .aktivitaeten-liste { margin-top: 8px; }
 .aktivitaeten-liste li {
   display: grid;
@@ -124,25 +174,27 @@ button { font: inherit; color: inherit; }
 .aktivitaeten-liste li:first-child { border-top: 0; }
 .aktivitaeten-liste .hinweis { display: block; color: var(--text-2); min-height: auto; border: 0; }
 
-.sport-kuerzel {
+.sport-icon {
   width: 40px; height: 40px; border-radius: 50%;
   display: grid; place-items: center;
-  font-size: 13px; font-weight: 800;
   color: var(--sport-farbe);
   background: color-mix(in srgb, var(--sport-farbe) 18%, transparent);
 }
+.sport-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .aktivitaet-sport { font-weight: 600; }
-.aktivitaet-datum { font-size: 13px; color: var(--text-2); }
+.aktivitaet-datum { font-size: 14px; color: var(--text-2); }
 .aktivitaet-werte { text-align: right; font-size: 14px; line-height: 1.3; }
 .aktivitaet-werte strong { display: block; font-size: 17px; font-weight: 800; }
 .aktivitaet-werte span { color: var(--text-2); }
 
-.knopf-breit {
-  width: 100%; min-height: var(--touch); margin-top: 8px;
-  border: 0; border-radius: 12px;
-  background: var(--karte-hell); font-weight: 600; cursor: pointer;
+.liste-aktionen { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.knopf {
+  min-height: var(--touch);
+  border: 0; border-radius: 12px; padding: 0 8px;
+  background: var(--karte-hell); font-weight: 600; font-size: 14px; white-space: nowrap; cursor: pointer;
 }
-.knopf-breit:focus-visible { outline: 2px solid var(--akzent); }
+.knopf-leise { background: transparent; border: 1px solid var(--linie); color: var(--text-2); }
+.knopf:focus-visible { outline: 2px solid var(--akzent); }
 
 /* Farbe je Sportart, gesetzt über data-sport im HTML */
 [data-sport="Laufen"]    { --sport-farbe: var(--laufen); }
@@ -164,12 +216,12 @@ button { font: inherit; color: inherit; }
   .kopf { grid-area: kopf; }
   #woche { grid-area: woche; }
   #kennzahlen { grid-area: kennzahlen; grid-template-columns: 1fr 1fr; }
-  #diagramm { grid-area: diagramm; }
+  #diagramm { grid-area: diagramm; align-self: start; }
   #aktivitaeten { grid-area: aktivitaeten; }
   .karte-kopf { flex-direction: row; align-items: center; justify-content: space-between; }
-  .zeitraum-wahl { flex: 0 0 240px; }
   .karte-kopf .karte-titel { white-space: nowrap; }
-  .diagramm-flaeche { height: 260px; }
+  .zeitraum-wahl { flex: 0 0 300px; }
+  .diagramm-flaeche { height: 280px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

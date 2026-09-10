@@ -61,12 +61,14 @@ def berechne_wochen(workouts: list[dict]) -> list[dict]:
         return []
 
     # Schritt 1: je Montag aufsummieren
-    summen = defaultdict(lambda: {"distanz_km": 0.0, "anzahl": 0, "dauer_min": 0})
+    summen = defaultdict(lambda: {"distanz_km": 0.0, "anzahl": 0, "dauer_min": 0,
+                                  "je_sportart": defaultdict(float)})
     for w in workouts:
         montag = montag_der_woche(w["datum"])
         summen[montag]["distanz_km"] += w["distanz_km"]
         summen[montag]["anzahl"] += 1
         summen[montag]["dauer_min"] += w["dauer_min"]
+        summen[montag]["je_sportart"][w["sportart"]] += w["distanz_km"]
 
     # Schritt 2: alle Montage von der ersten bis zur letzten Woche durchlaufen
     wochen = []
@@ -81,6 +83,8 @@ def berechne_wochen(workouts: list[dict]) -> list[dict]:
             "distanz_km": round(werte["distanz_km"], 1),
             "anzahl": werte["anzahl"],
             "dauer_min": werte["dauer_min"],
+            # Kilometer je Sportart, damit das Diagramm die Balken stapeln kann
+            "je_sportart": {name: round(km, 1) for name, km in sorted(werte["je_sportart"].items())},
         })
         montag += timedelta(days=7)
     return wochen
