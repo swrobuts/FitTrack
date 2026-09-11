@@ -365,7 +365,7 @@ svg { display: block; }
   #verlauf { grid-area: verlauf; display: flex; flex-direction: column; }
   #verlauf .diagramm-flaeche { flex: 1; min-height: 240px; }
   #kalender { grid-area: kalender; }
-  #sportarten { grid-area: sportarten; display: flex; flex-direction: column; align-self: start; position: sticky; top: 20px; }   /* wächst nicht mit der Liste, bleibt beim Scrollen sichtbar */
+  #sportarten { grid-area: sportarten; display: flex; flex-direction: column; align-self: start; }   /* wächst nicht mit der Liste; kein sticky, das klebte über dem Diagramm */
   #sportarten .sport-kacheln { flex: 1; }
   #sportarten .sport-kacheln button { justify-content: space-between; min-height: 205px; }   /* so hoch, dass die Karte neben sechs Einträgen endet */
   #aktivitaeten { grid-area: aktivitaeten; }
