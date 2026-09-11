@@ -129,3 +129,62 @@ def test_wochen_je_sportart():
     assert wochen[0]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 20.0, "Schwimmen": 1.5}
     assert wochen[1]["je_sportart"] == {}
     assert wochen[2]["je_sportart"] == {"Laufen": 13.0, "Radfahren": 30.0, "Wandern": 10.0}
+
+
+# Chat mit LM Studio (nur lokal)
+def test_chat_status_ohne_lmstudio(monkeypatch):
+    # Zeigt der Server ehrlich an, dass kein Modell erreichbar ist, blendet das Frontend den Bot aus
+    from app import chat
+    monkeypatch.setattr(chat, "lmstudio_modelle", lambda: [])
+    antwort = client.get("/api/chat/status")
+    assert antwort.status_code == 200
+    assert antwort.json() == {"verfuegbar": False, "modell": None}
+
+
+def test_chat_status_mit_lmstudio(monkeypatch):
+    from app import chat
+    monkeypatch.setattr(chat, "lmstudio_modelle", lambda: ["gemma-4"])
+    assert client.get("/api/chat/status").json() == {"verfuegbar": True, "modell": "gemma-4"}
+
+
+def test_chat_ohne_lmstudio_ist_503(monkeypatch):
+    from app import chat
+    monkeypatch.setattr(chat, "lmstudio_modelle", lambda: [])
+    antwort = client.post("/api/chat", json={"frage": "Wie viele Kilometer?", "verlauf": []})
+    assert antwort.status_code == 503
+
+
+def test_chat_antwortet_mit_kontext(monkeypatch):
+    # LM Studio wird durch eine Funktion ersetzt, die die gesendeten Nachrichten zurückgibt
+    from app import chat
+    gesendet = {}
+
+    def fake_lmstudio(nachrichten, modell):
+        gesendet["nachrichten"] = nachrichten
+        gesendet["modell"] = modell
+        return "Du bist 87,5 km gelaufen."
+
+    monkeypatch.setattr(chat, "lmstudio_modelle", lambda: ["gemma-4"])
+    monkeypatch.setattr(chat, "frage_lmstudio", fake_lmstudio)
+    antwort = client.post("/api/chat", json={
+        "frage": "Wie viele Kilometer insgesamt?",
+        "verlauf": [{"rolle": "nutzer", "text": "Hallo"}, {"rolle": "bot", "text": "Hallo zurück"}],
+    })
+    assert antwort.status_code == 200
+    assert antwort.json() == {"antwort": "Du bist 87,5 km gelaufen.", "modell": "gemma-4"}
+    system = gesendet["nachrichten"][0]
+    assert system["role"] == "system"
+    assert "87.5" in system["content"]                 # gesamt_km aus dem Fixture, vom Server gerechnet
+    assert "Radfahren" in system["content"]            # Lieblingssportart
+    rollen = [n["role"] for n in gesendet["nachrichten"]]
+    assert rollen == ["system", "user", "assistant", "user"]
+    assert gesendet["nachrichten"][-1]["content"] == "Wie viele Kilometer insgesamt?"
+
+
+def test_chat_kontext_enthaelt_wochen_und_sportarten():
+    from app.chat import baue_kontext
+    from app.daten import lade_workouts
+    text = baue_kontext(lade_workouts())
+    assert "2026-W23" in text          # eine der drei Fixture-Wochen
+    assert "Laufen: 26.0 km" in text   # 5,0 + 8,0 + 9,0 + 4,0 aus dem Fixture
+    assert "Einheiten: 8" in text

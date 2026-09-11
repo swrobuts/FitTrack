@@ -25,6 +25,8 @@
   <symbol id="icon-wandern" viewBox="0 0 24 24"><path d="M2 20l6-10 4 6 3-4 7 8z"/><circle cx="18" cy="6" r="2"/></symbol>
   <symbol id="icon-sonne" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
   <symbol id="icon-mond" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
+  <symbol id="icon-senden" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-6z"/></symbol>
 </svg>
 
 <main class="seite">
@@ -34,10 +36,15 @@
       <h1>FitTrack</h1>
       <p id="zeitraum" class="kopf-untertitel">…</p>
     </div>
-    <button id="thema-wechsel" type="button" class="knopf-icon" aria-label="Helles Design einschalten">
-      <svg class="nur-dunkel"><use href="#icon-sonne"></use></svg>
-      <svg class="nur-hell"><use href="#icon-mond"></use></svg>
-    </button>
+    <div class="kopf-knoepfe">
+      <button id="chat-knopf" type="button" class="knopf-icon" aria-label="Trainingsbot öffnen" hidden>
+        <svg><use href="#icon-chat"></use></svg>
+      </button>
+      <button id="thema-wechsel" type="button" class="knopf-icon" aria-label="Helles Design einschalten">
+        <svg class="nur-dunkel"><use href="#icon-sonne"></use></svg>
+        <svg class="nur-hell"><use href="#icon-mond"></use></svg>
+      </button>
+    </div>
   </header>
 
   <!-- 1. Wochenkarte: Bullet-Graph mit Zielmarke und Status-Badge. Tippen öffnet die Woche. -->
@@ -167,6 +174,15 @@
     <div id="kalender-raster" class="kalender-raster" role="grid" aria-label="Tage mit Training"></div>
   </section>
 
+  <!-- 7. Seitenfuß: die Option für den Trainingsbot. Der Bot läuft nur lokal mit LM Studio. -->
+  <footer class="fuss">
+    <label id="bot-option" class="option" hidden>
+      <input id="bot-anzeigen" type="checkbox" checked>
+      <span>Trainingsbot anzeigen</span>
+    </label>
+    <p id="bot-hinweis" class="fuss-hinweis" hidden>Trainingsbot nur lokal verfügbar, mit LM Studio auf demselben Rechner.</p>
+  </footer>
+
 </main>
 
 <!-- Bottom-Sheet: ein Dialog für alle Details. Auf dem Handy von unten, auf dem Desktop mittig. -->
@@ -182,6 +198,32 @@
     </button>
   </div>
   <div id="sheet-inhalt" class="sheet-inhalt"></div>
+</dialog>
+
+<!-- Trainingsbot: eigener Dialog, weil der Verlauf beim Schließen erhalten bleibt -->
+<dialog id="chat" class="sheet chat" aria-labelledby="chat-titel">
+  <div class="sheet-griff" aria-hidden="true"></div>
+  <div class="sheet-kopf">
+    <div>
+      <h2 id="chat-titel" class="sheet-titel">Trainingsbot</h2>
+      <p id="chat-untertitel" class="karte-untertitel">…</p>
+    </div>
+    <button id="chat-schliessen" type="button" class="knopf-icon" aria-label="Schließen">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div id="chat-verlauf" class="chat-verlauf" aria-live="polite"></div>
+  <div id="chat-vorschlaege" class="chat-vorschlaege">
+    <button type="button" class="knopf knopf-klein">Wie lief meine Woche?</button>
+    <button type="button" class="knopf knopf-klein">Welche Sportart kommt zu kurz?</button>
+    <button type="button" class="knopf knopf-klein">Wie viele Ruhetage sind sinnvoll?</button>
+  </div>
+  <form id="chat-form" class="chat-form">
+    <input id="chat-eingabe" type="text" autocomplete="off" maxlength="1000" placeholder="Frage zu deinem Training …" aria-label="Frage an den Trainingsbot">
+    <button id="chat-senden" type="submit" class="knopf-icon" aria-label="Senden">
+      <svg><use href="#icon-senden"></use></svg>
+    </button>
+  </form>
 </dialog>
 
 <!-- Chart.js zeichnet das Balkendiagramm; Version festgelegt, damit alle dasselbe Verhalten haben -->

@@ -10,4 +10,10 @@ services:
     image: fittrack
     ports:
       - "${FITTRACK_PORT:-8000}:8000" # links der Port auf dem Rechner, rechts im Container
+    environment:
+      # Trainingsbot: LM Studio läuft auf dem Rechner, nicht im Container. host.docker.internal
+      # ist aus dem Container der Name des Rechners; ohne laufendes LM Studio bleibt der Bot aus.
+      - LMSTUDIO_URL=http://host.docker.internal:1234/v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # nötig unter Linux, auf Mac und Windows ohne Wirkung
     restart: unless-stopped

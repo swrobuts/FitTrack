@@ -288,6 +288,124 @@ function verbindeThemaWechsel() {
   beschrifte();
 }
 
+// --- Trainingsbot: Chat über die eigenen Daten, nur lokal mit LM Studio ---------------
+
+let botStatus = { verfuegbar: false, modell: null };
+let chatVerlauf = [];      // [{rolle: "nutzer" | "bot", text}], bleibt bis zum Neuladen
+let chatWartet = false;    // solange eine Antwort aussteht, ist die Eingabe gesperrt
+
+function botGewuenscht() {
+  // Die Option im Seitenfuß; ohne gespeicherten Wert ist der Bot eingeschaltet
+  try { return localStorage.getItem("fittrack-bot") !== "aus"; } catch (fehler) { return true; }
+}
+
+function zeigeBotOption() {
+  // Knopf nur, wenn ein Modell erreichbar ist und die Option an ist; sonst der Hinweis im Fuß
+  const option = document.getElementById("bot-option");
+  const hinweis = document.getElementById("bot-hinweis");
+  const knopf = document.getElementById("chat-knopf");
+  option.hidden = !botStatus.verfuegbar;
+  hinweis.hidden = botStatus.verfuegbar;
+  document.getElementById("bot-anzeigen").checked = botGewuenscht();
+  knopf.hidden = !(botStatus.verfuegbar && botGewuenscht());
+}
+
+async function ladeBotStatus() {
+  // Fragt den Server, ob LM Studio erreichbar ist; auf Render ist die Antwort immer "nein"
+  try {
+    botStatus = await ladeJson("/api/chat/status");
+  } catch (fehler) {
+    botStatus = { verfuegbar: false, modell: null };
+  }
+  zeigeBotOption();
+}
+
+function zeigeChatVerlauf() {
+  // Baut die Sprechblasen neu auf; Text kommt per textContent, damit nichts als HTML gedeutet wird
+  const verlauf = document.getElementById("chat-verlauf");
+  verlauf.innerHTML = "";
+  for (const eintrag of chatVerlauf) {
+    const blase = document.createElement("div");
+    blase.className = `chat-nachricht ${eintrag.rolle}`;
+    blase.textContent = eintrag.text;
+    verlauf.appendChild(blase);
+  }
+  if (chatWartet) {
+    const blase = document.createElement("div");
+    blase.className = "chat-nachricht bot wartet";
+    blase.textContent = "Der Bot denkt nach …";
+    verlauf.appendChild(blase);
+  }
+  document.getElementById("chat-vorschlaege").hidden = chatVerlauf.length > 0;
+  verlauf.scrollTop = verlauf.scrollHeight;
+}
+
+function sperreEingabe(gesperrt) {
+  document.getElementById("chat-eingabe").disabled = gesperrt;
+  document.getElementById("chat-senden").disabled = gesperrt;
+}
+
+async function sendeFrage(frage) {
+  // Schickt Frage und bisherigen Verlauf an den Server und hängt die Antwort an
+  const text = frage.trim();
+  if (!text || chatWartet) return;
+  const bisher = chatVerlauf.slice();
+  chatVerlauf.push({ rolle: "nutzer", text });
+  chatWartet = true;
+  sperreEingabe(true);
+  zeigeChatVerlauf();
+  try {
+    const antwort = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ frage: text, verlauf: bisher }),
+    });
+    if (!antwort.ok) throw new Error(`HTTP ${antwort.status}`);
+    const daten = await antwort.json();
+    chatVerlauf.push({ rolle: "bot", text: daten.antwort });
+  } catch (fehler) {
+    chatVerlauf.push({ rolle: "fehler", text: "Keine Antwort von LM Studio. Läuft der Server dort noch? Frage einfach noch einmal stellen." });
+    console.error(fehler);
+  } finally {
+    chatWartet = false;
+    sperreEingabe(false);
+    zeigeChatVerlauf();
+    document.getElementById("chat-eingabe").focus();
+  }
+}
+
+function oeffneChat() {
+  document.getElementById("chat-untertitel").textContent = `${botStatus.modell} · lokal in LM Studio`;
+  zeigeChatVerlauf();
+  const chat = document.getElementById("chat");
+  if (!chat.open) chat.showModal();
+  document.getElementById("chat-eingabe").focus();
+}
+
+function verbindeBot() {
+  // Knopf im Kopf, Option im Fuß, Formular, Vorschläge und Schließen
+  const chat = document.getElementById("chat");
+  document.getElementById("chat-knopf").addEventListener("click", oeffneChat);
+  document.getElementById("bot-anzeigen").addEventListener("change", (ereignis) => {
+    try { localStorage.setItem("fittrack-bot", ereignis.target.checked ? "an" : "aus"); } catch (fehler) { /* dann eben ohne Speichern */ }
+    zeigeBotOption();
+  });
+  document.getElementById("chat-form").addEventListener("submit", (ereignis) => {
+    ereignis.preventDefault();
+    const eingabe = document.getElementById("chat-eingabe");
+    const frage = eingabe.value;
+    eingabe.value = "";
+    sendeFrage(frage);
+  });
+  document.querySelectorAll("#chat-vorschlaege button").forEach((knopf) => {
+    knopf.addEventListener("click", () => sendeFrage(knopf.textContent));
+  });
+  document.getElementById("chat-schliessen").addEventListener("click", () => chat.close());
+  chat.addEventListener("click", (ereignis) => {
+    if (ereignis.target === chat) chat.close();
+  });
+}
+
 // --- Kennzahlen (US-5, ergänzt in US-7) ----------------------------------------
 
 function zeigeKennzahlen(stats, wochen) {
@@ -765,6 +883,8 @@ function zeigeAktivitaeten(workouts) {
 
 async function start() {
   verbindeThemaWechsel();
+  verbindeBot();
+  ladeBotStatus();   // läuft nebenher, die Daten warten nicht darauf
   verbindeSheet();
 
   try {

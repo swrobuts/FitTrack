@@ -6,11 +6,13 @@ Start lokal (aus dem Projektordner FitTrack/):
 
 from pathlib import Path
 
-from fastapi import FastAPI
+import httpx2
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 
+from . import chat
 from .daten import lade_workouts
-from .models import Stats, WochenEintrag, Workout
+from .models import ChatAnfrage, ChatAntwort, ChatStatus, Stats, WochenEintrag, Workout
 from .statistik import berechne_stats, berechne_wochen
 
 FRONTEND_ORDNER = Path(__file__).parent.parent.parent / "frontend"
@@ -40,6 +42,27 @@ def stats() -> dict:
 def wochen() -> list[dict]:
     """Distanz, Anzahl und Dauer je Kalenderwoche, aufsteigend."""
     return berechne_wochen(lade_workouts())
+
+
+@app.get("/api/chat/status", response_model=ChatStatus)
+def chat_status() -> dict:
+    """Ob ein lokales Sprachmodell erreichbar ist. Das Frontend blendet den Chat sonst aus."""
+    return chat.status()
+
+
+@app.post("/api/chat", response_model=ChatAntwort)
+def chat_frage(anfrage: ChatAnfrage) -> dict:
+    """Beantwortet eine Frage zu den Trainingsdaten über LM Studio; 503 ohne Modell."""
+    modell = chat.aktives_modell()
+    if modell is None:
+        raise HTTPException(503, "Kein Sprachmodell erreichbar. Der Chat läuft nur lokal mit LM Studio.")
+    verlauf = [eintrag.model_dump() for eintrag in anfrage.verlauf]
+    nachrichten = chat.baue_nachrichten(lade_workouts(), verlauf, anfrage.frage)
+    try:
+        antwort = chat.frage_lmstudio(nachrichten, modell)
+    except (httpx2.HTTPError, KeyError, ValueError) as fehler:
+        raise HTTPException(502, f"LM Studio hat nicht geantwortet: {fehler}")
+    return {"antwort": antwort, "modell": modell}
 
 
 # Das Frontend liegt als statische Dateien im Ordner frontend/. Der Mount muss

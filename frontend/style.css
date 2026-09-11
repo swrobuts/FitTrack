@@ -89,6 +89,7 @@ svg { display: block; }
 .knopf-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .knopf-icon:hover { background: var(--karte-hell); }
 .knopf-icon:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+.kopf-knoepfe { display: flex; gap: 8px; flex: 0 0 auto; }
 /* Der Themaknopf zeigt das Symbol des Ziels: im Dunkeln die Sonne, im Hellen den Mond */
 .nur-hell { display: none; }
 @media (prefers-color-scheme: light) { :root:not([data-thema="dark"]) .nur-hell { display: block; } :root:not([data-thema="dark"]) .nur-dunkel { display: none; } }
@@ -309,6 +310,32 @@ svg { display: block; }
 .sheet-liste li { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; min-height: 52px; padding: 6px 0; border-top: 1px solid var(--linie); }
 .sheet-liste li:first-child { border-top: 0; }
 
+/* Seitenfuß: Option für den Trainingsbot */
+.fuss { display: grid; gap: 8px; padding: 4px 4px 8px; color: var(--text-2); font-size: 14px; }
+.option { display: flex; align-items: center; gap: 10px; min-height: var(--touch); cursor: pointer; width: fit-content; }
+.option input { width: 20px; height: 20px; accent-color: var(--akzent); margin: 0; }
+.fuss-hinweis { margin: 0; }
+
+/* Trainingsbot: der Dialog ist eine Spalte, der Verlauf scrollt, die Eingabe bleibt unten */
+.chat { display: none; flex-direction: column; height: 85vh; }
+.chat[open] { display: flex; }
+.chat-verlauf { flex: 1; overflow: auto; display: grid; gap: 10px; align-content: start; padding-bottom: 8px; }
+.chat-verlauf:empty::before { content: "Der Bot kennt deine Kennzahlen, die letzten zwölf Wochen und die letzten zehn Einheiten. Er antwortet lokal, nichts verlässt den Rechner."; color: var(--text-2); font-size: 15px; }
+.chat-nachricht { max-width: 88%; padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-nachricht.nutzer { justify-self: end; background: color-mix(in srgb, var(--akzent) 22%, var(--karte-hell)); border-bottom-right-radius: 4px; }
+.chat-nachricht.bot { justify-self: start; background: var(--karte-hell); border-bottom-left-radius: 4px; }
+.chat-nachricht.wartet { color: var(--text-2); font-style: italic; }
+.chat-nachricht.fehler { border: 1px solid var(--laufen); color: var(--laufen); background: transparent; }
+.chat-vorschlaege { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0; }
+.chat-vorschlaege .knopf { align-self: auto; white-space: normal; text-align: left; }
+.chat-form { display: flex; gap: 8px; padding-top: 8px; border-top: 1px solid var(--linie); }
+.chat-form input {
+  flex: 1; min-width: 0; min-height: var(--touch); padding: 0 14px;
+  border: 1px solid var(--linie); border-radius: 22px; background: var(--bg); color: var(--text); font: inherit; font-size: 16px;
+}
+.chat-form input:focus-visible { outline: 2px solid var(--akzent); outline-offset: 1px; }
+.chat-form button:disabled, .chat-form input:disabled { opacity: 0.5; cursor: default; }
+
 /* Schmale Displays (Frontdisplay eines Klapphandys, kleine Geräte): weniger Rand, Zeitraumwahl in zwei Reihen */
 @media (max-width: 379px) {
   :root { --abstand: 12px; }
@@ -351,6 +378,7 @@ svg { display: block; }
   .sheet[open] { animation: einblenden 0.2s ease-out; }
   @keyframes einblenden { from { opacity: 0; } to { opacity: 1; } }
   .sheet-griff { display: none; }
+  .chat { height: min(85vh, 640px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
