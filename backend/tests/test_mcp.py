@@ -28,11 +28,6 @@ def testdaten_statt_http(monkeypatch):
     monkeypatch.setattr(server, "hole_workouts", lambda: lade_workouts())
 
 
-def test_werkzeuge_vollstaendig():
-    namen = {w.name for w in server.server._tool_manager.list_tools()}
-    assert namen == {"gesundheit", "heute", "kennzahlen", "woche", "wochen", "zeitraum", "bestwerte", "einheiten"}
-
-
 def test_heute_nennt_datenstand():
     antwort = server.heute()
     assert antwort["erste_einheit"] == "2026-06-01"
@@ -139,3 +134,87 @@ def test_einheiten_mit_summe():
     assert [e["id"] for e in antwort["einheiten"]] == [8, 6]
     alle = server.einheiten(von="2026-06-15", anzahl=0)
     assert [e["id"] for e in alle["einheiten"]] == [8, 7, 6, 5]
+
+
+# --- Ausbau: Fragearten, die vorher ins Leere liefen ------------------------------
+
+def test_werkzeuge_nach_ausbau():
+    namen = {w.name for w in server.server._tool_manager.list_tools()}
+    assert namen == {"gesundheit", "heute", "datenumfang", "kennzahlen", "sportarten", "woche", "wochen",
+                     "monate", "zeitraum", "vergleich", "bestwerte", "pausen", "wochentage", "einheiten"}
+
+
+def test_datenumfang_sagt_was_fehlt():
+    antwort = server.datenumfang()
+    assert antwort["felder"] == ["datum", "sportart", "dauer_min", "distanz_km", "kalorien"]
+    assert antwort["sportarten"] == ["Laufen", "Radfahren", "Schwimmen", "Wandern"]
+    assert antwort["anzahl"] == 8 and antwort["zeitraum"]["von"] == "2026-06-01"
+    assert "Herzfrequenz" in antwort["nicht_enthalten"] and "Uhrzeit" in antwort["nicht_enthalten"]
+
+
+def test_einheiten_mit_tempo():
+    lauf = server.einheiten(sportart="Laufen", anzahl=1)["einheiten"][0]     # id 8: 4,0 km in 25 min
+    assert lauf["tempo_min_pro_km"] == 6.25 and lauf["tempo_text"] == "6:15 min/km" and lauf["km_pro_h"] == 9.6
+
+
+def test_sportarten_uebersicht():
+    antwort = server.sportarten()
+    assert [s["sportart"] for s in antwort["sportarten"]] == ["Radfahren", "Laufen", "Wandern", "Schwimmen"]
+    laufen = antwort["sportarten"][1]
+    assert laufen["anzahl"] == 4 and laufen["distanz_km"] == 26.0 and laufen["dauer_min"] == 150
+    assert laufen["kalorien"] == 1820                        # 350+560+630+280
+    assert laufen["anteil_km_prozent"] == 29.7               # 26,0 / 87,5
+    assert laufen["durchschnitt_km_pro_einheit"] == 6.5
+    assert laufen["letzte_einheit"] == "2026-06-21"
+    assert antwort["haeufigste_nach_anzahl"] == "Laufen"
+    assert antwort["meiste_kilometer"] == "Radfahren"
+
+
+def test_monate():
+    antwort = server.monate(anzahl=0)
+    assert len(antwort) == 1
+    juni = antwort[0]
+    assert juni["monat"] == "2026-06" and juni["von"] == "2026-06-01" and juni["bis"] == "2026-06-30"
+    assert juni["distanz_km"] == 87.5 and juni["anzahl"] == 8 and juni["je_sportart"]["Radfahren"] == 50.0
+
+
+def test_vergleich_zweier_zeitraeume():
+    antwort = server.vergleich(von_a="2026-06-01", bis_a="2026-06-07", von_b="2026-06-15", bis_b="2026-06-21")
+    assert antwort["a"]["distanz_km"] == 34.5 and antwort["b"]["distanz_km"] == 53.0
+    assert antwort["differenz"]["distanz_km"] == 18.5        # b minus a
+    assert antwort["differenz"]["anzahl"] == 0
+    assert antwort["differenz"]["distanz_prozent"] == 53.6   # 18,5 / 34,5
+    nur_laufen = server.vergleich("2026-06-01", "2026-06-07", "2026-06-15", "2026-06-21", sportart="Laufen")
+    assert nur_laufen["a"]["distanz_km"] == 13.0 and nur_laufen["b"]["distanz_km"] == 13.0
+    assert nur_laufen["differenz"]["distanz_prozent"] == 0.0
+
+
+def test_pausen():
+    antwort = server.pausen(heute_datum="2026-06-30")
+    assert antwort["laengste_pause"] == {"tage": 8, "von": "2026-06-07", "bis": "2026-06-14"}
+    assert antwort["wochen_ohne_training"] == ["2026-W24"]
+    assert antwort["tage_seit_letzter_einheit"] == 9
+    assert antwort["letzte_einheit"] == "2026-06-21"
+
+
+def test_wochentage():
+    antwort = server.wochentage()
+    tage = {t["wochentag"]: t for t in antwort["wochentage"]}
+    assert [t["wochentag"] for t in antwort["wochentage"]] == ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+    assert tage["Mo"]["anzahl"] == 2 and tage["Mo"]["distanz_km"] == 35.0    # 5,0 + 30,0
+    assert tage["Di"]["anzahl"] == 0 and tage["Do"]["distanz_km"] == 0.0
+    assert tage["Mo"]["anteil_anzahl_prozent"] == 25.0
+    assert antwort["haeufigster_tag"] == "Mo"
+
+
+def test_bestwerte_tempo_und_kalorien():
+    laufen = server.bestwerte(sportart="Laufen")
+    assert laufen["schnellste_einheit"]["id"] == 6 and laufen["schnellste_einheit"]["tempo_text"] == "5:33 min/km"
+    assert laufen["meiste_kalorien"]["id"] == 6
+    alle = server.bestwerte()
+    assert alle["meiste_kalorien"]["id"] == 5                # 750 kcal
+
+
+def test_zeitraum_mit_zielbilanz():
+    antwort = server.zeitraum()
+    assert antwort["wochenziel_km"] == 40 and antwort["wochen_mit_ziel"] == 1     # nur KW 25

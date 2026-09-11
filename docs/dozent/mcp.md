@@ -15,16 +15,24 @@ Der MCP-Server ist die Brücke, mit der ein fremdes Chatfenster an die Daten kom
 
 `mcp/server.py` spricht über stdin/stdout mit dem Chat-Client, das ist der Standard des Model Context Protocol. Er holt die Einheiten einmal je Aufruf von `GET /api/workouts` und rechnet dann mit denselben Funktionen wie die App, `statistik.py` aus dem Backend. Das Modell bekommt fertige Zahlen; es muss nichts addieren, zählen oder in Kalenderwochen umrechnen. Genau da entstehen sonst die Abweichungen, denn MCP transportiert präzise, das Modell rechnet nicht präzise.
 
-| Werkzeug | Beantwortet | Parameter |
-|---|---|---|
-| `gesundheit` | Ist die App erreichbar? | keine |
-| `heute` | heutiges Datum, aktuelle Kalenderwoche, erste und letzte Einheit | keine; zuerst aufrufen bei „letzte Woche“, „dieser Monat“ |
-| `kennzahlen` | Gesamtbild: Kilometer, Durchschnitt je Kalenderwoche, Lieblingssportart, Anzahl, Datenzeitraum | keine |
-| `woche` | genau eine Kalenderwoche: Montag, Sonntag, Summen, je Sportart, Wochenziel erreicht, Einheiten | `kalenderwoche` als `2026-W36` oder ein Datum in der Woche |
-| `wochen` | Verlauf als Liste, Wochen ohne Training mit Nullwerten | `anzahl` (Standard 12, 0 = alle) oder `von_kw`, `bis_kw` |
-| `zeitraum` | Summen und Durchschnitte für Monat, Quartal, Jahr oder freie Tage, wahlweise je Sportart | `von`, `bis` einschließlich; ohne Angabe der gesamte Datenbestand; `sportart` |
-| `bestwerte` | längste Einheit nach km und Minuten, beste Woche, längste und aktuelle Zielserie | `sportart` optional |
-| `einheiten` | einzelne Einheiten, jüngste zuerst, mit Trefferzahl und Summe über alle Treffer | `sportart`, `von`, `bis`, `anzahl` (Standard 20, 0 = alle) |
+Vierzehn Werkzeuge, geordnet nach der Frageart, die das Modell sonst selbst erledigen müsste:
+
+| Frageart | Werkzeug | Beantwortet | Parameter |
+|---|---|---|---|
+| Orientierung | `gesundheit` | Ist die App erreichbar? | keine |
+| | `heute` | heutiges Datum, aktuelle Kalenderwoche, erste und letzte Einheit | keine; zuerst bei „letzte Woche“, „dieser Monat“ |
+| | `datenumfang` | welche Felder und Sportarten es gibt, und was die App nicht erfasst | keine; bei Zweifel, ob eine Frage beantwortbar ist |
+| Gesamtbild | `kennzahlen` | Kilometer, Durchschnitt je Kalenderwoche, Lieblingssportart, Anzahl, Datenzeitraum | keine |
+| | `sportarten` | je Sportart Anzahl, Kilometer, Anteile, Kilometer je Einheit, letzte Einheit; häufigste nach Anzahl und nach Kilometern | `von`, `bis` optional |
+| Zeitscheiben | `woche` | genau eine Kalenderwoche mit Montag, Sonntag, Summen, je Sportart, Wochenziel, Einheiten | `kalenderwoche` als `2026-W36` oder ein Datum |
+| | `wochen` | Verlauf nach Kalenderwochen, Wochen ohne Training mit Nullwerten | `anzahl` (12, 0 = alle) oder `von_kw`, `bis_kw` |
+| | `monate` | Verlauf nach Kalendermonaten | `anzahl` (12, 0 = alle) |
+| | `zeitraum` | Summen und Durchschnitte für beliebige Tage, wahlweise je Sportart, dazu erreichte Wochenziele | `von`, `bis` einschließlich; ohne Angabe alles; `sportart` |
+| | `vergleich` | zwei Zeiträume nebeneinander mit Differenz in Kilometern, Anzahl, Minuten, Kalorien und Prozent | `von_a`, `bis_a`, `von_b`, `bis_b`, `sportart` |
+| Extreme und Muster | `bestwerte` | längste Einheit nach Kilometern und Minuten, schnellste Einheit, meiste Kalorien, beste Woche, Zielserien | `sportart` optional; für „schnellster Lauf“ Pflicht |
+| | `pausen` | längste Pause, Wochen ohne Training, Tage seit der letzten Einheit, Zahl der Trainingstage | keine |
+| | `wochentage` | Verteilung Montag bis Sonntag mit Anteilen, häufigster Trainingstag | `von`, `bis` optional |
+| Einzelfälle | `einheiten` | einzelne Einheiten mit Tempo, jüngste zuerst, Trefferzahl und Summe über alle Treffer | `sportart`, `von`, `bis`, `anzahl` (20, 0 = alle); ein Tag: `von` gleich `bis` |
 
 Drei Dinge machen die Antworten belastbar:
 
@@ -32,7 +40,7 @@ Drei Dinge machen die Antworten belastbar:
 - **Jede Antwort nennt ihren Bezug.** `woche` liefert `von` und `bis`, `zeitraum` die tatsächlich verwendeten Grenzen, `kennzahlen` den Datenzeitraum. Das Modell muss kein Enddatum ergänzen.
 - **Ungültige Eingaben geben eine Fehlermeldung mit den gültigen Werten**, etwa `Unbekannte Sportart 'Joggen'. Gültig sind: Laufen, Radfahren, Schwimmen, Wandern`. Eine Woche ohne Training ist kein Fehler, sondern liefert Nullwerte; liegt sie außerhalb der Daten, steht das im Feld `hinweis`. Technisches Detail: Die Werkzeuge werfen dafür `ToolError` aus dem SDK. Eine gewöhnliche Python-Ausnahme würde das SDK zu „Error executing tool“ ohne Text verkürzen, und das Modell wüsste nicht, was falsch war.
 
-Dazu bekommt das Modell beim Verbinden eine Anweisung: für relative Zeitangaben zuerst `heute` aufrufen, nie selbst summieren, Fehlermeldungen wörtlich weitergeben. Welche App der Server fragt, steht in `FITTRACK_URL`. Ohne die Variable ist es `https://fittrack-k7gg.onrender.com`; der Free-Tier schläft ein, der erste Aufruf kann bis zu einer Minute dauern. Für die lokale App: `FITTRACK_URL=http://localhost:8000`.
+Dazu bekommt das Modell beim Verbinden eine Anweisung: für relative Zeitangaben zuerst `heute` aufrufen, nie selbst summieren, Fehlermeldungen wörtlich weitergeben. Und die Regel für alles, was kein Werkzeug liefert: Die Daten enthalten nur Datum, Sportart, Dauer, Kilometer und Kalorien. Fragen nach Herzfrequenz, Uhrzeit, Strecke, Höhenmetern, Gewicht, Schlaf oder Gefühl beantwortet das Modell mit dem Satz, dass die App das nicht erfasst; liefert kein Werkzeug die gefragte Zahl, sagt es das offen. Dieselbe Regel steht im Systemprompt des Trainingsbots. Welche App der Server fragt, steht in `FITTRACK_URL`. Ohne die Variable ist es `https://fittrack-k7gg.onrender.com`; der Free-Tier schläft ein, der erste Aufruf kann bis zu einer Minute dauern. Für die lokale App: `FITTRACK_URL=http://localhost:8000`.
 
 ### Einmalig vorbereiten
 
@@ -77,6 +85,9 @@ LM Studio unterstützt MCP ab Version 0.3.17. Im Programm unter `Program → Int
 - „Wie viele Kilometer im August 2026, davon wie viel Radfahren?“ → `zeitraum` mit `von=2026-08-01`, `bis=2026-08-31`; die Aufteilung steht in `je_sportart`.
 - „Was war mein längster Lauf, und wie viele Wochen in Folge habe ich das Ziel erreicht?“ → `bestwerte` mit `sportart=Laufen`.
 - „Zeig mir meine Läufe im August 2026.“ → `einheiten` mit `sportart=Laufen`, `von=2026-08-01`, `bis=2026-08-31`.
+- „War der August besser als der Juli?“ → `vergleich` mit beiden Monaten; die Differenz steht fertig in der Antwort.
+- „Welche Sportart mache ich am häufigsten?“ → `sportarten`; die Antwort unterscheidet häufigste nach Anzahl und meiste Kilometer.
+- „Wie hoch war mein Puls beim letzten Lauf?“ → kein Werkzeug; das Modell antwortet, dass die App keine Herzfrequenz erfasst.
 
 Im aufgeklappten Werkzeugaufruf des Clients steht, was wirklich gefragt und geantwortet wurde. Weicht die Prosa davon ab, hat das Modell ergänzt.
 
@@ -123,7 +134,7 @@ Zwei Details, die man kennen sollte:
 
 ### Tests
 
-Zwölf Tests in `backend/tests/test_mcp.py` prüfen die Werkzeuge des MCP-Servers gegen das Fixture, der HTTP-Abruf ist durch die Testdatenbank ersetzt: Zeitraum ohne Grenzen gleich 87,5 km über drei Kalenderwochen, KW 24 mit Nullwerten und Ziel nicht erreicht, Läufe im Juni gleich 26,0 km in 150 Minuten, beste Woche 2026-W25, ungültige Sportart und falsches Datumsformat als Fehlermeldung.
+21 Tests in `backend/tests/test_mcp.py` prüfen die Werkzeuge des MCP-Servers gegen das Fixture, der HTTP-Abruf ist durch die Testdatenbank ersetzt: Zeitraum ohne Grenzen gleich 87,5 km über drei Kalenderwochen, KW 24 mit Nullwerten und Ziel nicht erreicht, Läufe im Juni gleich 26,0 km in 150 Minuten, beste Woche 2026-W25, ungültige Sportart und falsches Datumsformat als Fehlermeldung.
 
 Fünf Tests in `test_api.py` decken den Chat ab, zusätzlich zu den 15 Tests des Bauwegs. LM Studio wird darin durch `monkeypatch` ersetzt, die Tests laufen also ohne Modell:
 

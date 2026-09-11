@@ -180,6 +180,8 @@ def zeitraum_zusammenfassung(workouts: list[dict], von: str | None = None, bis: 
         "durchschnitt_km_pro_einheit": round(distanz / len(treffer), 1) if treffer else 0.0,
         "kalenderwochen": wochen,
         "durchschnitt_km_pro_woche": round(distanz / wochen, 1) if wochen else 0.0,
+        "wochenziel_km": WOCHENZIEL_KM,
+        "wochen_mit_ziel": sum(1 for w in berechne_wochen(treffer) if w["distanz_km"] >= WOCHENZIEL_KM),
     }
 
 
@@ -229,10 +231,160 @@ def bestwerte(workouts: list[dict], sportart: str | None = None) -> dict:
     laengste, aktuelle = zielserien(wochen)
     return {
         "sportart": sportart or "alle",
-        "laengste_einheit_km": max(treffer, key=lambda w: (w["distanz_km"], w["datum"])),
-        "laengste_einheit_min": max(treffer, key=lambda w: (w["dauer_min"], w["datum"])),
+        "laengste_einheit_km": mit_tempo(max(treffer, key=lambda w: (w["distanz_km"], w["datum"]))),
+        "laengste_einheit_min": mit_tempo(max(treffer, key=lambda w: (w["dauer_min"], w["datum"]))),
+        # Tempo über alle Sportarten ist immer Radfahren; aussagekräftig nur mit sportart
+        "schnellste_einheit": mit_tempo(max(treffer, key=lambda w: (w["distanz_km"] / w["dauer_min"], w["datum"]))),
+        "meiste_kalorien": mit_tempo(max(treffer, key=lambda w: (w["kalorien"], w["datum"]))),
         "beste_woche": beste_woche,
         "wochenziel_km": WOCHENZIEL_KM,
         "laengste_zielserie_wochen": laengste,
         "aktuelle_zielserie_wochen": aktuelle,
     }
+
+
+# --- Ausbau: Tempo, Sportarten, Monate, Vergleich, Pausen, Wochentage ------------------
+
+FELDER = ["datum", "sportart", "dauer_min", "distanz_km", "kalorien"]
+NICHT_ENTHALTEN = ["Herzfrequenz", "Uhrzeit", "Strecke oder GPS", "Höhenmeter", "Gewicht", "Schlaf", "Gefühl oder Notizen"]
+WOCHENTAGE = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+
+
+def mit_tempo(w: dict) -> dict:
+    """Kopie einer Einheit mit Tempo in min/km, als Text mm:ss und in km/h."""
+    e = dict(w)
+    if w["distanz_km"] > 0:
+        minuten = w["dauer_min"] / w["distanz_km"]
+        e["tempo_min_pro_km"] = round(minuten, 2)
+        e["tempo_text"] = f"{int(minuten)}:{round((minuten - int(minuten)) * 60):02d} min/km"
+        e["km_pro_h"] = round(w["distanz_km"] / (w["dauer_min"] / 60), 1)
+    return e
+
+
+def datenumfang(workouts: list[dict]) -> dict:
+    """Welche Felder und Sportarten es gibt, und welche Daten die App nicht erfasst."""
+    return {
+        "felder": FELDER,
+        "sportarten": SPORTARTEN,
+        "anzahl": len(workouts),
+        "zeitraum": datenzeitraum(workouts),
+        "nicht_enthalten": NICHT_ENTHALTEN,
+    }
+
+
+def sportarten_uebersicht(workouts: list[dict], von: str | None = None, bis: str | None = None) -> dict:
+    """Je Sportart Anzahl, Kilometer, Dauer, Kalorien, Anteil und letzte Einheit; ohne Grenzen der ganze Bestand."""
+    gesamt = datenzeitraum(workouts)
+    von = pruefe_datum(von, "von") if von else gesamt["von"]
+    bis = pruefe_datum(bis, "bis") if bis else gesamt["bis"]
+    treffer = im_zeitraum(workouts, von, bis, None)
+    gesamt_km = sum(w["distanz_km"] for w in treffer)
+    liste = []
+    for sportart in SPORTARTEN:
+        eigene = [w for w in treffer if w["sportart"] == sportart]
+        if not eigene:
+            continue
+        km = sum(w["distanz_km"] for w in eigene)
+        liste.append({
+            "sportart": sportart,
+            "anzahl": len(eigene),
+            "distanz_km": round(km, 1),
+            "dauer_min": sum(w["dauer_min"] for w in eigene),
+            "kalorien": sum(w["kalorien"] for w in eigene),
+            "anteil_km_prozent": round(100 * km / gesamt_km, 1) if gesamt_km else 0.0,
+            "anteil_anzahl_prozent": round(100 * len(eigene) / len(treffer), 1),
+            "durchschnitt_km_pro_einheit": round(km / len(eigene), 1),
+            "letzte_einheit": max(w["datum"] for w in eigene),
+        })
+    liste.sort(key=lambda s: (-s["distanz_km"], s["sportart"]))
+    return {
+        "von": von, "bis": bis,
+        "sportarten": liste,
+        "haeufigste_nach_anzahl": max(liste, key=lambda s: (s["anzahl"], s["distanz_km"]))["sportart"] if liste else None,
+        "meiste_kilometer": liste[0]["sportart"] if liste else None,
+    }
+
+
+def letzter_tag_im_monat(jahr: int, monat: int) -> date:
+    """Der letzte Kalendertag eines Monats."""
+    erster_naechster = date(jahr + (monat == 12), monat % 12 + 1, 1)
+    return erster_naechster - timedelta(days=1)
+
+
+def nach_monaten(workouts: list[dict]) -> list[dict]:
+    """Summen je Kalendermonat vom ersten bis zum letzten Monat, Monate ohne Training mit Nullwerten."""
+    if not workouts:
+        return []
+    erster = date.fromisoformat(min(w["datum"] for w in workouts)).replace(day=1)
+    letzter = date.fromisoformat(max(w["datum"] for w in workouts)).replace(day=1)
+    monate = []
+    aktuell = erster
+    while aktuell <= letzter:
+        von, bis = aktuell.isoformat(), letzter_tag_im_monat(aktuell.year, aktuell.month).isoformat()
+        treffer = im_zeitraum(workouts, von, bis, None)
+        monate.append({
+            "monat": aktuell.strftime("%Y-%m"), "von": von, "bis": bis,
+            "distanz_km": round(sum(w["distanz_km"] for w in treffer), 1),
+            "anzahl": len(treffer),
+            "dauer_min": sum(w["dauer_min"] for w in treffer),
+            "kalorien": sum(w["kalorien"] for w in treffer),
+            "je_sportart": kilometer_je_sportart(treffer),
+        })
+        aktuell = date(aktuell.year + (aktuell.month == 12), aktuell.month % 12 + 1, 1)
+    return monate
+
+
+def vergleich(workouts: list[dict], von_a: str, bis_a: str, von_b: str, bis_b: str, sportart: str | None = None) -> dict:
+    """Zwei Zeiträume nebeneinander, dazu die Differenz b minus a in Kilometern, Anzahl, Minuten, Kalorien und Prozent."""
+    a = zeitraum_zusammenfassung(workouts, von_a, bis_a, sportart)
+    b = zeitraum_zusammenfassung(workouts, von_b, bis_b, sportart)
+    return {
+        "a": a, "b": b,
+        "differenz": {
+            "distanz_km": round(b["distanz_km"] - a["distanz_km"], 1),
+            "anzahl": b["anzahl"] - a["anzahl"],
+            "dauer_min": b["dauer_min"] - a["dauer_min"],
+            "kalorien": b["kalorien"] - a["kalorien"],
+            "distanz_prozent": round(100 * (b["distanz_km"] - a["distanz_km"]) / a["distanz_km"], 1) if a["distanz_km"] else None,
+        },
+    }
+
+
+def pausen(workouts: list[dict], heute_datum: str) -> dict:
+    """Längste Pause zwischen zwei Trainingstagen, Wochen ohne Training und die Tage seit der letzten Einheit."""
+    if not workouts:
+        return {"hinweis": "keine Einheiten"}
+    tage = sorted({w["datum"] for w in workouts})
+    laengste = {"tage": 0, "von": None, "bis": None}
+    for vorher, nachher in zip(tage, tage[1:]):
+        luecke = (date.fromisoformat(nachher) - date.fromisoformat(vorher)).days - 1
+        if luecke > laengste["tage"]:
+            laengste = {"tage": luecke,
+                        "von": (date.fromisoformat(vorher) + timedelta(days=1)).isoformat(),
+                        "bis": (date.fromisoformat(nachher) - timedelta(days=1)).isoformat()}
+    return {
+        "laengste_pause": laengste,
+        "wochen_ohne_training": [w["kw"] for w in berechne_wochen(workouts) if w["anzahl"] == 0],
+        "letzte_einheit": tage[-1],
+        "tage_seit_letzter_einheit": (date.fromisoformat(heute_datum) - date.fromisoformat(tage[-1])).days,
+        "trainingstage": len(tage),
+    }
+
+
+def nach_wochentagen(workouts: list[dict], von: str | None = None, bis: str | None = None) -> dict:
+    """Anzahl und Kilometer je Wochentag Montag bis Sonntag, mit Anteilen; ohne Grenzen der ganze Bestand."""
+    gesamt = datenzeitraum(workouts)
+    von = pruefe_datum(von, "von") if von else gesamt["von"]
+    bis = pruefe_datum(bis, "bis") if bis else gesamt["bis"]
+    treffer = im_zeitraum(workouts, von, bis, None)
+    liste = []
+    for index, name in enumerate(WOCHENTAGE):
+        eigene = [w for w in treffer if date.fromisoformat(w["datum"]).weekday() == index]
+        liste.append({
+            "wochentag": name,
+            "anzahl": len(eigene),
+            "distanz_km": round(sum(w["distanz_km"] for w in eigene), 1),
+            "anteil_anzahl_prozent": round(100 * len(eigene) / len(treffer), 1) if treffer else 0.0,
+        })
+    haeufigster = max(liste, key=lambda t: (t["anzahl"], t["distanz_km"])) if treffer else None
+    return {"von": von, "bis": bis, "wochentage": liste, "haeufigster_tag": haeufigster["wochentag"] if haeufigster else None}

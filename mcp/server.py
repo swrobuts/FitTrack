@@ -31,7 +31,9 @@ Regeln für die Werkzeuge:
 - Bei relativen Zeitangaben (letzte Woche, dieser Monat, zuletzt) zuerst heute() aufrufen; die Daten enden nicht zwingend heute.
 - Wochen sind ISO-Kalenderwochen von Montag bis Sonntag, Schreibweise JJJJ-Wnn, z. B. 2026-W36. Daten im Format JJJJ-MM-TT, beide Grenzen einschließlich.
 - Jede Antwort nennt ihren Zeitraum (von, bis). Diese Angaben übernehmen, keine Daten ergänzen oder umrechnen.
-- Fehlermeldungen der Werkzeuge wörtlich weitergeben, keine Werte erfinden."""
+- Fehlermeldungen der Werkzeuge wörtlich weitergeben, keine Werte erfinden.
+- Die Daten enthalten nur Datum, Sportart, Dauer, Kilometer und Kalorien (siehe datenumfang). Fragen nach Herzfrequenz, Uhrzeit, Strecke, Höhenmetern, Gewicht, Schlaf oder Gefühl beantwortest du mit dem Satz, dass die App das nicht erfasst. Nicht schätzen, nicht aus anderen Werten ableiten.
+- Liefert kein Werkzeug die gefragte Zahl, sage das offen, statt eine plausible Zahl zu nennen."""
 
 server = MCPServer("fittrack", instructions=ANWEISUNG)
 
@@ -91,6 +93,17 @@ def heute() -> dict:
 
 
 @server.tool()
+def datenumfang() -> dict:
+    """Welche Daten es gibt und welche nicht. Aufrufen, wenn unklar ist, ob eine Frage überhaupt beantwortbar ist.
+
+    Liefert die fünf Felder je Einheit (datum, sportart, dauer_min, distanz_km, kalorien), die vier Sportarten, Anzahl
+    und Zeitraum der Daten, und die Liste dessen, was die App nicht erfasst (Herzfrequenz, Uhrzeit, Strecke, Höhenmeter,
+    Gewicht, Schlaf, Gefühl). Fragen dazu sind mit "die App erfasst das nicht" zu beantworten, nicht mit Schätzungen.
+    """
+    return statistik.datenumfang(hole_workouts())
+
+
+@server.tool()
 def kennzahlen() -> dict:
     """Kennzahlen über den gesamten Datenbestand, erste bis letzte Einheit einschließlich.
 
@@ -100,6 +113,16 @@ def kennzahlen() -> dict:
     """
     workouts = hole_workouts()
     return {**statistik.berechne_stats(workouts), "zeitraum": statistik.datenzeitraum(workouts)}
+
+
+@server.tool()
+@klare_fehler
+def sportarten(von: str | None = None, bis: str | None = None) -> dict:
+    """Übersicht je Sportart: Anzahl, Kilometer, Minuten, Kalorien, Anteil an Kilometern und an Einheiten, Kilometer je Einheit, letzte Einheit. Beantwortet "welche Sportart am häufigsten" (haeufigste_nach_anzahl) und "am meisten Kilometer" (meiste_kilometer), das sind zwei verschiedene Antworten.
+
+    von, bis: JJJJ-MM-TT, beide einschließlich; ohne Angabe der gesamte Datenbestand. Sortiert nach Kilometern, größte zuerst.
+    """
+    return statistik.sportarten_uebersicht(hole_workouts(), von, bis)
 
 
 @server.tool()
@@ -132,6 +155,17 @@ def wochen(anzahl: int = 12, von_kw: str | None = None, bis_kw: str | None = Non
 
 
 @server.tool()
+def monate(anzahl: int = 12) -> list[dict]:
+    """Kalendermonate als Liste, ältester zuerst, je Monat Kilometer, Anzahl, Minuten, Kalorien und Kilometer je Sportart.
+
+    Monate ohne Training stehen mit Nullwerten in der Liste. anzahl: die letzten n Monate, 0 = alle seit der ersten
+    Einheit. Jeder Eintrag nennt monat (JJJJ-MM), von und bis. Für die Summe über mehrere Monate zeitraum() verwenden.
+    """
+    alle = statistik.nach_monaten(hole_workouts())
+    return alle[-anzahl:] if anzahl > 0 else alle
+
+
+@server.tool()
 @klare_fehler
 def zeitraum(von: str | None = None, bis: str | None = None, sportart: str | None = None) -> dict:
     """Summen und Durchschnitte für einen Zeitraum, wahlweise für eine Sportart. Das Werkzeug für jede Frage nach Kilometern in einem Monat, Quartal, Jahr oder frei gewählten Tagen.
@@ -147,13 +181,45 @@ def zeitraum(von: str | None = None, bis: str | None = None, sportart: str | Non
 
 @server.tool()
 @klare_fehler
-def bestwerte(sportart: str | None = None) -> dict:
-    """Bestwerte über den gesamten Datenbestand: längste Einheit nach Kilometern und nach Minuten, beste Kalenderwoche, längste und aktuelle Serie von Wochen mit erreichtem Wochenziel (40 km).
+def vergleich(von_a: str, bis_a: str, von_b: str, bis_b: str, sportart: str | None = None) -> dict:
+    """Zwei Zeiträume nebeneinander mit der Differenz b minus a. Das Werkzeug für "diesen Monat gegen letzten Monat", "dieses Jahr gegen letztes Jahr".
 
-    sportart: Laufen, Radfahren, Schwimmen oder Wandern schränkt Einheiten und beste Woche auf diese Sportart ein;
-    die Zielserien gelten immer über alle Sportarten, weil das Wochenziel so definiert ist.
+    von_a, bis_a: erster Zeitraum, von_b, bis_b: zweiter Zeitraum, alle als JJJJ-MM-TT, Grenzen einschließlich.
+    sportart optional. Ergebnis: a und b wie bei zeitraum(), dazu differenz mit distanz_km, anzahl, dauer_min, kalorien
+    und distanz_prozent (Veränderung von a nach b; null, wenn a keine Kilometer hat). Nicht selbst subtrahieren.
+    """
+    return statistik.vergleich(hole_workouts(), von_a, bis_a, von_b, bis_b, sportart)
+
+
+@server.tool()
+@klare_fehler
+def bestwerte(sportart: str | None = None) -> dict:
+    """Bestwerte über den gesamten Datenbestand: längste Einheit nach Kilometern und nach Minuten, schnellste Einheit (Tempo), Einheit mit den meisten Kalorien, beste Kalenderwoche, längste und aktuelle Serie von Wochen mit erreichtem Wochenziel (40 km).
+
+    sportart: Laufen, Radfahren, Schwimmen oder Wandern schränkt Einheiten und beste Woche auf diese Sportart ein.
+    Für "schnellster Lauf" immer sportart angeben, sonst gewinnt Radfahren. Die Zielserien gelten immer über alle
+    Sportarten, weil das Wochenziel so definiert ist. Einheiten tragen tempo_min_pro_km, tempo_text und km_pro_h.
     """
     return statistik.bestwerte(hole_workouts(), sportart)
+
+
+@server.tool()
+def pausen(heute_datum: str | None = None) -> dict:
+    """Trainingspausen: längste Lücke zwischen zwei Trainingstagen (Tage ohne Training, von, bis), alle Kalenderwochen ohne Training, Tage seit der letzten Einheit, Zahl der Trainingstage.
+
+    heute_datum: nur für Tests; ohne Angabe gilt das heutige Datum.
+    """
+    return statistik.pausen(hole_workouts(), heute_datum or date.today().isoformat())
+
+
+@server.tool()
+@klare_fehler
+def wochentage(von: str | None = None, bis: str | None = None) -> dict:
+    """Verteilung auf die Wochentage Montag bis Sonntag: Anzahl, Kilometer und Anteil je Tag, dazu der häufigste Trainingstag. Beantwortet "an welchem Tag trainiere ich am meisten".
+
+    von, bis: JJJJ-MM-TT, beide einschließlich; ohne Angabe der gesamte Datenbestand. Eine Uhrzeit gibt es nicht.
+    """
+    return statistik.nach_wochentagen(hole_workouts(), von, bis)
 
 
 @server.tool()
@@ -162,8 +228,9 @@ def einheiten(sportart: str | None = None, von: str | None = None, bis: str | No
     """Einzelne Trainingseinheiten, jüngste zuerst, mit Datum, Sportart, Dauer, Kilometern und Kalorien.
 
     sportart: Laufen, Radfahren, Schwimmen oder Wandern; leer für alle. von, bis: JJJJ-MM-TT, beide einschließlich.
-    anzahl: höchstens so viele Einheiten in der Liste, 0 für alle. treffer und distanz_km beziehen sich auf alle
-    passenden Einheiten, auch die nicht gezeigten; für weitere Summen zeitraum() verwenden.
+    Ein einzelner Tag: von und bis auf dasselbe Datum setzen. anzahl: höchstens so viele Einheiten in der Liste,
+    0 für alle. treffer und distanz_km beziehen sich auf alle passenden Einheiten, auch die nicht gezeigten; für
+    weitere Summen zeitraum() verwenden. Jede Einheit trägt tempo_min_pro_km, tempo_text (mm:ss min/km) und km_pro_h.
     """
     sportart = statistik.pruefe_sportart(sportart)
     von = statistik.pruefe_datum(von, "von") if von else None
@@ -172,7 +239,7 @@ def einheiten(sportart: str | None = None, von: str | None = None, bis: str | No
     return {
         "treffer": len(treffer),
         "distanz_km": round(sum(w["distanz_km"] for w in treffer), 1),
-        "einheiten": treffer[:anzahl] if anzahl > 0 else treffer,
+        "einheiten": [statistik.mit_tempo(w) for w in (treffer[:anzahl] if anzahl > 0 else treffer)],
     }
 
 
