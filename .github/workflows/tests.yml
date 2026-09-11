@@ -17,7 +17,8 @@ jobs:
           python-version: "3.12"
 
       - name: Abhängigkeiten installieren
-        run: pip install -r requirements.txt
+        # mcp/requirements.txt gehört nicht ins Docker-Image, aber zu den Tests des MCP-Servers
+        run: pip install -r requirements.txt -r mcp/requirements.txt
 
       - name: Tests ausführen
         run: pytest
