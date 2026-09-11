@@ -9,3 +9,5 @@ backend/tests
 docs
 scripts
 *.md
+# Der MCP-Server läuft auf dem Rechner, nicht im Container
+mcp

@@ -1,11 +1,11 @@
 # Die Tests der Referenzlösung
 
-Stand 11.09.2026, 15 Tests in `backend/tests/test_api.py`, alle grün in unter einer Sekunde. Dieses Dokument beschreibt, wie die Tests aufgebaut sind, was jeder einzelne prüft und wie man sie ausführt.
+Stand 11.09.2026, 20 Tests in `backend/tests/test_api.py`, alle grün in unter einer Sekunde: 15 für den Bauweg des Kurses und fünf für den Trainingsbot, der nicht Teil des Bauwegs ist. Dieses Dokument beschreibt, wie die Tests aufgebaut sind, was jeder einzelne prüft und wie man sie ausführt.
 
 ## Ausführen
 
 ```bash
-pytest                          # alle Tests, kurze Ausgabe: 15 passed
+pytest                          # alle Tests, kurze Ausgabe: 20 passed
 pytest -v                       # je Test Name und PASSED/FAILED
 pytest -k test_stats_gesamt_km  # nur ein Test
 ```
@@ -41,7 +41,7 @@ Acht Einheiten in drei Kalenderwochen, KW 24 bewusst leer:
 
 Daraus: 87,5 km gesamt, 3 Kalenderwochen, Ø 29,2 km, Radfahren 50,0 km vor Laufen 26,0 km; KW 23: 34,5 km, 4 Einheiten, 175 min; KW 25: 53,0 km, 4 Einheiten, 285 min.
 
-## Die 15 Tests
+## Die 15 Tests des Bauwegs
 
 | Test | Story | Prüft | Erwartung | Warum dieser Test |
 |---|---|---|---|---|
@@ -60,6 +60,10 @@ Daraus: 87,5 km gesamt, 3 Kalenderwochen, Ø 29,2 km, Radfahren 50,0 km vor Lauf
 | `test_wochen_summen` | US-6 | Summen je Woche | 34,5 / 4 / 175 und 53,0 / 4 / 285 | Aggregation je Kalenderwoche, Montag als `wochenstart` |
 | `test_wochen_leer` | US-6 | Randfall ohne Daten | leere Liste | per `monkeypatch` |
 | `test_wochen_je_sportart` | US-7 | Kilometer je Sportart und Woche | KW 23: Laufen 13,0, Radfahren 20,0, Schwimmen 1,5; KW 24: `{}`; KW 25: Laufen 13,0, Radfahren 30,0, Wandern 10,0 | Das Backend liefert die Aufteilung, das Frontend rechnet nichts selbst |
+
+## Die fünf Tests für den Trainingsbot
+
+Der Chat über die eigenen Daten (`POST /api/chat`, nur lokal mit LM Studio) hat fünf eigene Tests. LM Studio wird darin per `monkeypatch` durch feste Antworten ersetzt, die Tests laufen also ohne Modell und ohne Netz. Beschreibung in `docs/dozent/mcp.md`, Abschnitt Tests.
 
 ## Was die Tests nicht prüfen
 

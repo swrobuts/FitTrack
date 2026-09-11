@@ -20,13 +20,15 @@ KAPITEL = [
     ("ablauf", "Der Bauweg", "docs/dozent/prompt-skript.md",
      "Termin 1 und 2 in Schritten. Jeder Schritt: kurz beschrieben, dann die Handlung, dann Test, Prompt und Befehle zum Kopieren."),
     ("tests", "Die Tests", "docs/dozent/tests.md",
-     "Wie die 15 Tests aufgebaut sind, was jeder prüft und wie man sie ausführt."),
+     "Wie die Tests aufgebaut sind, was jeder prüft und wie man sie ausführt."),
     ("checklisten", "Checklisten", "docs/checklisten.md",
      "Definition of Done, Review-Checkliste, Semantik-Review, Prompt-Regeln, Endabnahme."),
     ("render", "Deploy auf Render", "docs/dozent/render-deploy.md",
      "Vom Push zur öffentlichen Adresse, einmalige Einrichtung und Hinweise für die Veranstaltung."),
     ("lmstudio", "Exkurs LM Studio", "docs/dozent/lmstudio-demo.md",
      "Derselbe Prompt an ein lokales Modell, zehn Minuten Demo."),
+    ("mcp", "Bot und MCP", "docs/dozent/mcp.md",
+     "Nach dem Kurs: die App als Werkzeuge in Claude Desktop und LM Studio, und der Trainingsbot in der App, nur lokal."),
 ]
 
 # Beschriftung der Codeblöcke nach Sprache
