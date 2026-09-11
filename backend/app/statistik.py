@@ -88,3 +88,151 @@ def berechne_wochen(workouts: list[dict]) -> list[dict]:
         })
         montag += timedelta(days=7)
     return wochen
+
+
+# --- Erweiterungen für den MCP-Server: Zeiträume, einzelne Wochen, Bestwerte -----------
+
+WOCHENZIEL_KM = 40                    # dieselbe Zahl wie im Frontend (app.js)
+SPORTARTEN = ["Laufen", "Radfahren", "Schwimmen", "Wandern"]
+
+
+def pruefe_datum(text: str, name: str) -> str:
+    """Prüft ein Datum im Format JJJJ-MM-TT und gibt es unverändert zurück."""
+    try:
+        return date.fromisoformat(text).isoformat()
+    except (TypeError, ValueError):
+        raise ValueError(f"{name} muss ein Datum im Format JJJJ-MM-TT sein, nicht {text!r}")
+
+
+def pruefe_sportart(name: str | None) -> str | None:
+    """Gibt die Sportart in der Schreibweise der App zurück; None heißt alle Sportarten."""
+    if name is None or name == "":
+        return None
+    for sportart in SPORTARTEN:
+        if sportart.lower() == name.strip().lower():
+            return sportart
+    raise ValueError(f"Unbekannte Sportart {name!r}. Gültig sind: {', '.join(SPORTARTEN)}")
+
+
+def kalenderwoche_text(datum_text: str) -> str:
+    """Kalenderwoche eines Datums nach ISO 8601, z. B. 2026-W36."""
+    jahr, woche, _ = date.fromisoformat(datum_text).isocalendar()
+    return f"{jahr}-W{woche:02d}"
+
+
+def wochenbereich(kw_oder_datum: str) -> tuple[str, str]:
+    """Montag und Sonntag einer Kalenderwoche; nimmt 2026-W36 oder ein Datum in der Woche."""
+    text = kw_oder_datum.strip().upper()
+    try:
+        if "-W" in text:
+            jahr, woche = text.split("-W")
+            montag = date.fromisocalendar(int(jahr), int(woche), 1)
+        else:
+            montag = montag_der_woche(text)
+    except ValueError:
+        raise ValueError(f"Kalenderwoche als JJJJ-Wnn oder Datum als JJJJ-MM-TT angeben, nicht {kw_oder_datum!r}")
+    return montag.isoformat(), (montag + timedelta(days=6)).isoformat()
+
+
+def datenzeitraum(workouts: list[dict]) -> dict:
+    """Erste und letzte Einheit und die Zahl der Kalenderwochen dazwischen, beide einschließlich."""
+    if not workouts:
+        return {"von": None, "bis": None, "kalenderwochen": 0}
+    daten = [w["datum"] for w in workouts]
+    return {"von": min(daten), "bis": max(daten), "kalenderwochen": anzahl_kalenderwochen(workouts)}
+
+
+def kilometer_je_sportart(workouts: list[dict]) -> dict:
+    """Summe der Kilometer je Sportart, größte zuerst, gerundet auf eine Nachkommastelle."""
+    summen = defaultdict(float)
+    for w in workouts:
+        summen[w["sportart"]] += w["distanz_km"]
+    return {name: round(km, 1) for name, km in sorted(summen.items(), key=lambda paar: (-paar[1], paar[0]))}
+
+
+def im_zeitraum(workouts: list[dict], von: str | None, bis: str | None, sportart: str | None) -> list[dict]:
+    """Filtert Einheiten nach Datum (beide Grenzen einschließlich) und Sportart."""
+    return [w for w in workouts
+            if (von is None or w["datum"] >= von)
+            and (bis is None or w["datum"] <= bis)
+            and (sportart is None or w["sportart"] == sportart)]
+
+
+def zeitraum_zusammenfassung(workouts: list[dict], von: str | None = None, bis: str | None = None,
+                             sportart: str | None = None) -> dict:
+    """Summen und Durchschnitte für einen Zeitraum; ohne Grenzen gilt der gesamte Datenbestand."""
+    gesamt = datenzeitraum(workouts)
+    von = pruefe_datum(von, "von") if von else gesamt["von"]
+    bis = pruefe_datum(bis, "bis") if bis else gesamt["bis"]
+    if von and bis and von > bis:
+        raise ValueError(f"von ({von}) liegt nach bis ({bis})")
+    sportart = pruefe_sportart(sportart)
+    treffer = im_zeitraum(workouts, von, bis, sportart)
+    distanz = round(sum(w["distanz_km"] for w in treffer), 1)
+    wochen = anzahl_kalenderwochen(treffer) if treffer else 0
+    return {
+        "von": von, "bis": bis, "sportart": sportart or "alle",
+        "distanz_km": distanz,
+        "anzahl": len(treffer),
+        "dauer_min": sum(w["dauer_min"] for w in treffer),
+        "kalorien": sum(w["kalorien"] for w in treffer),
+        "je_sportart": kilometer_je_sportart(treffer),
+        "durchschnitt_km_pro_einheit": round(distanz / len(treffer), 1) if treffer else 0.0,
+        "kalenderwochen": wochen,
+        "durchschnitt_km_pro_woche": round(distanz / wochen, 1) if wochen else 0.0,
+    }
+
+
+def woche_details(workouts: list[dict], kw_oder_datum: str) -> dict:
+    """Eine Kalenderwoche mit Summen, Kilometern je Sportart, Zielstatus und ihren Einheiten."""
+    von, bis = wochenbereich(kw_oder_datum)
+    treffer = im_zeitraum(workouts, von, bis, None)
+    distanz = round(sum(w["distanz_km"] for w in treffer), 1)
+    ergebnis = {
+        "kalenderwoche": kalenderwoche_text(von), "von": von, "bis": bis,
+        "distanz_km": distanz,
+        "anzahl": len(treffer),
+        "dauer_min": sum(w["dauer_min"] for w in treffer),
+        "je_sportart": kilometer_je_sportart(treffer),
+        "wochenziel_km": WOCHENZIEL_KM,
+        "ziel_erreicht": distanz >= WOCHENZIEL_KM,
+        "einheiten": treffer,
+    }
+    gesamt = datenzeitraum(workouts)
+    if gesamt["von"] and (bis < gesamt["von"] or von > gesamt["bis"]):
+        ergebnis["hinweis"] = f"Die Woche liegt außerhalb der Daten ({gesamt['von']} bis {gesamt['bis']})."
+    return ergebnis
+
+
+def zielserien(wochen: list[dict]) -> tuple[int, int]:
+    """Längste und aktuelle Folge von Kalenderwochen, die das Wochenziel erreichen."""
+    laengste = aktuelle = 0
+    for woche in wochen:
+        aktuelle = aktuelle + 1 if woche["distanz_km"] >= WOCHENZIEL_KM else 0
+        laengste = max(laengste, aktuelle)
+    return laengste, aktuelle
+
+
+def bestwerte(workouts: list[dict], sportart: str | None = None) -> dict:
+    """Längste Einheit nach Kilometern und Minuten, beste Woche und Zielserien, wahlweise je Sportart."""
+    sportart = pruefe_sportart(sportart)
+    treffer = im_zeitraum(workouts, None, None, sportart)
+    if not treffer:
+        return {"sportart": sportart or "alle", "hinweis": "keine Einheiten"}
+    wochen = berechne_wochen(workouts)          # Serien immer über alle Sportarten, wie das Wochenziel
+    if sportart:
+        beste = max(wochen, key=lambda w: (w["je_sportart"].get(sportart, 0.0), w["kw"]))
+        beste_woche = {"kw": beste["kw"], "distanz_km": beste["je_sportart"].get(sportart, 0.0)}
+    else:
+        beste = max(wochen, key=lambda w: (w["distanz_km"], w["kw"]))
+        beste_woche = {"kw": beste["kw"], "distanz_km": beste["distanz_km"]}
+    laengste, aktuelle = zielserien(wochen)
+    return {
+        "sportart": sportart or "alle",
+        "laengste_einheit_km": max(treffer, key=lambda w: (w["distanz_km"], w["datum"])),
+        "laengste_einheit_min": max(treffer, key=lambda w: (w["dauer_min"], w["datum"])),
+        "beste_woche": beste_woche,
+        "wochenziel_km": WOCHENZIEL_KM,
+        "laengste_zielserie_wochen": laengste,
+        "aktuelle_zielserie_wochen": aktuelle,
+    }

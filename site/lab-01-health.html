@@ -121,7 +121,7 @@ flowchart TD
       Zieldateien übernehmen.</p>
     <h3>5. Wieder pytest</h3>
     <p>Entweder grün:</p>
-    <pre class="code-block">20 passed in 0.19s</pre>
+    <pre class="code-block">32 passed in 0.52s</pre>
     <p>oder rot mit genauer Angabe. Ein Lauf mit falschem Ergebnis sieht so aus:</p>
     <pre class="code-block">>       assert stats["gesamt_km"] == 87.5
 E       assert 90.0 == 87.5
@@ -148,7 +148,7 @@ backend/tests/test_api.py:52: AssertionError</pre>
       <p><code>conftest.py</code> baut vor jedem Lauf aus <code>schema.sql</code> und dem Fixture eine temporäre
         Testdatenbank und setzt <code>FITTRACK_DATA</code> darauf. Die Tests laufen nie gegen die 311 Echtdaten.
         <code>TestClient</code> ruft die App im selben Prozess auf, ein Server wird nicht gestartet; deshalb dauern
-        alle 20 Tests unter einer Sekunde. Für den Sonderfall „keine Daten“ tauscht <code>monkeypatch</code> die
+        alle 32 Tests unter einer Sekunde. Für den Sonderfall „keine Daten“ tauscht <code>monkeypatch</code> die
         Ladefunktion vorübergehend gegen eine leere Liste aus.</p>
     </div>
     <div class="warn-box">

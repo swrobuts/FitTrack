@@ -1,11 +1,11 @@
 # Die Tests der Referenzlösung
 
-Stand 11.09.2026, 20 Tests in `backend/tests/test_api.py`, alle grün in unter einer Sekunde: 15 für den Bauweg des Kurses und fünf für den Trainingsbot, der nicht Teil des Bauwegs ist. Dieses Dokument beschreibt, wie die Tests aufgebaut sind, was jeder einzelne prüft und wie man sie ausführt.
+Stand 11.09.2026, 32 Tests, alle grün in unter einer Sekunde: 15 für den Bauweg des Kurses und fünf für den Trainingsbot in `test_api.py`, zwölf für die Werkzeuge des MCP-Servers in `test_mcp.py`. Bot und MCP-Server sind nicht Teil des Bauwegs. Dieses Dokument beschreibt, wie die Tests aufgebaut sind, was jeder einzelne prüft und wie man sie ausführt.
 
 ## Ausführen
 
 ```bash
-pytest                          # alle Tests, kurze Ausgabe: 20 passed
+pytest                          # alle Tests, kurze Ausgabe: 32 passed
 pytest -v                       # je Test Name und PASSED/FAILED
 pytest -k test_stats_gesamt_km  # nur ein Test
 ```
@@ -64,6 +64,10 @@ Daraus: 87,5 km gesamt, 3 Kalenderwochen, Ø 29,2 km, Radfahren 50,0 km vor Lauf
 ## Die fünf Tests für den Trainingsbot
 
 Der Chat über die eigenen Daten (`POST /api/chat`, nur lokal mit LM Studio) hat fünf eigene Tests. LM Studio wird darin per `monkeypatch` durch feste Antworten ersetzt, die Tests laufen also ohne Modell und ohne Netz. Beschreibung in `docs/dozent/mcp.md`, Abschnitt Tests.
+
+## Die zwölf Tests für den MCP-Server
+
+`test_mcp.py` lädt `mcp/server.py` und ersetzt den HTTP-Abruf der Einheiten durch die Testdatenbank. Jedes Werkzeug wird mit von Hand gerechneten Werten aus den acht Einheiten geprüft, dazu die Fehlermeldungen bei ungültiger Sportart, falschem Datumsformat und vertauschten Grenzen. Beschreibung in `docs/dozent/mcp.md`.
 
 ## Was die Tests nicht prüfen
 

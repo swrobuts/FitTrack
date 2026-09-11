@@ -13,16 +13,26 @@ Der MCP-Server ist die Brücke, mit der ein fremdes Chatfenster an die Daten kom
 
 ### Was er tut
 
-`mcp/server.py` spricht über stdin/stdout mit dem Chat-Client, das ist der Standard des Model Context Protocol. Er bietet vier Werkzeuge an, jedes ruft eine Route der App auf:
+`mcp/server.py` spricht über stdin/stdout mit dem Chat-Client, das ist der Standard des Model Context Protocol. Er holt die Einheiten einmal je Aufruf von `GET /api/workouts` und rechnet dann mit denselben Funktionen wie die App, `statistik.py` aus dem Backend. Das Modell bekommt fertige Zahlen; es muss nichts addieren, zählen oder in Kalenderwochen umrechnen. Genau da entstehen sonst die Abweichungen, denn MCP transportiert präzise, das Modell rechnet nicht präzise.
 
-| Werkzeug | Route | Parameter |
+| Werkzeug | Beantwortet | Parameter |
 |---|---|---|
-| `gesundheit` | `GET /health` | keine |
-| `kennzahlen` | `GET /api/stats` | keine |
-| `wochen` | `GET /api/stats/wochen` | `anzahl` (Standard 12, 0 für alle) |
-| `einheiten` | `GET /api/workouts` | `sportart`, `von`, `bis`, `anzahl` (Standard 20) |
+| `gesundheit` | Ist die App erreichbar? | keine |
+| `heute` | heutiges Datum, aktuelle Kalenderwoche, erste und letzte Einheit | keine; zuerst aufrufen bei „letzte Woche“, „dieser Monat“ |
+| `kennzahlen` | Gesamtbild: Kilometer, Durchschnitt je Kalenderwoche, Lieblingssportart, Anzahl, Datenzeitraum | keine |
+| `woche` | genau eine Kalenderwoche: Montag, Sonntag, Summen, je Sportart, Wochenziel erreicht, Einheiten | `kalenderwoche` als `2026-W36` oder ein Datum in der Woche |
+| `wochen` | Verlauf als Liste, Wochen ohne Training mit Nullwerten | `anzahl` (Standard 12, 0 = alle) oder `von_kw`, `bis_kw` |
+| `zeitraum` | Summen und Durchschnitte für Monat, Quartal, Jahr oder freie Tage, wahlweise je Sportart | `von`, `bis` einschließlich; ohne Angabe der gesamte Datenbestand; `sportart` |
+| `bestwerte` | längste Einheit nach km und Minuten, beste Woche, längste und aktuelle Zielserie | `sportart` optional |
+| `einheiten` | einzelne Einheiten, jüngste zuerst, mit Trefferzahl und Summe über alle Treffer | `sportart`, `von`, `bis`, `anzahl` (Standard 20, 0 = alle) |
 
-Welche App er fragt, steht in `FITTRACK_URL`. Ohne die Variable ist es `https://fittrack-k7gg.onrender.com`. Der Free-Tier auf Render schläft ein; der erste Aufruf kann bis zu einer Minute dauern, das Zeitlimit ist entsprechend gesetzt. Für die lokale App: `FITTRACK_URL=http://localhost:8000`.
+Drei Dinge machen die Antworten belastbar:
+
+- **Definitionen stehen im Docstring.** Kalenderwochen sind ISO-Wochen von Montag bis Sonntag, Daten gelten einschließlich beider Grenzen, der Durchschnitt je Woche zählt auch Wochen ohne Training, die Lieblingssportart ist die mit den meisten Kilometern. Der Docstring ist die einzige Anleitung, die das Modell hat.
+- **Jede Antwort nennt ihren Bezug.** `woche` liefert `von` und `bis`, `zeitraum` die tatsächlich verwendeten Grenzen, `kennzahlen` den Datenzeitraum. Das Modell muss kein Enddatum ergänzen.
+- **Ungültige Eingaben geben eine Fehlermeldung mit den gültigen Werten**, etwa `Unbekannte Sportart 'Joggen'. Gültig sind: Laufen, Radfahren, Schwimmen, Wandern`. Eine Woche ohne Training ist kein Fehler, sondern liefert Nullwerte; liegt sie außerhalb der Daten, steht das im Feld `hinweis`. Technisches Detail: Die Werkzeuge werfen dafür `ToolError` aus dem SDK. Eine gewöhnliche Python-Ausnahme würde das SDK zu „Error executing tool“ ohne Text verkürzen, und das Modell wüsste nicht, was falsch war.
+
+Dazu bekommt das Modell beim Verbinden eine Anweisung: für relative Zeitangaben zuerst `heute` aufrufen, nie selbst summieren, Fehlermeldungen wörtlich weitergeben. Welche App der Server fragt, steht in `FITTRACK_URL`. Ohne die Variable ist es `https://fittrack-k7gg.onrender.com`; der Free-Tier schläft ein, der erste Aufruf kann bis zu einer Minute dauern. Für die lokale App: `FITTRACK_URL=http://localhost:8000`.
 
 ### Einmalig vorbereiten
 
@@ -62,9 +72,13 @@ LM Studio unterstützt MCP ab Version 0.3.17. Im Programm unter `Program → Int
 
 ### Fragen zum Ausprobieren
 
-- „Wie viele Kilometer bin ich insgesamt gefahren, und welche Sportart ist die häufigste?“ → ein Aufruf von `kennzahlen`.
-- „Wie liefen die letzten vier Wochen, und in welchen habe ich das Wochenziel von 40 km erreicht?“ → `wochen` mit `anzahl=4`, das Modell vergleicht mit 40.
+- „Wie viele Kilometer bin ich insgesamt gefahren, und welche Sportart ist die häufigste?“ → `kennzahlen`.
+- „Wie lief meine letzte Trainingswoche?“ → `heute`, dann `woche` mit der Kalenderwoche der letzten Einheit.
+- „Wie viele Kilometer im August 2026, davon wie viel Radfahren?“ → `zeitraum` mit `von=2026-08-01`, `bis=2026-08-31`; die Aufteilung steht in `je_sportart`.
+- „Was war mein längster Lauf, und wie viele Wochen in Folge habe ich das Ziel erreicht?“ → `bestwerte` mit `sportart=Laufen`.
 - „Zeig mir meine Läufe im August 2026.“ → `einheiten` mit `sportart=Laufen`, `von=2026-08-01`, `bis=2026-08-31`.
+
+Im aufgeklappten Werkzeugaufruf des Clients steht, was wirklich gefragt und geantwortet wurde. Weicht die Prosa davon ab, hat das Modell ergänzt.
 
 Für die Lehre lohnt der Vergleich: dieselbe Frage einmal in Claude Desktop, einmal in LM Studio mit Gemma 4. Beide rufen dieselben Werkzeuge auf; Unterschiede liegen in der Wahl der Parameter und in der Formulierung, nicht in den Zahlen.
 
@@ -108,6 +122,8 @@ Zwei Details, die man kennen sollte:
 - Datumsangaben rechnet das Modell gelegentlich selbst um und vertut sich dabei um einen Tag. Die Kilometer stimmen, weil sie aus der App kommen.
 
 ### Tests
+
+Zwölf Tests in `backend/tests/test_mcp.py` prüfen die Werkzeuge des MCP-Servers gegen das Fixture, der HTTP-Abruf ist durch die Testdatenbank ersetzt: Zeitraum ohne Grenzen gleich 87,5 km über drei Kalenderwochen, KW 24 mit Nullwerten und Ziel nicht erreicht, Läufe im Juni gleich 26,0 km in 150 Minuten, beste Woche 2026-W25, ungültige Sportart und falsches Datumsformat als Fehlermeldung.
 
 Fünf Tests in `test_api.py` decken den Chat ab, zusätzlich zu den 15 Tests des Bauwegs. LM Studio wird darin durch `monkeypatch` ersetzt, die Tests laufen also ohne Modell:
 

@@ -28,10 +28,11 @@ FitTrack/
 │   └── tests/
 │       ├── conftest.py        # baut die Testdatenbank aus schema.sql und dem Fixture
 │       ├── fixtures/workouts_klein.sql    # 8 Einheiten, von Hand nachrechenbar
-│       └── test_api.py        # Tests ZUERST schreiben
+│       ├── test_api.py        # Tests ZUERST schreiben
+│       └── test_mcp.py        # Werkzeuge des MCP-Servers gegen das Fixture
 ├── frontend/                  # index.html, style.css, app.js (Sprint 2)
 ├── scripts/generate_workouts.py   # erzeugt fittrack.db reproduzierbar
-├── mcp/server.py              # MCP-Server: die API als Werkzeuge für Claude Desktop und LM Studio
+├── mcp/server.py              # MCP-Server: acht Werkzeuge für Claude Desktop und LM Studio, rechnet mit statistik.py
 ├── docs/
 │   ├── setup-webstorm.md      # IDE einrichten
 │   └── checklisten.md         # Definition of Done, Review, End-Abnahme
@@ -195,7 +196,7 @@ Die Referenzlösung läuft unter <https://fittrack-k7gg.onrender.com>. Der Free-
 Zwei Zugänge über die App hinaus, beide beschrieben in [docs/dozent/mcp.md](docs/dozent/mcp.md):
 
 - **Trainingsbot in der App.** Ein Chat über Training und die eigenen Zahlen. Er läuft nur lokal: Die Route `POST /api/chat` schickt die von `statistik.py` berechneten Kennzahlen, Wochen und letzten Einheiten an ein Modell in LM Studio (`LMSTUDIO_URL`, Standard `http://localhost:1234/v1`). `GET /api/chat/status` meldet, ob ein Modell erreichbar ist; nur dann zeigt die Seite den Chat-Knopf, und die Option „Trainingsbot anzeigen“ im Seitenfuß kann ihn ausblenden. Auf Render gibt es kein LM Studio, dort bleibt der Bot aus.
-- **MCP-Server** in `mcp/server.py`. Macht die vier API-Routen als Werkzeuge `gesundheit`, `kennzahlen`, `wochen` und `einheiten` für Claude Desktop und LM Studio verfügbar; Ziel-App über `FITTRACK_URL`, Standard ist die Adresse auf Render. Abhängigkeiten in `mcp/requirements.txt`, nicht im Docker-Image.
+- **MCP-Server** in `mcp/server.py`. Acht Werkzeuge für Claude Desktop und LM Studio: `gesundheit`, `heute`, `kennzahlen`, `woche`, `wochen`, `zeitraum`, `bestwerte`, `einheiten`. Der Server holt die Einheiten von der App (`FITTRACK_URL`, Standard Render) und rechnet mit `statistik.py`, damit das Modell nichts selbst addieren muss. Abhängigkeiten in `mcp/requirements.txt`, nicht im Docker-Image.
 
 ## Wie die Kennzahlen definiert sind
 
@@ -225,7 +226,7 @@ Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: elf Labs ent
 - `docs/dozent/prompt-skript.md`: alle Prompts in Schrittreihenfolge mit Prüfpunkten und Befehlen
 - `docs/dozent/anleitung.html`: dieselben Inhalte als klickbare Anleitung zum lokalen Öffnen, mit Abhaken je Schritt und Kopierknopf an jedem Prompt und Befehl; erzeugt aus den Markdown-Dateien mit `scripts/baue_anleitung.py`
 - `docs/dozent/erwartungswerte.md`: Handrechnung für das Fixture
-- `docs/dozent/tests.md`: die 15 Tests des Bauwegs und die fünf Tests des Trainingsbots, ihr Aufbau, Ausführung und typische Fehlerbilder
+- `docs/dozent/tests.md`: die 15 Tests des Bauwegs, die fünf Tests des Trainingsbots und die zwölf Tests des MCP-Servers, ihr Aufbau, Ausführung und typische Fehlerbilder
 - `docs/dozent/mcp.md`: MCP-Server für Claude Desktop und LM Studio, Trainingsbot in der App
 - `docs/dozent/render-deploy.md` und `docs/dozent/lmstudio-demo.md`
 - `docs/dozent/2026-09-10-fittrack-design.md`: Design der Referenzlösung, fortgeschrieben bis US-7; `docs/dozent/archiv/`: der ursprüngliche Plan

@@ -74,7 +74,7 @@ Rot ist hier richtig. Es beweist, dass der Test etwas prüft, was noch fehlt. Ei
 **5. Wieder `pytest`.** Entweder grün:
 
 ```text
-20 passed in 0.19s
+32 passed in 0.52s
 ```
 
 oder rot mit genauer Angabe. Ein Lauf mit falschem Ergebnis sieht so aus:
@@ -91,11 +91,11 @@ Die Zeile mit `E` sagt: Die App liefert 90,0, der Test erwartete 87,5. Genau die
 
 **Alternative zum Terminal:** Rechtsklick auf `test_api.py` in WebStorm, „Run pytest in test_api.py“. Unten erscheint eine Liste mit grünen Haken und roten Kreuzen je Test, oben rechts ein grüner Pfeil zum Wiederholen. Ein einzelner Test: `pytest -k test_stats_gesamt_km`. Mehr Ausgabe: `pytest -v`.
 
-**Was dahinter passiert:** `conftest.py` baut vor jedem Lauf aus `schema.sql` und dem Fixture eine temporäre Testdatenbank und setzt `FITTRACK_DATA` darauf. Die Tests laufen also nie gegen die 311 Echtdaten. `TestClient` ruft die App im selben Prozess auf, ein Server wird nicht gestartet; deshalb dauern alle 20 Tests unter einer Sekunde. Für den Randfall „keine Daten“ tauscht `monkeypatch` die Ladefunktion vorübergehend gegen eine leere Liste aus.
+**Was dahinter passiert:** `conftest.py` baut vor jedem Lauf aus `schema.sql` und dem Fixture eine temporäre Testdatenbank und setzt `FITTRACK_DATA` darauf. Die Tests laufen also nie gegen die 311 Echtdaten. `TestClient` ruft die App im selben Prozess auf, ein Server wird nicht gestartet; deshalb dauern alle 32 Tests unter einer Sekunde. Für den Randfall „keine Daten“ tauscht `monkeypatch` die Ladefunktion vorübergehend gegen eine leere Liste aus.
 
 **Zwei Regeln:** Der Erwartungswert kommt nie vom Modell, sonst prüft der Test nur, ob die KI mit sich selbst übereinstimmt. Und der Test wird nie geändert, damit er zum Code passt; der Code muss sich dem Test anpassen. Ausnahme: Eine Story erweitert bewusst die Spezifikation, wie US-7 mit `je_sportart`. Dann ändert sich der Test vor dem Code, mit Begründung im Commit.
 
-Beschreibung aller Tests: `docs/dozent/tests.md`. Die Referenzlösung hat 20: 15 entstehen auf dem Bauweg, fünf gehören zum Trainingsbot, der nach dem Kurs dazukam.
+Beschreibung aller Tests: `docs/dozent/tests.md`. Die Referenzlösung hat 32: 15 entstehen auf dem Bauweg, fünf gehören zum Trainingsbot und zwölf zum MCP-Server, beide nach dem Kurs dazugekommen.
 
 ---
 
