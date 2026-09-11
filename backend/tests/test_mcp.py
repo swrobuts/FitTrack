@@ -218,3 +218,12 @@ def test_bestwerte_tempo_und_kalorien():
 def test_zeitraum_mit_zielbilanz():
     antwort = server.zeitraum()
     assert antwort["wochenziel_km"] == 40 and antwort["wochen_mit_ziel"] == 1     # nur KW 25
+
+
+def test_werkzeugkatalog_des_bots_entspricht_dem_server():
+    # Bot und MCP-Server bieten dieselben Werkzeuge an, nur gesundheit gehört allein dem Server
+    from app import werkzeuge
+    mcp_namen = {w.name for w in server.server._tool_manager.list_tools()} - {"gesundheit"}
+    assert set(werkzeuge.NAMEN) == mcp_namen
+    schema = werkzeuge.katalog()
+    assert all(w["type"] == "function" and "parameters" in w["function"] for w in schema)

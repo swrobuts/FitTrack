@@ -326,6 +326,7 @@ svg { display: block; }
 .chat-nachricht.bot { justify-self: start; background: var(--karte-hell); border-bottom-left-radius: 4px; }
 .chat-nachricht.wartet { color: var(--text-2); font-style: italic; }
 .chat-nachricht.fehler { border: 1px solid var(--laufen); color: var(--laufen); background: transparent; }
+.chat-werkzeuge { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--linie); font-size: 12px; color: var(--text-2); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .chat-vorschlaege { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0; }
 .chat-vorschlaege .knopf { align-self: auto; white-space: normal; text-align: left; }
 .chat-form { display: flex; gap: 8px; padding-top: 8px; border-top: 1px solid var(--linie); }

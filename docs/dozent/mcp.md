@@ -5,9 +5,9 @@ Zwei Wege, die Trainingsdaten in ein Chatfenster zu holen. Beide brauchen keine 
 | Weg | Wo läuft der Chat | Wer rechnet | Wofür |
 |---|---|---|---|
 | **MCP-Server** (`mcp/server.py`) | Claude Desktop oder LM Studio, auf Ihrem Rechner | die App: der Client ruft Werkzeuge auf, die die API abfragen | Fragen an die Daten stellen, Werkzeugaufrufe beobachten, Cloud gegen lokal vergleichen |
-| **Trainingsbot** in der App | die FitTrack-Seite selbst, nur lokal | die App rechnet vorab, LM Studio formuliert | Chat über Training und die eigenen Zahlen, ohne Konto und ohne dass Daten den Rechner verlassen |
+| **Trainingsbot** in der App | die FitTrack-Seite selbst, nur lokal | die App: das Modell in LM Studio ruft dieselben Werkzeuge auf wie über MCP | Chat über Training und die eigenen Zahlen, ohne Konto und ohne dass Daten den Rechner verlassen |
 
-Der MCP-Server ist die Brücke, mit der ein fremdes Chatfenster an die Daten kommt. Der Trainingsbot sitzt in der App, deshalb braucht er diese Brücke nicht: Seine Route ruft dieselben Python-Funktionen auf wie die übrigen Endpunkte.
+Der MCP-Server ist die Brücke, mit der ein fremdes Chatfenster an die Daten kommt. Der Trainingsbot sitzt in der App, deshalb braucht er diese Brücke nicht: Seine Route meldet LM Studio dieselben Werkzeuge direkt im OpenAI-Format und führt die Aufrufe selbst aus, mit denselben Funktionen aus `statistik.py`.
 
 ## Weg 1: MCP-Server
 
@@ -115,11 +115,14 @@ Aus dem Docker-Container heißt der Rechner nicht `localhost`; `docker-compose.y
 
 `POST /api/chat` bekommt die Frage und den bisherigen Verlauf. Die Route in `backend/app/chat.py`:
 
-1. rechnet mit `statistik.py` Kennzahlen, die letzten zwölf Kalenderwochen mit Kilometern je Sportart und die letzten zehn Einheiten,
-2. legt diese Zahlen als Text in den Systemprompt, zusammen mit der Anweisung, nicht selbst zu rechnen und keine Werte zu erfinden,
-3. schickt Systemprompt, Verlauf und Frage im OpenAI-Format an LM Studio und gibt die Antwort zurück.
+1. rechnet mit `statistik.py` einen kompakten Kontext (Kennzahlen, die letzten zwölf Wochen, die letzten zehn Einheiten) und legt ihn in den Systemprompt; einfache Fragen brauchen so keinen Werkzeugaufruf,
+2. schickt Systemprompt, Verlauf und Frage zusammen mit dem Werkzeugkatalog aus `backend/app/werkzeuge.py` an LM Studio, im OpenAI-Format mit `tools`,
+3. führt jeden verlangten Aufruf aus (`fuehre_aus`, dieselben Funktionen wie im MCP-Server), hängt das Ergebnis als `tool`-Nachricht an und fragt erneut, bis das Modell mit Text antwortet; höchstens fünf Runden,
+4. gibt Antwort und Aufrufe zurück. Das Sheet zeigt unter der Antwort, welche Werkzeuge mit welchen Argumenten gerufen wurden, etwa `zeitraum(von=2026-08-01, bis=2026-08-31)`.
 
-Das Modell bekommt also keine rohen Einheiten zum Addieren. Das ist die Lehre aus „Schön, aber falsch“: Zahlen kommen aus Python, das Modell formuliert. Die Wochensumme der KW 36 im Bot ist deshalb dieselbe wie auf der Wochenkarte.
+Das Modell bekommt also nie rohe Einheiten zum Addieren. Das ist die Lehre aus „Schön, aber falsch“: Zahlen kommen aus Python, das Modell formuliert. Prüffehler wie eine unbekannte Sportart gehen als `{"fehler": ...}` an das Modell zurück, mit den gültigen Werten; ein Modell, das endlos Werkzeuge verlangt, wird nach fünf Runden gestoppt.
+
+Der Katalog in `werkzeuge.py` und die Docstrings in `mcp/server.py` beschreiben dieselben dreizehn Funktionen; ein Test hält die beiden Listen gleich. Die Beschreibungen im Katalog sind kürzer, weil sie bei jeder Anfrage an ein lokales Modell mitgeschickt werden.
 
 Zwei Details, die man kennen sollte:
 
@@ -128,7 +131,7 @@ Zwei Details, die man kennen sollte:
 
 ### Was der Bot nicht kann
 
-- Fragen zu Einheiten, die älter sind als die letzten zehn, oder zu Wochen vor den letzten zwölf, beantwortet er nur über die Kennzahlen. Wer alles braucht, nimmt Weg 1 mit `einheiten` und `wochen`.
+- Das Modell muss Werkzeugaufrufe beherrschen; in LM Studio erkennbar am Hammersymbol. Ohne diese Fähigkeit antwortet es nur aus dem Kontext (Kennzahlen, zwölf Wochen, zehn Einheiten).
 - Der Verlauf lebt im Browser bis zum Neuladen. Nichts wird gespeichert, weder in der App noch in LM Studio.
 - Datumsangaben rechnet das Modell gelegentlich selbst um und vertut sich dabei um einen Tag. Die Kilometer stimmen, weil sie aus der App kommen.
 
@@ -136,7 +139,7 @@ Zwei Details, die man kennen sollte:
 
 21 Tests in `backend/tests/test_mcp.py` prüfen die Werkzeuge des MCP-Servers gegen das Fixture, der HTTP-Abruf ist durch die Testdatenbank ersetzt: Zeitraum ohne Grenzen gleich 87,5 km über drei Kalenderwochen, KW 24 mit Nullwerten und Ziel nicht erreicht, Läufe im Juni gleich 26,0 km in 150 Minuten, beste Woche 2026-W25, ungültige Sportart und falsches Datumsformat als Fehlermeldung.
 
-Fünf Tests in `test_api.py` decken den Chat ab, zusätzlich zu den 15 Tests des Bauwegs. LM Studio wird darin durch `monkeypatch` ersetzt, die Tests laufen also ohne Modell:
+Neun Tests in `test_api.py` decken den Chat ab, zusätzlich zu den 15 Tests des Bauwegs. LM Studio wird darin durch `monkeypatch` ersetzt, die Tests laufen also ohne Modell:
 
 | Test | Prüft |
 |---|---|
@@ -145,3 +148,7 @@ Fünf Tests in `test_api.py` decken den Chat ab, zusätzlich zu den 15 Tests des
 | `test_chat_ohne_lmstudio_ist_503` | die Route lehnt ohne Modell mit 503 ab |
 | `test_chat_antwortet_mit_kontext` | Systemprompt enthält die Fixture-Zahlen, der Verlauf wird in der richtigen Reihenfolge übergeben |
 | `test_chat_kontext_enthaelt_wochen_und_sportarten` | der Datenkontext nennt Wochen, Sportarten und die Anzahl der Einheiten |
+| `test_chat_fuehrt_werkzeug_aus` | ein verlangter Aufruf von `zeitraum` wird ausgeführt, das Ergebnis geht als `tool`-Nachricht zurück, die Aufrufe stehen in der Antwort |
+| `test_chat_werkzeugfehler_geht_an_das_modell` | eine unbekannte Sportart kommt als Fehlertext mit den gültigen Werten beim Modell an |
+| `test_chat_begrenzt_die_runden` | nach fünf Runden ohne Textantwort bricht die Route ab |
+| `test_werkzeug_ausfuehren` | `fuehre_aus` ruft die richtige Funktion, meldet Prüffehler und unbekannte Werkzeuge als Dictionary |

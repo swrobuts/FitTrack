@@ -57,12 +57,11 @@ def chat_frage(anfrage: ChatAnfrage) -> dict:
     if modell is None:
         raise HTTPException(503, "Kein Sprachmodell erreichbar. Der Chat läuft nur lokal mit LM Studio.")
     verlauf = [eintrag.model_dump() for eintrag in anfrage.verlauf]
-    nachrichten = chat.baue_nachrichten(lade_workouts(), verlauf, anfrage.frage)
     try:
-        antwort = chat.frage_lmstudio(nachrichten, modell)
+        antwort, aufrufe = chat.chat_mit_werkzeugen(lade_workouts(), verlauf, anfrage.frage, modell)
     except (httpx2.HTTPError, KeyError, ValueError) as fehler:
         raise HTTPException(502, f"LM Studio hat nicht geantwortet: {fehler}")
-    return {"antwort": antwort, "modell": modell}
+    return {"antwort": antwort, "modell": modell, "aufrufe": aufrufe}
 
 
 # Das Frontend liegt als statische Dateien im Ordner frontend/. Der Mount muss

@@ -55,10 +55,11 @@ class ChatAnfrage(BaseModel):
 
 
 class ChatAntwort(BaseModel):
-    """Antwort von POST /api/chat."""
+    """Antwort von POST /api/chat, mit den Werkzeugen, die das Modell dafür aufgerufen hat."""
 
     antwort: str
     modell: str
+    aufrufe: list[dict] = []
 
 
 class ChatStatus(BaseModel):

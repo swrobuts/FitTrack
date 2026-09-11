@@ -328,6 +328,13 @@ function zeigeChatVerlauf() {
     const blase = document.createElement("div");
     blase.className = `chat-nachricht ${eintrag.rolle}`;
     blase.textContent = eintrag.text;
+    if (eintrag.aufrufe && eintrag.aufrufe.length) {
+      // Welche Werkzeuge das Modell für diese Antwort aufgerufen hat, mit Argumenten
+      const zeile = document.createElement("div");
+      zeile.className = "chat-werkzeuge";
+      zeile.textContent = "Werkzeuge: " + eintrag.aufrufe.map(werkzeugText).join(" · ");
+      blase.appendChild(zeile);
+    }
     verlauf.appendChild(blase);
   }
   if (chatWartet) {
@@ -338,6 +345,12 @@ function zeigeChatVerlauf() {
   }
   document.getElementById("chat-vorschlaege").hidden = chatVerlauf.length > 0;
   verlauf.scrollTop = verlauf.scrollHeight;
+}
+
+function werkzeugText(aufruf) {
+  // zeitraum(von=2026-08-01, bis=2026-08-31)
+  const argumente = Object.entries(aufruf.argumente || {}).map(([name, wert]) => `${name}=${wert}`).join(", ");
+  return `${aufruf.werkzeug}(${argumente})`;
 }
 
 function sperreEingabe(gesperrt) {
@@ -358,11 +371,11 @@ async function sendeFrage(frage) {
     const antwort = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ frage: text, verlauf: bisher }),
+      body: JSON.stringify({ frage: text, verlauf: bisher.filter((e) => e.rolle !== "fehler").map((e) => ({ rolle: e.rolle, text: e.text })) }),
     });
     if (!antwort.ok) throw new Error(`HTTP ${antwort.status}`);
     const daten = await antwort.json();
-    chatVerlauf.push({ rolle: "bot", text: daten.antwort });
+    chatVerlauf.push({ rolle: "bot", text: daten.antwort, aufrufe: daten.aufrufe });
   } catch (fehler) {
     chatVerlauf.push({ rolle: "fehler", text: "Keine Antwort von LM Studio. Läuft der Server dort noch? Frage einfach noch einmal stellen." });
     console.error(fehler);

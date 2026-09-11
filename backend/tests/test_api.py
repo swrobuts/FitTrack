@@ -159,10 +159,11 @@ def test_chat_antwortet_mit_kontext(monkeypatch):
     from app import chat
     gesendet = {}
 
-    def fake_lmstudio(nachrichten, modell):
+    def fake_lmstudio(nachrichten, modell, werkzeuge=None):
         gesendet["nachrichten"] = nachrichten
         gesendet["modell"] = modell
-        return "Du bist 87,5 km gelaufen."
+        gesendet["werkzeuge"] = werkzeuge
+        return {"role": "assistant", "content": "Du bist 87,5 km gelaufen."}
 
     monkeypatch.setattr(chat, "lmstudio_modelle", lambda: ["gemma-4"])
     monkeypatch.setattr(chat, "frage_lmstudio", fake_lmstudio)
@@ -171,7 +172,8 @@ def test_chat_antwortet_mit_kontext(monkeypatch):
         "verlauf": [{"rolle": "nutzer", "text": "Hallo"}, {"rolle": "bot", "text": "Hallo zurück"}],
     })
     assert antwort.status_code == 200
-    assert antwort.json() == {"antwort": "Du bist 87,5 km gelaufen.", "modell": "gemma-4"}
+    assert antwort.json() == {"antwort": "Du bist 87,5 km gelaufen.", "modell": "gemma-4", "aufrufe": []}
+    assert [w["function"]["name"] for w in gesendet["werkzeuge"]][:2] == ["heute", "datenumfang"]
     system = gesendet["nachrichten"][0]
     assert system["role"] == "system"
     assert "87.5" in system["content"]                 # gesamt_km aus dem Fixture, vom Server gerechnet
@@ -188,3 +190,82 @@ def test_chat_kontext_enthaelt_wochen_und_sportarten():
     assert "2026-W23" in text          # eine der drei Fixture-Wochen
     assert "Laufen: 26.0 km" in text   # 5,0 + 8,0 + 9,0 + 4,0 aus dem Fixture
     assert "Einheiten: 8" in text
+
+
+def test_chat_fuehrt_werkzeug_aus(monkeypatch):
+    # Runde 1: das Modell verlangt zeitraum(); Runde 2: es antwortet mit dem Ergebnis
+    from app import chat
+    runden = []
+
+    def fake_lmstudio(nachrichten, modell, werkzeuge=None):
+        runden.append(list(nachrichten))
+        if len(runden) == 1:
+            return {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "a1", "type": "function", "function": {"name": "zeitraum", "arguments": '{"von": "2026-06-01", "bis": "2026-06-30"}'}}]}
+        return {"role": "assistant", "content": "Im Juni waren es 87,5 km in 8 Einheiten."}
+
+    monkeypatch.setattr(chat, "lmstudio_modelle", lambda: ["gemma-4"])
+    monkeypatch.setattr(chat, "frage_lmstudio", fake_lmstudio)
+    antwort = client.post("/api/chat", json={"frage": "Wie viel im Juni?", "verlauf": []}).json()
+    assert antwort["antwort"] == "Im Juni waren es 87,5 km in 8 Einheiten."
+    assert antwort["aufrufe"] == [{"werkzeug": "zeitraum", "argumente": {"von": "2026-06-01", "bis": "2026-06-30"}}]
+    # In Runde 2 stehen Aufruf und Ergebnis in den Nachrichten, das Ergebnis kommt aus statistik.py
+    assert runden[1][-2]["tool_calls"][0]["function"]["name"] == "zeitraum"
+    ergebnis = runden[1][-1]
+    assert ergebnis["role"] == "tool" and ergebnis["tool_call_id"] == "a1"
+    assert '"distanz_km": 87.5' in ergebnis["content"]
+
+
+def test_chat_werkzeugfehler_geht_an_das_modell(monkeypatch):
+    from app import chat
+    runden = []
+
+    def fake_lmstudio(nachrichten, modell, werkzeuge=None):
+        runden.append(list(nachrichten))
+        if len(runden) == 1:
+            return {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "b1", "type": "function", "function": {"name": "bestwerte", "arguments": '{"sportart": "Joggen"}'}}]}
+        return {"role": "assistant", "content": "Joggen kenne ich nicht, nur Laufen."}
+
+    monkeypatch.setattr(chat, "lmstudio_modelle", lambda: ["gemma-4"])
+    monkeypatch.setattr(chat, "frage_lmstudio", fake_lmstudio)
+    antwort = client.post("/api/chat", json={"frage": "Mein schnellstes Joggen?", "verlauf": []}).json()
+    assert "Gültig sind: Laufen, Radfahren, Schwimmen, Wandern" in runden[1][-1]["content"]
+    assert antwort["antwort"].startswith("Joggen kenne ich nicht")
+
+
+def test_chat_begrenzt_die_runden(monkeypatch):
+    # Ein Modell, das nie aufhört, Werkzeuge zu verlangen, wird nach fünf Runden gestoppt
+    from app import chat
+    zaehler = {"runden": 0}
+
+    def fake_lmstudio(nachrichten, modell, werkzeuge=None):
+        zaehler["runden"] += 1
+        return {"role": "assistant", "content": None, "tool_calls": [
+            {"id": f"c{zaehler['runden']}", "type": "function", "function": {"name": "kennzahlen", "arguments": "{}"}}]}
+
+    monkeypatch.setattr(chat, "lmstudio_modelle", lambda: ["gemma-4"])
+    monkeypatch.setattr(chat, "frage_lmstudio", fake_lmstudio)
+    antwort = client.post("/api/chat", json={"frage": "Endlos?", "verlauf": []}).json()
+    assert zaehler["runden"] == chat.MAX_RUNDEN
+    assert len(antwort["aufrufe"]) == chat.MAX_RUNDEN
+    assert "keine Antwort" in antwort["antwort"]
+
+
+def test_werkzeug_ausfuehren():
+    from app import werkzeuge
+    from app.daten import lade_workouts
+    workouts = lade_workouts()
+    assert werkzeuge.fuehre_aus("woche", {"kalenderwoche": "2026-W25"}, workouts)["distanz_km"] == 53.0
+    assert werkzeuge.fuehre_aus("einheiten", {"sportart": "Laufen", "anzahl": 1}, workouts)["treffer"] == 4
+    assert werkzeuge.fuehre_aus("pausen", {}, workouts)["letzte_einheit"] == "2026-06-21"
+    fehler = werkzeuge.fuehre_aus("zeitraum", {"von": "gestern"}, workouts)
+    assert "JJJJ-MM-TT" in fehler["fehler"]
+    unbekannt = werkzeuge.fuehre_aus("wetter", {}, workouts)
+    assert "Unbekanntes Werkzeug" in unbekannt["fehler"]
+
+
+def test_chat_bereinigt_denkkanal():
+    from app.chat import bereinige
+    assert bereinige("<|channel>thought\n<channel|>Im August waren es 209,2 km.") == "Im August waren es 209,2 km."
+    assert bereinige("Ohne Marken bleibt alles.") == "Ohne Marken bleibt alles."
