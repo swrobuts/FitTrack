@@ -22,3 +22,11 @@ jobs:
 
       - name: Tests ausführen
         run: pytest
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Frontend-Regressionstests ausführen
+        run: node --test frontend/tests/*.test.cjs

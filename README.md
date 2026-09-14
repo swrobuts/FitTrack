@@ -56,10 +56,12 @@ pip install -r requirements.txt
 ## Tests ausführen
 
 ```bash
+pip install -r mcp/requirements.txt   # zusätzliche Abhängigkeiten der MCP-Tests
 pytest
+node --test frontend/tests/*.test.cjs # Frontend-Regressionstests, Node.js 20 oder neuer
 ```
 
-Zu Beginn ist der Test rot: `ModuleNotFoundError: No module named 'app.main'`. Das ist Absicht. Der Test beschreibt, was die App können soll, bevor es den Code gibt.
+Auf `main` sollen alle Tests bestehen. Im Branch `starter` ist der Test zu Beginn rot: `ModuleNotFoundError: No module named 'app.main'`. Das ist dort Absicht: Der Test beschreibt, was die App können soll, bevor es den Code gibt.
 
 ## App starten
 
@@ -209,6 +211,8 @@ Zwei Zugänge über die App hinaus, beide beschrieben in [docs/dozent/mcp.md](do
 - Zeitbezug: Jede Karte nennt ihren Zeitraum, im Kopf „Daten vom … bis …“, in Kennzahlen und Sportarten „seit Sep 2024“ (aus der ersten Kalenderwoche gerechnet), unter dem Verlauf der Zeitraum der gezeigten Balken mit Jahr, unter dem Kalender die Datumsspanne, unter „Letzte Aktivitäten“ die Spanne der gerade sichtbaren Einträge („6 von 311 Einheiten, 28.08. bis 05.09.2026“), die mit Aufklappen und Filter mitläuft.
 - Kennzahl-Kacheln: Überschrift nennt den Bezug („Gesamt seit Sep 2024“, „Einheiten seit Sep 2024“), die Zeile unter der Zahl ordnet ein („in 311 Einheiten“, „Ziel in 33 von 105 Wochen“, „KW 37/2025 · 5 Einheiten“, „Ø 3,0 je Woche“). Tippen zeigt die Rechnung.
 - `je_sportart` (pro Woche in `/api/stats/wochen`): Summe `distanz_km` je Sportart, gerundet auf 1 Nachkommastelle; Wochen ohne Training liefern `{}`.
+- Die Monatsansicht rechnet aus dem Datum jeder Einheit. Eine Woche über einer Monatsgrenze wird aufgeteilt; Monate ohne Training bleiben sichtbar. „1 Jahr“ zeigt die letzten zwölf Kalendermonate einschließlich des Monats der letzten Einheit, „Alles“ den gesamten Datenbestand.
+- Bei `zeitraum` und `vergleich` beziehen sich `kalenderwochen` und der Wochendurchschnitt auf die ausgegebenen Grenzen `von` und `bis`, einschließlich leerer Randwochen. Ein Sportfilter verkürzt diesen Zeitraum nicht.
 - Wochenziel 40 km: einzige Konstante im Frontend (`WOCHENZIEL_KM` in `app.js`), gilt über alle Sportarten und steht so auch in der Wochenkarte. Dargestellt als Bullet-Graph: Balken für die Ist-Kilometer, Marke für das Ziel, Skala bis über das Ziel hinaus.
 - Status-Badge: „Ziel erreicht“ ab 40 km; in der laufenden Woche „Auf Kurs“, wenn die Kilometer mindestens dem anteiligen Ziel nach verstrichenen Tagen entsprechen, sonst „Im Rückstand“; abgeschlossene Wochen unter 40 km: „Unter dem Ziel“. „n Wochen in Folge“ zählt zusammenhängende Wochen mit erreichtem Ziel.
 - Trainingskalender und Sportarten-Kacheln rechnen im Browser aus `/api/workouts`: Kilometer je Tag, Kilometer, Anteil, Ø je Einheit und letzte Einheit je Sportart. Die Aktivitätenliste startet mit 10 Einträgen, auf dem Desktop mit 6, damit sie neben den Sportarten endet. „20 weitere anzeigen“ und „Alle anzeigen“ verlängern sie, „Wieder einklappen“ setzt sie auf den Start zurück und scrollt zur Karte.

@@ -47,8 +47,12 @@ def lmstudio_modelle() -> list[str]:
     try:
         antwort = httpx2.get(f"{lmstudio_url()}/models", timeout=2.0)
         antwort.raise_for_status()
-        return [eintrag["id"] for eintrag in antwort.json().get("data", [])]
-    except (httpx2.ConnectError, httpx2.TimeoutException, httpx2.HTTPStatusError, ValueError, KeyError):
+        daten = antwort.json()
+        if not isinstance(daten, dict) or not isinstance(daten.get("data"), list):
+            return []
+        return [eintrag["id"] for eintrag in daten["data"]
+                if isinstance(eintrag, dict) and isinstance(eintrag.get("id"), str) and eintrag["id"]]
+    except (httpx2.HTTPError, ValueError):
         return []
 
 
@@ -129,7 +133,23 @@ def frage_lmstudio(nachrichten: list[dict], modell: str, werkzeuge_schema: list[
         timeout=180.0,   # ein lokales Modell braucht auf dem Notebook auch mal eine Minute
     )
     antwort.raise_for_status()
-    nachricht = antwort.json()["choices"][0]["message"]
+    try:
+        nachricht = antwort.json()["choices"][0]["message"]
+    except (KeyError, IndexError, TypeError) as fehler:
+        raise ValueError("ungültige Antwort: choices mit message fehlt") from fehler
+    if not isinstance(nachricht, dict):
+        raise ValueError("ungültige Antwortnachricht")
+    if nachricht.get("content") is not None and not isinstance(nachricht["content"], str):
+        raise ValueError("Antwortinhalt muss Text sein")
+    aufrufe = nachricht.get("tool_calls")
+    if aufrufe is not None:
+        if not isinstance(aufrufe, list):
+            raise ValueError("tool_calls muss eine Liste sein")
+        for aufruf in aufrufe:
+            if (not isinstance(aufruf, dict) or not isinstance(aufruf.get("id"), str)
+                    or not isinstance(aufruf.get("function"), dict)
+                    or not isinstance(aufruf["function"].get("name"), str)):
+                raise ValueError("ungültiger Werkzeugaufruf")
     if not nachricht.get("content") and not nachricht.get("tool_calls"):
         raise ValueError("leere Antwort, vermutlich hat das Modell nur nachgedacht")
     return nachricht
@@ -149,15 +169,20 @@ def chat_mit_werkzeugen(workouts: list[dict], verlauf: list[dict], frage: str, m
     for _ in range(MAX_RUNDEN):
         nachricht = frage_lmstudio(nachrichten, modell, werkzeuge.katalog())
         if not nachricht.get("tool_calls"):
-            return bereinige(nachricht.get("content") or ""), aufrufe
+            text = bereinige(nachricht.get("content") or "")
+            if not text:
+                raise ValueError("leere Antwort nach Entfernen des Denkkanals")
+            return text, aufrufe
         nachrichten.append({"role": "assistant", "content": nachricht.get("content"), "tool_calls": nachricht["tool_calls"]})
         for aufruf in nachricht["tool_calls"]:
             name = aufruf["function"]["name"]
             try:
-                argumente = json.loads(aufruf["function"].get("arguments") or "{}")
-            except json.JSONDecodeError:
-                argumente = {}
-            ergebnis = werkzeuge.fuehre_aus(name, argumente, workouts)
+                argumente = json.loads(aufruf["function"].get("arguments", "{}"))
+            except (json.JSONDecodeError, TypeError):
+                argumente = aufruf["function"].get("arguments")
+                ergebnis = {"fehler": "Werkzeugargumente müssen gültiges JSON enthalten"}
+            else:
+                ergebnis = werkzeuge.fuehre_aus(name, argumente, workouts)
             aufrufe.append({"werkzeug": name, "argumente": argumente})
             nachrichten.append({"role": "tool", "tool_call_id": aufruf["id"], "content": json.dumps(ergebnis, ensure_ascii=False)})
     return ("Ich habe die Werkzeuge mehrfach befragt, aber keine Antwort formulieren können. "

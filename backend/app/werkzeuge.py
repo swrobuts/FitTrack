@@ -112,6 +112,15 @@ def fuehre_aus(name: str, argumente: dict, workouts: list[dict]):
     funktion = FUNKTIONEN.get(name)
     if funktion is None:
         return {"fehler": f"Unbekanntes Werkzeug {name!r}. Gültig sind: {', '.join(NAMEN)}"}
+    if not isinstance(argumente, dict):
+        return {"fehler": "Werkzeugargumente müssen ein JSON-Objekt sein"}
+    parameter = next(p for n, _, p, _ in KATALOG if n == name)
+    for schluessel, wert in argumente.items():
+        if wert is None or schluessel not in parameter:
+            continue
+        typ = parameter[schluessel]["type"]
+        if (typ == "string" and not isinstance(wert, str)) or (typ == "integer" and type(wert) is not int):
+            return {"fehler": f"{schluessel} muss vom Typ {typ} sein"}
     try:
         return funktion(workouts, **{k: v for k, v in argumente.items() if v is not None})
     except (ValueError, TypeError) as fehler:

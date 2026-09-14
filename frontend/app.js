@@ -132,11 +132,13 @@ function workoutsImZeitraum(von, bis) {
 
 function tempo(workout) {
   // Tempo passend zur Sportart: min/km beim Laufen und Wandern, km/h beim Radfahren, min/100 m beim Schwimmen
+  if (workout.distanz_km <= 0) return "–";
   const minProKm = workout.dauer_min / workout.distanz_km;
   if (workout.sportart === "Radfahren") return `${formatZahl(workout.distanz_km / (workout.dauer_min / 60))} km/h`;
   if (workout.sportart === "Schwimmen") return `${formatZahl(minProKm / 10, 1)} min/100 m`;
-  const minuten = Math.floor(minProKm);
-  const sekunden = Math.round((minProKm - minuten) * 60);
+  const gesamtSekunden = Math.round(minProKm * 60);
+  const minuten = Math.floor(gesamtSekunden / 60);
+  const sekunden = gesamtSekunden % 60;
   return `${minuten}:${String(sekunden).padStart(2, "0")} min/km`;
 }
 
@@ -146,7 +148,7 @@ function htmlSportBalken(jeSportart) {
   // Ein Balken je Sportart, der längste voll
   const teile = nachKilometern(jeSportart);
   if (!teile.length) return '<p class="sheet-text">Kein Training in diesem Zeitraum.</p>';
-  const groesste = teile[0][1];
+  const groesste = teile[0][1] || 1;
   return `<ul class="sport-balken">${teile.map(([sportart, km]) => `
     <li data-sport="${sportart}"><span class="name">${sportart}</span>
       <span class="balken"><span style="width:${(km / groesste) * 100}%"></span></span>
@@ -216,7 +218,8 @@ function sheetAktivitaet(workout) {
   // Eine Einheit: alle Felder aus der API plus das daraus gerechnete Tempo
   oeffneSheet(workout.sportart, formatDatum(workout.datum, true),
     htmlZahlen([["Kilometer", formatZahl(workout.distanz_km)], ["Minuten", String(workout.dauer_min)], ["Kalorien", String(workout.kalorien)]]) +
-    `<p class="sheet-text">Tempo <strong>${tempo(workout)}</strong> · ${formatZahl(workout.kalorien / workout.distanz_km, 0)} kcal je km</p>`);
+    `<p class="sheet-text">Tempo <strong>${tempo(workout)}</strong>${workout.distanz_km > 0
+      ? ` · ${formatZahl(workout.kalorien / workout.distanz_km, 0)} kcal je km` : " · Ohne Distanz ist kein Tempo berechenbar."}</p>`);
 }
 
 function sheetSportart(sportart) {
@@ -240,6 +243,10 @@ function sheetSportart(sportart) {
 
 function sheetKennzahl(name) {
   // Wie eine Kennzahl gerechnet wird, mit den echten Zahlen
+  if (!alleWorkouts.length || !alleWochen.length || !alleStats) {
+    oeffneSheet("Kennzahlen", "Keine Daten", '<p class="sheet-text">Es liegen noch keine Trainingseinheiten vor.</p>');
+    return;
+  }
   const stats = alleStats;
   const erste = alleWorkouts[alleWorkouts.length - 1].datum;
   const letzte = alleWorkouts[0].datum;
@@ -258,9 +265,10 @@ function sheetKennzahl(name) {
     sheetWoche(alleWochen.reduce((a, b) => (b.distanz_km > a.distanz_km ? b : a), alleWochen[0]));
   } else {
     const jeSportartAnzahl = SPORTARTEN.map((s) => [s, alleWorkouts.filter((w) => w.sportart === s).length]).filter(([, n]) => n > 0);
+    const groessteAnzahl = Math.max(...jeSportartAnzahl.map(([, n]) => n));
     oeffneSheet(`${stats.anzahl} Einheiten`, `${formatDatum(erste)} bis ${formatDatum(letzte)}`,
       `<p class="sheet-text">Im Schnitt <strong>${formatZahl(stats.anzahl / alleWochen.length)} Einheiten je Woche</strong>.</p>` +
-      `<ul class="sport-balken">${jeSportartAnzahl.map(([s, n]) => `<li data-sport="${s}"><span class="name">${s}</span><span class="balken"><span style="width:${(n / jeSportartAnzahl[0][1]) * 100}%"></span></span><span class="wert">${n}</span></li>`).join("")}</ul>`);
+      `<ul class="sport-balken">${jeSportartAnzahl.map(([s, n]) => `<li data-sport="${s}"><span class="name">${s}</span><span class="balken"><span style="width:${(n / groessteAnzahl) * 100}%"></span></span><span class="wert">${n}</span></li>`).join("")}</ul>`);
   }
 }
 
@@ -436,6 +444,9 @@ function zeigeKennzahlen(stats, wochen) {
   if (beste) {
     document.getElementById("stat-beste").textContent = formatZahl(beste.distanz_km);
     document.getElementById("stat-beste-sub").textContent = `KW ${kalenderwoche(beste)}/${beste.kw.slice(0, 4)} · ${beste.anzahl} Einheiten`;
+  } else {
+    document.getElementById("stat-beste").textContent = "–";
+    document.getElementById("stat-beste-sub").textContent = "Noch keine Trainingseinheiten";
   }
   document.querySelectorAll("#kennzahlen .kachel").forEach((kachel) => {
     kachel.addEventListener("click", () => sheetKennzahl(kachel.dataset.kennzahl));
@@ -444,7 +455,10 @@ function zeigeKennzahlen(stats, wochen) {
 
 function zeigeZeitraum(workouts) {
   // Die Liste kommt absteigend sortiert: erstes Element = jüngstes Training.
-  if (workouts.length === 0) return;
+  if (workouts.length === 0) {
+    document.getElementById("zeitraum").textContent = "Noch keine Trainingseinheiten vorhanden";
+    return;
+  }
   const juengstes = workouts[0].datum;
   const aeltestes = workouts[workouts.length - 1].datum;
   document.getElementById("zeitraum").textContent =
@@ -520,7 +534,16 @@ function zeigeBullet(woche, skalaMax) {
 function zeigeWoche(wochen) {
   // Läuft die aktuelle Kalenderwoche mit Daten, zeigt die Karte Fortschritt.
   // Sonst zeigt sie das Ergebnis der letzten Trainingswoche und sagt das auch.
-  if (wochen.length === 0) return;
+  document.getElementById("woche-knopf").disabled = wochen.length === 0;
+  if (wochen.length === 0) {
+    document.getElementById("woche-untertitel").textContent = "Noch keine Trainingseinheiten vorhanden";
+    document.getElementById("woche-km").textContent = "0,0";
+    document.getElementById("woche-status").textContent = "";
+    document.getElementById("woche-zahlen").textContent = "";
+    document.getElementById("badge-status").textContent = "Keine Daten";
+    document.getElementById("badge-serie").hidden = true;
+    return;
+  }
   const montag = montagDieserWoche();
   let index = wochen.findIndex((w) => w.wochenstart === montag);
   const laufend = index >= 0;
@@ -571,25 +594,30 @@ let aktuelleBalken = [];  // die gerade gezeichneten Einträge, für Tippen und 
 let aktuellerModus = "wochen";
 let aktuelleAuswahl = 8;
 
-function nachMonaten(wochen) {
-  // Fasst Wochen zu Monaten zusammen, damit lange Zeiträume lesbar bleiben.
-  // Eine Woche zählt zu dem Monat, in dem ihr Montag liegt.
+function nachMonaten(workouts) {
+  // Kalendermonate aus den Trainingstagen, damit Wochen über Monatsgrenzen korrekt aufgeteilt werden.
+  if (!workouts.length) return [];
+  const daten = workouts.map((w) => w.datum).sort();
+  const erster = alsDatum(`${daten[0].slice(0, 7)}-01`);
+  const letzter = daten[daten.length - 1].slice(0, 7);
   const monate = new Map();
-  for (const w of wochen) {
-    const schluessel = w.wochenstart.slice(0, 7);   // "2026-09"
-    if (!monate.has(schluessel)) {
-      monate.set(schluessel, { wochenstart: w.wochenstart, wochenende: w.wochenstart, distanz_km: 0, anzahl: 0, dauer_min: 0, je_sportart: {} });
-    }
-    const m = monate.get(schluessel);
-    m.wochenende = tageSpaeter(w.wochenstart, 6);
-    m.distanz_km += w.distanz_km;
-    m.anzahl += w.anzahl;
-    m.dauer_min += w.dauer_min;
-    for (const [sport, km] of Object.entries(w.je_sportart)) {
-      m.je_sportart[sport] = (m.je_sportart[sport] ?? 0) + km;
-    }
+  for (const tag = erster; alsIso(tag).slice(0, 7) <= letzter; tag.setMonth(tag.getMonth() + 1)) {
+    const wochenstart = alsIso(tag);
+    const wochenende = alsIso(new Date(tag.getFullYear(), tag.getMonth() + 1, 0));
+    monate.set(wochenstart.slice(0, 7), { wochenstart, wochenende, distanz_km: 0, anzahl: 0, dauer_min: 0, je_sportart: {} });
   }
-  return [...monate.values()];
+  for (const w of workouts) {
+    const schluessel = w.datum.slice(0, 7);
+    const m = monate.get(schluessel);
+    m.distanz_km += w.distanz_km;
+    m.anzahl++;
+    m.dauer_min += w.dauer_min;
+    m.je_sportart[w.sportart] = (m.je_sportart[w.sportart] ?? 0) + w.distanz_km;
+  }
+  return [...monate.values()].map((m) => ({ ...m,
+    distanz_km: Math.round(m.distanz_km * 10) / 10,
+    je_sportart: Object.fromEntries(Object.entries(m.je_sportart).map(([s, km]) => [s, Math.round(km * 10) / 10])),
+  }));
 }
 
 function zeitraumText(auswahl) {
@@ -645,12 +673,17 @@ function balkenFarben(auswahl) {
 
 function zeigeDiagramm(wochen, anzahlWochen) {
   // anzahlWochen = 0 bedeutet alle; ab einem Jahr wird nach Monaten zusammengefasst
+  if (typeof Chart === "undefined") {
+    document.getElementById("verlauf-untertitel").textContent = "Die Diagramm-Bibliothek konnte nicht geladen werden. Bitte die Seite neu laden.";
+    return;
+  }
   Chart.defaults.font.family = schriftAusCss();
   Chart.defaults.font.size = 13;
   aktuelleAuswahl = anzahlWochen;
   aktuellerModus = anzahlWochen === 0 || anzahlWochen >= 52 ? "monate" : "wochen";
   const basis = anzahlWochen === 0 ? wochen : wochen.slice(-anzahlWochen);
-  const auswahl = aktuellerModus === "monate" ? nachMonaten(basis) : basis;
+  const monate = aktuellerModus === "monate" ? nachMonaten(alleWorkouts) : [];
+  const auswahl = aktuellerModus === "monate" ? (anzahlWochen === 0 ? monate : monate.slice(-12)) : basis;
   aktuelleBalken = auswahl;
   const labels = auswahl.map(beschriftung);
   const daten = auswahl.map((e) => e.distanz_km);
@@ -665,6 +698,7 @@ function zeigeDiagramm(wochen, anzahlWochen) {
   document.getElementById("verlauf-titel").textContent =
     aktuellerModus === "monate" ? "Kilometer pro Monat" : "Kilometer pro Woche";
   document.getElementById("verlauf-untertitel").textContent = zeitraumText(auswahl);
+  document.getElementById("verlauf-legende").hidden = aktuellerModus === "monate";
   document.getElementById("legende-ziel").hidden = aktuellerModus === "monate";
 
   if (wochenChart) {
@@ -679,6 +713,7 @@ function zeigeDiagramm(wochen, anzahlWochen) {
     wochenChart.options.scales.y.title.color = textFarbe;
     wochenChart.options.scales.y.grid.color = farbeAusCss("--linie");
     wochenChart.options.zielKm = zielKm;
+    wochenChart.options.scales.y.suggestedMax = zielKm ?? 0;
     wochenChart.update();
   } else {
     wochenChart = new Chart(document.getElementById("wochen-chart"), {
@@ -708,6 +743,7 @@ function zeigeDiagramm(wochen, anzahlWochen) {
           },
           y: {
             beginAtZero: true,
+            suggestedMax: zielKm ?? 0,
             title: { display: true, text: "km", color: textFarbe },
             ticks: { color: textFarbe, maxTicksLimit: 5 },
             grid: { color: farbeAusCss("--linie") },
@@ -745,7 +781,10 @@ function zeigeKalender(workouts, wochen) {
   // Ein Feld je Tag für die letzten Wochen; Farbe nach Kilometern, Tippen öffnet den Tag
   const raster = document.getElementById("kalender-raster");
   raster.innerHTML = "";
-  if (wochen.length === 0) return;
+  if (wochen.length === 0) {
+    document.getElementById("kalender-untertitel").textContent = "Noch keine Trainingseinheiten vorhanden";
+    return;
+  }
 
   const kmJeTag = new Map();   // "2026-09-02" -> 9.8
   for (const w of workouts) kmJeTag.set(w.datum, (kmJeTag.get(w.datum) ?? 0) + w.distanz_km);
@@ -901,17 +940,28 @@ async function start() {
   verbindeSheet();
 
   try {
-    alleWochen = await ladeJson("/api/stats/wochen");
+    // Erst alle Daten laden: Jeder Detaildialog und die Monatsansicht brauchen die Einheiten.
+    [alleWochen, alleStats, alleWorkouts] = await Promise.all([
+      ladeJson("/api/stats/wochen"), ladeJson("/api/stats"), ladeJson("/api/workouts"),
+    ]);
+  } catch (fehler) {
+    for (const id of ["woche", "kennzahlen", "sportarten", "aktivitaeten", "verlauf", "kalender"]) {
+      zeigeFehler(id, "Trainingsdaten konnten nicht geladen werden. Bitte die Seite neu laden.");
+    }
+    console.error(fehler);
+    return;
+  }
+
+  try {
     zeigeWoche(alleWochen);
     zeigeDiagramm(alleWochen, 8);
     verbindeZeitraumWahl(alleWochen);
   } catch (fehler) {
-    zeigeFehler("woche", "Wochenverlauf konnte nicht geladen werden. Läuft der Server?");
+    zeigeFehler("verlauf", "Wochenverlauf konnte nicht angezeigt werden.");
     console.error(fehler);
   }
 
   try {
-    alleStats = await ladeJson("/api/stats");
     zeigeKennzahlen(alleStats, alleWochen);
   } catch (fehler) {
     zeigeFehler("kennzahlen", "Kennzahlen konnten nicht geladen werden. Läuft der Server?");
@@ -919,7 +969,6 @@ async function start() {
   }
 
   try {
-    alleWorkouts = await ladeJson("/api/workouts");
     zeigeZeitraum(alleWorkouts);
     zeigeKalender(alleWorkouts, alleWochen);
     zeigeSportarten(alleWorkouts);

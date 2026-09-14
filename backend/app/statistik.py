@@ -108,6 +108,8 @@ def pruefe_sportart(name: str | None) -> str | None:
     """Gibt die Sportart in der Schreibweise der App zurück; None heißt alle Sportarten."""
     if name is None or name == "":
         return None
+    if not isinstance(name, str):
+        raise ValueError("sportart muss ein Text sein")
     for sportart in SPORTARTEN:
         if sportart.lower() == name.strip().lower():
             return sportart
@@ -152,6 +154,8 @@ def kilometer_je_sportart(workouts: list[dict]) -> dict:
 
 def im_zeitraum(workouts: list[dict], von: str | None, bis: str | None, sportart: str | None) -> list[dict]:
     """Filtert Einheiten nach Datum (beide Grenzen einschließlich) und Sportart."""
+    if von and bis and von > bis:
+        raise ValueError(f"von ({von}) liegt nach bis ({bis})")
     return [w for w in workouts
             if (von is None or w["datum"] >= von)
             and (bis is None or w["datum"] <= bis)
@@ -169,7 +173,8 @@ def zeitraum_zusammenfassung(workouts: list[dict], von: str | None = None, bis: 
     sportart = pruefe_sportart(sportart)
     treffer = im_zeitraum(workouts, von, bis, sportart)
     distanz = round(sum(w["distanz_km"] for w in treffer), 1)
-    wochen = anzahl_kalenderwochen(treffer) if treffer else 0
+    # Der angefragte Zeitraum zählt, auch wenn an seinen Rändern kein Training liegt.
+    wochen = (montag_der_woche(bis) - montag_der_woche(von)).days // 7 + 1 if von and bis else 0
     return {
         "von": von, "bis": bis, "sportart": sportart or "alle",
         "distanz_km": distanz,
@@ -256,7 +261,8 @@ def mit_tempo(w: dict) -> dict:
     if w["distanz_km"] > 0:
         minuten = w["dauer_min"] / w["distanz_km"]
         e["tempo_min_pro_km"] = round(minuten, 2)
-        e["tempo_text"] = f"{int(minuten)}:{round((minuten - int(minuten)) * 60):02d} min/km"
+        minuten_text, sekunden = divmod(round(minuten * 60), 60)
+        e["tempo_text"] = f"{minuten_text}:{sekunden:02d} min/km"
         e["km_pro_h"] = round(w["distanz_km"] / (w["dauer_min"] / 60), 1)
     return e
 
