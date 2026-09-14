@@ -2,7 +2,7 @@
   "name": "fittrack-tests",
   "private": true,
   "scripts": {
-    "test": "node --test frontend/tests tests/lab"
+    "test": "node --test frontend/tests/app.test.cjs tests/lab/exercises.test.cjs tests/lab/regressions.test.cjs"
   },
   "devDependencies": {
     "jsdom": "26.1.0",
