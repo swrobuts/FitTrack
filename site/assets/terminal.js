@@ -1,5 +1,5 @@
 /**
- * PITM-Lab · Nachgebildete Kommandozeile
+ * FitTrack-Lab · Nachgebildete Kommandozeile
  *
  * Kein echter Rechner, sondern ein Modell davon: ein Dateibaum im
  * Arbeitsspeicher, ein Satz nachgebauter Befehle und Ausgaben, die den echten
@@ -69,7 +69,6 @@ export const HEIMAT = () => ordner({
 
 const DOCKER_ABBILDER = {
   'hello-world':          { groesse: '20.4kB',  tag: 'latest' },
-  'fittrack':             { groesse: '303MB',   tag: 'latest' },
   'postgres':             { groesse: '438MB',   tag: '16' },
   'nginx':                { groesse: '192MB',   tag: '1.27' },
   'python':               { groesse: '124MB',   tag: '3.12-slim' },
@@ -1010,7 +1009,7 @@ function git (w, marken) {
       'Receiving objects: 100% (12/12), 4.21 KiB | 4.21 MiB/s, done.'])
   }
 
-  if (!w.git) {
+  if (!w.git || !w.git.wurzel.every((teil, i) => w.pfad[i] === teil)) {
     return fehler(['fatal: not a git repository (or any of the parent directories): .git'], 'keinRepo')
   }
   const g = w.git
@@ -1302,7 +1301,8 @@ function docker (w, marken) {
     const abbildIdx = arg.findIndex((a, i) => !a.startsWith('-') && !wertFlaggen.includes(arg[i - 1]))
     if (abbildIdx < 0) return fehler(['docker: "docker run" requires at least 1 argument.'])
     const bezeichner = arg[abbildIdx]
-    const voll = zieheAbbild(bezeichner)
+    const lokal = d.abbilder.find(a => a.voll === bezeichner || a.voll === `${bezeichner}:latest`)
+    const voll = lokal ? lokal.voll : zieheAbbild(bezeichner)
     if (!voll) return fehler([`Unable to find image '${bezeichner}' locally`,
       `docker: Error response from daemon: pull access denied for ${bezeichner.split(':')[0]}.`], 'abbildUnbekannt')
 
@@ -1341,7 +1341,7 @@ function docker (w, marken) {
     const id = neueId()
     const eintrag = {
       id, name: nameC, abbild: voll, port, band, baender, umgebung,
-      laeuft: !wegDanach || imHintergrund, wegDanach
+      laeuft: !wegDanach || imHintergrund, wegDanach, imHintergrund
     }
 
     if (voll.startsWith('hello-world')) {
@@ -1477,13 +1477,21 @@ function docker (w, marken) {
   }
 
   if (unter === 'build') {
-    const t = arg[arg.indexOf('-t') + 1]
-    const k = knoten(w, w.pfad)
+    const tagIndex = arg.findIndex(a => a === '-t' || a === '--tag')
+    const t = tagIndex >= 0 ? arg[tagIndex + 1] : null
+    const kontexte = arg.filter((a, i) => i !== tagIndex && (tagIndex < 0 || i !== tagIndex + 1))
+    if ((tagIndex >= 0 && (!t || t.startsWith('-'))) || kontexte.length !== 1 || kontexte[0].startsWith('-')) {
+      return fehler(['docker build requires one build context and a value for each tag option.'])
+    }
+    const k = knoten(w, loese(w, kontexte[0]))
     if (!k || k.typ !== 'ordner' || !k.kinder.Dockerfile) {
       return fehler(['ERROR: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory'], 'keinDockerfile')
     }
-    const voll = t || 'sha256:' + neueId()
-    d.abbilder.push({ voll, name: (t || 'unbenannt').split(':')[0], tag: (t || ':latest').split(':')[1] || 'latest', groesse: '303MB', id: neueId() })
+    const tagPos = t ? t.lastIndexOf(':') : -1
+    const hatTag = t && tagPos > t.lastIndexOf('/')
+    const voll = t ? (hatTag ? t : `${t}:latest`) : 'sha256:' + neueId()
+    d.abbilder = d.abbilder.filter(a => a.voll !== voll)
+    d.abbilder.push({ voll, name: t ? (hatTag ? t.slice(0, tagPos) : t) : '<none>', tag: t ? (hatTag ? t.slice(tagPos + 1) : 'latest') : '<none>', groesse: '303MB', id: neueId() })
     return ok(['[+] Building 14.8s (11/11) FINISHED',
       ' => [internal] load build definition from Dockerfile        0.0s',
       ' => [1/6] FROM docker.io/library/python:3.12-slim           3.1s',
@@ -1505,21 +1513,21 @@ function docker (w, marken) {
       if (!d.abbilder.some(a => a.name === 'fittrack')) {
         d.abbilder.push({ voll: 'fittrack:latest', name: 'fittrack', tag: 'latest', groesse: '303MB', id: neueId() })
       }
-      d.compose = true
-      d.container = d.container.filter(c => !c.compose)
       const port = w.fittrackPort || '8000'
-      if (d.container.some(c => c.laeuft && hostPortVon(c.port) === port)) {
+      if (d.container.some(c => c.name !== 'fittrack-fittrack-1' && c.laeuft && hostPortVon(c.port) === port)) {
         return fehler([`Error response from daemon: driver failed programming external connectivity: Bind for 0.0.0.0:${port} failed: port is already allocated`], 'portBelegt')
       }
-      d.container.push({ id: neueId(), name: 'fittrack-fittrack-1', abbild: 'fittrack:latest', port: `${port}:8000`, baender: [], umgebung: [], laeuft: true, compose: true })
+      d.compose = true
+      d.container = d.container.filter(c => c.name !== 'fittrack-fittrack-1')
+      d.container.push({ id: neueId(), name: 'fittrack-fittrack-1', abbild: 'fittrack:latest', port: `${port}:8000`, baender: [], umgebung: [], laeuft: true, imHintergrund: arg.includes('-d') || arg.includes('--detach'), compose: true })
       return ok(['[+] Running 2/2', ' ✔ Network fittrack_default        Created', ' ✔ Container fittrack-fittrack-1   Started'])
     }
     if (arg[0] === 'down' && inhalt.includes('fittrack')) {
-      d.container = d.container.filter(c => !c.compose)
+      d.container = d.container.filter(c => c.name !== 'fittrack-fittrack-1')
       return ok(['[+] Running 2/2', ' ✔ Container fittrack-fittrack-1   Removed', ' ✔ Network fittrack_default        Removed'])
     }
     if (arg[0] === 'stop' && inhalt.includes('fittrack')) {
-      d.container.filter(c => c.compose).forEach(c => { c.laeuft = false })
+      d.container.filter(c => c.name === 'fittrack-fittrack-1').forEach(c => { c.laeuft = false })
       return ok(['[+] Stopping 1/1', ' ✔ Container fittrack-fittrack-1   Stopped'])
     }
     if (arg[0] === 'up') {
@@ -1546,8 +1554,15 @@ function docker (w, marken) {
       }
       return ok(zeilen)
     }
-    if (arg[0] === 'ps') return docker(w, ['docker', 'ps'])
-    if (arg[0] === 'logs') return docker(w, ['docker', 'logs', `${COMPOSE_PROJEKT}-db-1`])
+    const projekt = inhalt.includes('fittrack') ? 'fittrack' : COMPOSE_PROJEKT
+    const projektContainer = d.container.filter(c => c.compose && c.name.startsWith(projekt + '-'))
+    if (arg[0] === 'ps') return docker({ ...w, docker: { ...d, container: projektContainer } }, ['docker', 'ps', ...arg.slice(1)])
+    if (arg[0] === 'logs') {
+      const dienst = arg.slice(1).find(a => !a.startsWith('-'))
+      const liste = projektContainer.filter(c => !dienst || c.name === `${projekt}-${dienst}-1`)
+      if (dienst && !liste.length) return fehler([`no such service: ${dienst}`])
+      return { zeilen: liste.flatMap(c => docker(w, ['docker', 'logs', c.name]).zeilen) }
+    }
     return ok(['Usage:  docker compose [OPTIONS] COMMAND'])
   }
 
@@ -1594,6 +1609,7 @@ export function fuehreAus (welt, zeile) {
 
   const roh = ersetzeUmgebung(welt, eingetippt)
   const marken = zerlege(roh)
+  if (!marken.length) return fehler(['Empty command name.'], 'unbekannt')
   const kopf = marken[0].toLowerCase()
 
   if (kopf === 'git') return git(welt, marken)

@@ -1,0 +1,11 @@
+{
+  "name": "fittrack-tests",
+  "private": true,
+  "scripts": {
+    "test": "node --test frontend/tests tests/lab"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0",
+    "sql.js": "1.13.0"
+  }
+}

@@ -16,3 +16,6 @@ __pycache__/
 
 # lokale Einstellungen, z. B. FITTRACK_PORT für docker compose
 .env
+
+# JavaScript-Testwerkzeuge
+node_modules/

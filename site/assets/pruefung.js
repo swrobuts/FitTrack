@@ -1,10 +1,10 @@
 /**
- * PITM-Lab · Pruefung der Terminalschritte
+ * FitTrack-Lab · Pruefung der Terminalschritte
  *
  * Hier steht die ganze Logik, die entscheidet, ob ein Schritt einer
  * Terminaluebung erledigt ist. Sie liegt bewusst in einer eigenen Datei ohne
  * DOM-Bezug: So laeuft dieselbe Pruefung im Browser und im Testlauf auf der
- * Kommandozeile (`tools/verify.mjs`). Was auf der Kommandozeile besteht,
+ * Kommandozeile (`npm test`). Was auf der Kommandozeile besteht,
  * besteht auch im Browser.
  *
  * Zwei Regeln tragen das Ganze:
@@ -46,16 +46,20 @@ export function zustandTrifft (welt, z) {
   if (z.gitIndexGefuellt && !(welt.git && welt.git.index.length)) return false
   if (z.gitVeroeffentlicht && (!zweig || !zweig.commits.length || zweig.gepusht < zweig.commits.length)) return false
   if (z.containerLaeuft && !welt.docker.container.some(c => c.name === z.containerLaeuft && c.laeuft)) return false
+  if (z.containerGestoppt && !welt.docker.container.some(c => c.name === z.containerGestoppt && !c.laeuft)) return false
+  const container = welt.docker.container.filter(c => !z.containerLaeuft || c.name === z.containerLaeuft)
+  if (z.containerAbbild && !container.some(c => c.abbild === z.containerAbbild)) return false
+  if (z.imHintergrund && !container.some(c => c.laeuft && c.imHintergrund)) return false
   if (z.containerWeg && welt.docker.container.some(c => c.name === z.containerWeg)) return false
   if (z.volumen && !welt.docker.volumen.includes(z.volumen)) return false
   if (z.abbild && !welt.docker.abbilder.some(a => a.voll === z.abbild || a.name === z.abbild)) return false
   // `-p 127.0.0.1:5432:5432` ist dieselbe Abbildung wie `-p 5432:5432`, nur
   // enger gebunden - die Befehlskarten lehren die engere Fassung.
-  if (z.portGebunden && !welt.docker.container.some(c =>
+  if (z.portGebunden && !container.some(c =>
     c.laeuft && portPaar(c.port) === portPaar(z.portGebunden))) return false
-  if (z.umgebung && !welt.docker.container.some(c =>
+  if (z.umgebung && !container.some(c =>
     (c.umgebung || []).some(e => e.startsWith(z.umgebung)))) return false
-  if (z.bandAn && !welt.docker.container.some(c =>
+  if (z.bandAn && !container.some(c =>
     (c.baender || []).some(b => b.startsWith(z.bandAn + ':')))) return false
   return true
 }

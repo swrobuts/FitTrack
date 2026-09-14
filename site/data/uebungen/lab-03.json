@@ -21,7 +21,7 @@
           "frage": { "de": "Welche Sportart ist die Lieblingssportart nach der Definition?", "en": "Which sport is the favourite by definition?" },
           "optionen": [ { "de": "Radfahren, 50,0 km", "en": "Cycling, 50.0 km" }, { "de": "Laufen, 4 Einheiten", "en": "Running, 4 sessions" }, { "de": "Wandern, längste Dauer", "en": "Hiking, longest duration" } ],
           "richtig": [0],
-          "erklaerung": { "de": "Die Story definiert die Lieblingssportart über die Summe der Distanz. Nach Anzahl wäre es Laufen, nach Dauer Wandern. Deshalb muss das Kriterium die Kennzahl benennen.", "en": "The story defines favourite by total distance." }
+          "erklaerung": { "de": "Die Story definiert die Lieblingssportart über die Summe der Distanz. Nach Anzahl wäre es Laufen; die längste einzelne Einheit ist Wandern. Summiert man dagegen die Dauer, liegen Laufen und Radfahren mit je 150 Minuten gleichauf. Deshalb muss das Kriterium die Kennzahl benennen.", "en": "The story defines favourite by total distance. Running has the most sessions; hiking has the longest individual session. By total duration, running and cycling tie at 150 minutes each." }
         }
       ]
     },

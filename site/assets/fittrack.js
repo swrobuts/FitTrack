@@ -246,18 +246,30 @@ const labVon = (id) => LABS.find(l => l.id === id)
 /* --------------------------------------------------------------- Fortschritt */
 
 const fortschrittSchluessel = (lab) => `fittrack:fortschritt:${lab}`
+const sitzungsFortschritt = new Map()
 
 function ladeFortschritt (lab) {
-  try { return JSON.parse(localStorage.getItem(fortschrittSchluessel(lab)) || '{}') } catch { return {} }
+  if (sitzungsFortschritt.has(lab)) return { ...sitzungsFortschritt.get(lab) }
+  let f = sitzungsFortschritt.get(lab) || {}
+  try { f = JSON.parse(localStorage.getItem(fortschrittSchluessel(lab)) || '{}') } catch { /* Sitzung bleibt nutzbar */ }
+  if (!f || typeof f !== 'object' || Array.isArray(f)) return {}
+  const l = labVon(lab)
+  if (!l) return {}
+  const ids = Array.from({ length: l.uebungen }, (_, i) => `P${l.nr}-${String(i + 1).padStart(2, '0')}`)
+  return Object.fromEntries(ids.filter(id => f[id] === true).map(id => [id, true]))
 }
-function merkeFortschritt (lab, id) {
+function merkeFortschritt (lab, id, fertig = true) {
   const f = ladeFortschritt(lab)
-  f[id] = true
+  if (fertig) f[id] = true
+  else delete f[id]
+  sitzungsFortschritt.set(lab, f)
   try { localStorage.setItem(fortschrittSchluessel(lab), JSON.stringify(f)) } catch { /* egal */ }
   document.dispatchEvent(new CustomEvent('fittrack:fortschritt'))
 }
 function loescheFortschritt () {
+  sitzungsFortschritt.clear()
   for (const l of LABS) {
+    sitzungsFortschritt.set(l.id, {})
     try { localStorage.removeItem(fortschrittSchluessel(l.id)) } catch { /* egal */ }
   }
   document.dispatchEvent(new CustomEvent('fittrack:fortschritt'))
@@ -348,6 +360,10 @@ function baueBefehl (ziel, def) {
 
   const zeichne = () => {
     const os = mehrere ? (varianten[aktuellesOs()] ? aktuellesOs() : Object.keys(varianten)[0]) : 'alle'
+    karte.querySelectorAll('[data-os-btn]').forEach(b => {
+      b.classList.toggle('active', b.dataset.osBtn === os)
+      b.setAttribute('aria-pressed', String(b.dataset.osBtn === os))
+    })
     const v = varianten[os]
     pre.textContent = v.befehl
     promptSpan.textContent = mehrere ? OS_PROMPT[os] : (def.prompt || '$')
@@ -355,7 +371,7 @@ function baueBefehl (ziel, def) {
     const liste = v.teile || def.teile || []
     for (const t of liste) {
       dl.append(el('dt', null, t.was))
-      dl.append(zwei(el('dd'), t.bedeutet))
+      dl.append(el('dd', null, txt(t.bedeutet)))
     }
     teile.hidden = !liste.length
     if (ausgabe) ausgabe.textContent = typeof def.ausgabe === 'string' ? def.ausgabe : (def.ausgabe[os] || def.ausgabe.alle || '')
@@ -493,7 +509,7 @@ function baueTerminal (ziel, opt = {}) {
       schreibe('dim', '→ ' + txt(TERMINAL_HINWEISE[r.hinweis]))
     }
     zeichneKopf()
-    pruefeSchritte(roh.trim(), vorher)
+    if (!r.zeilen.some(z => z.art === 'fehler')) pruefeSchritte(roh.trim(), vorher)
   }
 
   eingabe.addEventListener('keydown', (e) => {
@@ -594,20 +610,23 @@ async function holeSaat () {
 
 async function holeDb () {
   if (!dbVersprechen) {
-    dbVersprechen = (async () => {
-      const SQL = await ladeSqlJs()
-      const db = new SQL.Database()
-      db.exec(await holeSaat())
-      return db
-    })()
+    dbVersprechen = neueDb().catch(e => { dbVersprechen = null; throw e })
   }
   return dbVersprechen
 }
 
-async function saeen (db) {
-  // Alles fallen lassen und neu einspielen, damit jede Prüfung auf demselben Stand läuft.
-  db.exec('DROP VIEW IF EXISTS v_workout; DROP TABLE IF EXISTS workout; DROP TABLE IF EXISTS sportart;')
-  db.exec(await holeSaat())
+async function neueDb () {
+  const SQL = await ladeSqlJs()
+  const saat = await holeSaat()
+  const db = new SQL.Database()
+  try { db.exec(saat); return db } catch (e) { db.close(); throw e }
+}
+
+async function pruefErgebnis (sql) {
+  // Jede Abfrage hat eine eigene Verbindung: auch PRAGMA, DDL oder parallele
+  // Prüfungen dürfen weder Musterlösung noch freie SQL-Konsole verändern.
+  const db = await neueDb()
+  try { return alsErgebnis(db.exec(sql)) } finally { db.close() }
 }
 
 /** sql.js liefert [{columns, values}]; die Übungsboxen erwarten {fields, rows}. */
@@ -685,8 +704,10 @@ function baueDbBand (ziel) {
     text.textContent = txt(T.dbLaden)
     btn.disabled = true
     try {
-      const db = await holeDb()
-      await saeen(db)
+      const db = await neueDb()
+      const alt = dbVersprechen
+      dbVersprechen = Promise.resolve(db)
+      if (alt) (await alt.catch(() => null))?.close()
       band.className = 'db-status ready'
       text.textContent = txt(T.dbBereit)
       btn.disabled = false
@@ -694,7 +715,7 @@ function baueDbBand (ziel) {
     } catch (e) {
       band.className = 'db-status failed'
       text.textContent = txt(T.dbFehler) + ' ' + e.message
-    }
+    } finally { btn.disabled = false }
   }
   btn.addEventListener('click', setzen)
   document.addEventListener('fittrack:sprache', () => {
@@ -705,12 +726,21 @@ function baueDbBand (ziel) {
 
 /* ============================================================== Uebungsboxen */
 
+const statusTexte = new WeakMap()
 function status (ziel, art, ueberschrift, detail) {
+  if (!statusTexte.has(ziel)) document.addEventListener('fittrack:sprache', () => {
+    const texte = statusTexte.get(ziel)
+    const kopf = ziel.querySelector('.line strong')
+    const p = ziel.querySelector('.line pre')
+    if (kopf) kopf.textContent = txt(texte.ueberschrift)
+    if (p) p.textContent = txt(texte.detail)
+  })
+  statusTexte.set(ziel, { ueberschrift, detail })
   ziel.replaceChildren()
   const zeile = el('div', 'line ' + art)
-  zeile.append(el('strong', null, ueberschrift))
+  zeile.append(el('strong', null, txt(ueberschrift)))
   if (detail) {
-    const p = el('pre'); p.textContent = detail; zeile.append(p)
+    const p = el('pre'); p.textContent = txt(detail); zeile.append(p)
   }
   ziel.append(zeile)
   return zeile
@@ -721,7 +751,7 @@ function baueFragen (fragen, ziel, uebungId) {
   const zustand = []
   fragen.forEach((f, i) => {
     const block = el('div', 'frage')
-    block.append(html('p', null, txt(f.frage)))
+    block.append(zwei(el('p'), f.frage, 'innerHTML'))
     const mehrfach = !!f.mehrfach
     const eintraege = []
     f.optionen.forEach((o, j) => {
@@ -735,7 +765,7 @@ function baueFragen (fragen, ziel, uebungId) {
       block.append(lab)
       eintraege.push({ lab, inp, j })
     })
-    const erk = el('div', 'erklaerung')
+    const erk = zwei(el('div', 'erklaerung'), f.erklaerung, 'innerHTML')
     erk.hidden = true
     block.append(erk)
     ziel.append(block)
@@ -785,9 +815,9 @@ function baueBox (uebung, ctx) {
   koerper.append(aufgabe)
   box.append(koerper)
 
-  const erledigt = () => {
-    haken.hidden = false
-    merkeFortschritt(ctx.lab, uebung.id)
+  const erledigt = (fertig = true) => {
+    haken.hidden = !fertig
+    merkeFortschritt(ctx.lab, uebung.id, fertig)
   }
 
   const meldung = el('div', 'uebung-status')
@@ -803,12 +833,12 @@ function baueBox (uebung, ctx) {
     aktionen.append(btn)
     koerper.append(aktionen, meldung)
     btn.addEventListener('click', () => {
-      if (!fragen.beantwortet()) { status(meldung, 'note', txt(T.fragenOffen)); return }
+      if (!fragen.beantwortet()) { status(meldung, 'note', T.fragenOffen); return }
       if (fragen.pruefe()) {
-        status(meldung, 'ok', txt(T.richtig), uebung.rueckmeldung ? txt(uebung.rueckmeldung) : null)
+        status(meldung, 'ok', T.richtig, uebung.rueckmeldung)
         erledigt()
       } else {
-        status(meldung, 'fail', txt(T.nochNicht))
+        status(meldung, 'fail', T.nochNicht)
       }
     })
   }
@@ -843,13 +873,14 @@ function baueBox (uebung, ctx) {
 
     document.addEventListener('fittrack:sprache', () => {
       for (const f of felder) {
+        f.sel.setAttribute('aria-label', txt(f.p.begriff))
         f.sel.options[0].textContent = txt(T.waehlen)
         uebung.ziele.forEach((z, i) => { f.sel.options[i + 1].textContent = txt(z.text) })
       }
     })
 
     btn.addEventListener('click', () => {
-      if (felder.some(f => !f.sel.value)) { status(meldung, 'note', txt(T.alleZuordnen)); return }
+      if (felder.some(f => !f.sel.value)) { status(meldung, 'note', T.alleZuordnen); return }
       let alle = true
       for (const f of felder) {
         const passt = f.sel.value === f.p.ziel
@@ -858,9 +889,9 @@ function baueBox (uebung, ctx) {
         if (!passt) alle = false
       }
       if (alle) {
-        status(meldung, 'ok', txt(T.richtig), uebung.rueckmeldung ? txt(uebung.rueckmeldung) : null)
+        status(meldung, 'ok', T.richtig, uebung.rueckmeldung)
         erledigt()
-      } else status(meldung, 'fail', txt(T.nochNicht))
+      } else status(meldung, 'fail', T.nochNicht)
     })
   }
 
@@ -873,6 +904,8 @@ function baueBox (uebung, ctx) {
       const inp = document.createElement('input')
       inp.type = 'checkbox'
       inp.id = `${uebung.id}-s${i}`
+      inp.checked = !!ctx.fortschritt[uebung.id]
+      li.classList.toggle('ab', inp.checked)
       const lab = document.createElement('label')
       lab.className = 'schritt-text'
       lab.htmlFor = inp.id
@@ -887,8 +920,11 @@ function baueBox (uebung, ctx) {
     const pruefe = () => {
       for (const k of kaesten) k.li.classList.toggle('ab', k.inp.checked)
       if (kaesten.every(k => k.inp.checked)) {
-        status(meldung, 'ok', txt(T.richtig), uebung.rueckmeldung ? txt(uebung.rueckmeldung) : null)
+        status(meldung, 'ok', T.richtig, uebung.rueckmeldung)
         erledigt()
+      } else {
+        meldung.replaceChildren()
+        erledigt(false)
       }
     }
     for (const k of kaesten) k.inp.addEventListener('change', pruefe)
@@ -903,7 +939,7 @@ function baueBox (uebung, ctx) {
       schritte: uebung.schritte,
       begruessung: uebung.begruessung,
       beiFertig: () => {
-        status(meldung, 'ok', txt(T.richtig), uebung.rueckmeldung ? txt(uebung.rueckmeldung) : null)
+        status(meldung, 'ok', T.richtig, uebung.rueckmeldung)
         erledigt()
       }
     })
@@ -915,10 +951,12 @@ function baueBox (uebung, ctx) {
     eingabe.spellcheck = false
     eingabe.value = uebung.start || ''
     eingabe.setAttribute('aria-label', txt(uebung.titel))
+    document.addEventListener('fittrack:sprache', () => eingabe.setAttribute('aria-label', txt(uebung.titel)))
     koerper.append(eingabe)
 
     const aktionen = el('div', 'uebung-aktionen')
-    const btnRun = zwei(el('button', 'btn-sm'), T.ausfuehren)
+    const btnRun = el('button', 'btn-sm')
+    btnRun.append(zwei(el('span'), T.ausfuehren))
     const btnCheck = zwei(el('button', 'btn-sm primary'), T.pruefen)
     btnRun.type = btnCheck.type = 'button'
     btnRun.append(el('kbd', null, navigator.platform.includes('Mac') ? '⌘⏎' : 'Strg+⏎'))
@@ -971,15 +1009,15 @@ function baueBox (uebung, ctx) {
 
     btnRun.addEventListener('click', async () => {
       const sql = eingabe.value.trim()
-      if (!sql) { status(meldung, 'note', txt(T.leer)); return }
-      sperren(true); status(meldung, 'note', txt(T.dbLaden))
+      if (!sql) { status(meldung, 'note', T.leer); return }
+      sperren(true); status(meldung, 'note', T.dbLaden)
       try {
         const db = await holeDb()
         const res = await fuehre(db, sql)
-        if (res.fields && res.fields.length) zeigeErgebnis('note', txt(T.ergebnis), res)
-        else status(meldung, 'note', txt(T.ausgefuehrt))
+        if (res.fields && res.fields.length) zeigeErgebnis('note', T.ergebnis, res)
+        else status(meldung, 'note', T.ausgefuehrt)
       } catch (e) {
-        status(meldung, 'fail', txt(T.fehlerSql), e.message)
+        status(meldung, 'fail', T.fehlerSql, e.message)
       } finally { sperren(false) }
     })
 
@@ -989,25 +1027,23 @@ function baueBox (uebung, ctx) {
 
     btnCheck.addEventListener('click', async () => {
       const sql = eingabe.value.trim()
-      if (!sql) { status(meldung, 'note', txt(T.leer)); return }
-      sperren(true); status(meldung, 'note', txt(T.dbLaden))
+      if (!sql) { status(meldung, 'note', T.leer); return }
+      sperren(true); status(meldung, 'note', T.dbLaden)
       try {
-        const db = await holeDb()
-        await saeen(db)
-        const meins = await fuehre(db, sql)
-        await saeen(db)
-        const soll = await fuehre(db, uebung.loesung)
-        const spaltenGleich = meins.fields.length === soll.fields.length
+        const meins = await pruefErgebnis(sql)
+        const soll = await pruefErgebnis(uebung.loesung)
+        const spaltenGleich = meins.fields.length === soll.fields.length &&
+          meins.fields.every((f, i) => f.name === soll.fields[i].name)
         if (!spaltenGleich) {
-          zeigeErgebnis('fail', txt(T.nochNicht), meins, txt(T.spaltenFalsch))
+          zeigeErgebnis('fail', T.nochNicht, meins, T.spaltenFalsch)
         } else if (gleich(meins, soll, !!uebung.sortiert)) {
-          zeigeErgebnis('ok', txt(T.richtig), meins, uebung.rueckmeldung ? txt(uebung.rueckmeldung) : null)
+          zeigeErgebnis('ok', T.richtig, meins, uebung.rueckmeldung)
           erledigt()
         } else {
-          zeigeErgebnis('fail', txt(T.nochNicht), meins, txt(T.zeilenFalsch))
+          zeigeErgebnis('fail', T.nochNicht, meins, T.zeilenFalsch)
         }
       } catch (e) {
-        status(meldung, 'fail', txt(T.fehlerSql), e.message)
+        status(meldung, 'fail', T.fehlerSql, e.message)
       } finally { sperren(false) }
     })
 
@@ -1095,6 +1131,7 @@ function baueLabNavigation (labId) {
 function karteFortschritt (nurLab = null) {
   const ziel = document.querySelector('[data-fortschritt]')
   if (!ziel) return
+  let wurdeGeloescht = false
   const zeichne = () => {
     const labs = nurLab ? LABS.filter(l => l.id === nurLab) : LABS
     const geloest = labs.reduce((s, l) => s + Math.min(Object.keys(ladeFortschritt(l.id)).length, l.uebungen), 0)
@@ -1102,7 +1139,7 @@ function karteFortschritt (nurLab = null) {
 
     const karte = el('div', 'fortschritt')
     const kopf = el('div', 'fortschritt-kopf')
-    kopf.append(zwei(el('span', 'titel'), T.stand))
+    kopf.append(el('span', 'titel', txt(T.stand)))
     kopf.append(el('span', 'zahl', `${geloest} / ${gesamt} ${txt(T.geloest)}`))
     karte.append(kopf)
 
@@ -1125,7 +1162,7 @@ function karteFortschritt (nurLab = null) {
         const a = el('a', 'name')
         a.href = l.datei
         a.setAttribute('data-lab-link', '')
-        zwei(a, l.titel)
+        a.textContent = txt(l.titel)
         li.append(a)
         li.append(el('span', 'stand', `${n} / ${l.uebungen}`))
         ul.append(li)
@@ -1133,15 +1170,16 @@ function karteFortschritt (nurLab = null) {
       karte.append(ul)
 
       const akt = el('div', 'uebung-aktionen')
-      const btn = zwei(el('button', 'btn-sm gefahr'), T.loeschen)
+      const btn = el('button', 'btn-sm gefahr', txt(T.loeschen))
       btn.type = 'button'
       btn.disabled = geloest === 0
-      const echo = el('span', 'hinweis-klein')
+      const echo = el('span', 'hinweis-klein', wurdeGeloescht ? txt(T.geloescht) : '')
+      echo.setAttribute('role', 'status')
       akt.append(btn, echo)
       btn.addEventListener('click', () => {
         if (!confirm(txt(T.loeschenFrage))) return
+        wurdeGeloescht = true
         loescheFortschritt()
-        echo.textContent = txt(T.geloescht)
       })
       karte.append(akt)
     } else if (geloest === gesamt && gesamt) {

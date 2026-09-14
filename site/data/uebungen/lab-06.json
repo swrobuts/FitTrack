@@ -58,11 +58,11 @@
       "id": "P06-02", "typ": "terminal",
       "titel": { "de": "Container starten, prüfen, stoppen", "en": "Start, check, stop a container" },
       "aufgabe": { "de": "<p>Starten Sie aus dem Image einen Container im Hintergrund mit dem Namen <code>fittrack</code> und Port 8000 auf 8000. Prüfen Sie mit <code>docker ps</code>, stoppen Sie ihn danach.</p>", "en": "<p>Run a container from the image in the background named fittrack with port 8000 to 8000, check with docker ps, then stop it.</p>" },
-      "begruessung": [ { "de": "Auftrag 2 von 3. Falls das Image fehlt: erst cd FitTrack und docker build -t fittrack .", "en": "Assignment 2 of 3." } ],
+      "begruessung": [ { "de": "Auftrag 2 von 3. Falls das Image fehlt: erst cd FitTrack und docker build -t fittrack .", "en": "Assignment 2 of 3. If the image is missing: first cd FitTrack, then docker build -t fittrack ." } ],
       "schritte": [
-        { "text": { "de": "Container im Hintergrund starten (-d), Port 8000:8000, Name fittrack", "en": "Run in background with port 8000:8000, name fittrack" }, "zustand": { "containerLaeuft": "fittrack", "portGebunden": "8000:8000" } },
+        { "text": { "de": "Container im Hintergrund starten (-d), Port 8000:8000, Name fittrack", "en": "Run in background with port 8000:8000, name fittrack" }, "zustand": { "containerLaeuft": "fittrack", "containerAbbild": "fittrack:latest", "portGebunden": "8000:8000", "imHintergrund": true } },
         { "text": { "de": "Laufende Container anzeigen", "en": "Show running containers" }, "muster": "^docker\\s+ps\\s*$" },
-        { "text": { "de": "Container stoppen", "en": "Stop the container" }, "muster": "^docker\\s+stop\\b" }
+        { "text": { "de": "Container stoppen", "en": "Stop the container" }, "muster": "^docker\\s+stop\\b", "zustand": { "containerGestoppt": "fittrack" } }
       ],
       "rueckmeldung": { "de": "Auf dem eigenen Rechner jetzt: http://localhost:8000/health im Browser, dann http://<IP>:8000 auf dem Handy. Ergebnis: Was hier läuft, läuft identisch auf jedem Server.", "en": "On your own machine now: localhost:8000/health, then the phone." }
     },
@@ -99,7 +99,7 @@
             { "de": "Der Port muss immer 8000 sein.", "en": "The port must always be 8000." }
           ],
           "richtig": [0],
-          "erklaerung": { "de": "Render setzt PORT auf einen eigenen Wert und erwartet, dass die App dort lauscht. Lokal fällt der Fehler nicht auf, weil ohne PORT der Standard gilt.", "en": "Render sets PORT to its own value." }
+          "erklaerung": { "de": "Render setzt PORT auf einen eigenen Wert und erwartet, dass die App dort lauscht. Auch lokal scheitert diese Exec-Form: Ohne Shell wird weder die Variable noch der Standardwert 8000 ausgewertet.", "en": "Render sets PORT to its own value. This exec form also fails locally: without a shell neither the variable nor the default value 8000 is expanded." }
         }
       ]
     },

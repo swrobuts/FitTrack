@@ -58,7 +58,8 @@ pip install -r requirements.txt
 ```bash
 pip install -r mcp/requirements.txt   # zusätzliche Abhängigkeiten der MCP-Tests
 pytest
-node --test frontend/tests/*.test.cjs # Frontend-Regressionstests, Node.js 20 oder neuer
+npm ci --ignore-scripts              # einmalig, Node.js 20 oder neuer
+npm test                            # Frontend und alle 41 Lab-Übungen
 ```
 
 Auf `main` sollen alle Tests bestehen. Im Branch `starter` ist der Test zu Beginn rot: `ModuleNotFoundError: No module named 'app.main'`. Das ist dort Absicht: Der Test beschreibt, was die App können soll, bevor es den Code gibt.
@@ -192,7 +193,7 @@ Die Referenzlösung läuft unter <https://fittrack-k7gg.onrender.com>. Der Free-
 
 ## Tests bei jedem Push (GitHub Actions)
 
-`.github/workflows/tests.yml` führt `pytest` bei jedem Push und Pull Request aus. Das Ergebnis steht im Reiter „Actions“ und als Haken oder Kreuz am Commit. Rote Tests fallen so auf, bevor jemand den Stand übernimmt.
+`.github/workflows/tests.yml` führt `pytest` und `npm test` bei jedem Push und Pull Request aus. Das Ergebnis steht im Reiter „Actions“ und als Haken oder Kreuz am Commit. Rote Tests fallen so auf, bevor jemand den Stand übernimmt.
 
 ## Trainingsbot und MCP-Server
 
@@ -225,6 +226,8 @@ Rechnet die Erwartungswerte für das Fixture selbst aus, bevor ihr die KI nach C
 ## Lernumgebung FitTrack-Lab
 
 Der Ordner `site/` enthält eine interaktive Lernumgebung zum Kurs: elf Labs entlang der Schritte, mit den Prompts zum Kopieren, Mermaid-Diagrammen, einer nachgebildeten Konsole für `git` und `docker`, SQLite im Browser mit dem Schema der App und 41 Übungen. Sie wird per GitHub Actions auf GitHub Pages veröffentlicht: <https://swrobuts.github.io/FitTrack/>. Lokal ansehen: `python3 -m http.server 8080 -d site` und <http://localhost:8080> öffnen.
+
+Die Tests unter `tests/lab/` führen alle Übungen mit richtigen und falschen Eingaben aus, einschließlich der drei Shell-Varianten, Fortschrittsspeicherung und echter SQLite-Abfragen über sql.js. Sie benötigen weder Docker noch einen laufenden Webserver. Die Prüffunktion verwendet für Eingabe und Musterlösung jeweils eine frische Datenbank; die freie SQL-Konsole behält ihren Zustand bis zum Zurücksetzen. Die Python-Tests vergleichen zusätzlich den Lab-Datenexport mit der App-Datenbank. Umfang, Ergebnisse und Grenzen der Prüfung stehen in [docs/lab-pruefung.md](docs/lab-pruefung.md).
 
 ## Für Dozierende
 

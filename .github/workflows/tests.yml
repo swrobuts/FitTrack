@@ -28,5 +28,8 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Frontend-Regressionstests ausführen
-        run: node --test frontend/tests/*.test.cjs
+      - name: JavaScript-Testwerkzeuge installieren
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Frontend und alle Lab-Übungen prüfen
+        run: npm test

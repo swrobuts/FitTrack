@@ -11,3 +11,8 @@ scripts
 *.md
 # Der MCP-Server läuft auf dem Rechner, nicht im Container
 mcp
+node_modules
+frontend/tests
+tests
+package.json
+package-lock.json
