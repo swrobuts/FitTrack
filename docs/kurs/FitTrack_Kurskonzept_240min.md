@@ -182,6 +182,8 @@ US-3: Als Entwickler möchte ich einen Health-Endpunkt,
       Akzeptanz: GET /health liefert {"status": "ok"}.
 ```
 
+Umgesetzt wird US-3 zuerst: `/health` kommt ohne Datenbank aus, deshalb läuft die Schleife aus rotem Test, Prompt, grünem Test und Commit einmal ganz durch, bevor es inhaltlich wird. Die Nummer ist die Kennung der Story, die Reihenfolge legt das Backlog fest.
+
 ### Der Test-First-Schritt (vorgeführt, 15 Min)
 
 Kernbotschaft an die Studis: **„Wir schreiben die Tests BEVOR Claude den Code schreibt – dann prüfen wir gegen das Soll-Verhalten, nicht gegen das, was die KI zufällig gebaut hat."**
