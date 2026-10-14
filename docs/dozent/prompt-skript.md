@@ -133,6 +133,8 @@ pytest
 
 **Story:** Als Entwickler möchte ich einen Health-Endpunkt, damit ich später im Container prüfen kann, ob die App läuft. Akzeptanz: `GET /health` liefert `{"status": "ok"}`.
 
+**Warum vor US-1:** `/health` kommt ohne Datenbank aus, deshalb läuft die Schleife aus rotem Test, Prompt, grünem Test und Commit hier einmal ganz durch, bevor es inhaltlich wird. Die Nummer ist die Kennung der Story, die Reihenfolge legt das Backlog fest.
+
 **Test:** steht bereits in `test_api.py`. `pytest` ist rot.
 
 **Prompt:**

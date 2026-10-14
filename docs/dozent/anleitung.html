@@ -356,6 +356,7 @@ pytest
 <hr />
 </div></section><section class="schritt" id="ablauf-schritt-1-us-3-health-endpunkt-termin-1-ab-0-55"><header class="schritt-kopf"><label class="erledigt"><input type="checkbox" data-schritt="ablauf-schritt-1-us-3-health-endpunkt-termin-1-ab-0-55"> <span>erledigt</span></label><h2>Schritt 1: US-3 Health-Endpunkt (Termin 1, ab 0:55)</h2></header><div class="schritt-inhalt">
 <p class="label label-info"><strong>Story:</strong> Als Entwickler möchte ich einen Health-Endpunkt, damit ich später im Container prüfen kann, ob die App läuft. Akzeptanz: <code>GET /health</code> liefert <code>{"status": "ok"}</code>.</p>
+<p class="label label-info"><strong>Warum vor US-1:</strong> <code>/health</code> kommt ohne Datenbank aus, deshalb läuft die Schleife aus rotem Test, Prompt, grünem Test und Commit hier einmal ganz durch, bevor es inhaltlich wird. Die Nummer ist die Kennung der Story, die Reihenfolge legt das Backlog fest.</p>
 <p class="label label-handlung"><strong>Test:</strong> steht bereits in <code>test_api.py</code>. <code>pytest</code> ist rot.</p>
 <p class="label label-handlung"><strong>Prompt:</strong></p>
 <div class="block block-prompt"><div class="block-kopf"><span>Prompt für den Chat</span><button type="button" class="kopieren">Kopieren</button></div><pre><code>Du bist ein erfahrener Python-Entwickler. Wir bauen mit FastAPI eine kleine
